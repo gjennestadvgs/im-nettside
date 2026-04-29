@@ -1,7 +1,7 @@
 I DAG
-- index.html
-- css fil (style.css)
+- [ ] index.html
+- [ ] css fil (style.css)
 
 I MORGEN
-- javascript
-- flere sider
+- [ ] javascript
+- [ ] flere sider
