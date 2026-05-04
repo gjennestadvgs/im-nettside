@@ -1,0 +1,218 @@
+<!doctype html>
+<html>
+
+<head>
+    <style>
+        .back-button {
+            margin: 15px 0 0 40px;
+            background: none;
+            font-size: 40px;
+            cursor: pointer;
+            border: none;
+            z-index: 1005;
+        }
+
+        .flex-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr 220px;
+            /* bilder | innhold | info */
+            gap: 32px;
+            align-items: start;
+            min-height: calc(100vh - 56px);
+        }
+
+        .bilde-kolonne {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 10px;
+            width: 100%;
+            margin-left: 10px;
+        }
+
+        .bilde-kolonne img,
+        .bilde-kolonne i.fab.fa-github {
+            border-radius: 8px;
+            width: 30vw;
+            max-width: 350px;
+            height: auto;
+            font-size: 12vw;
+            /* gjør ikonet stort */
+            color: #24292f;
+            display: block;
+            margin: 0 auto;
+            text-align: center;
+            padding: 32px 0;
+            /* gir lik høyde og luft rundt */
+        }
+
+        .inhold {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            max-width: 600px;
+        }
+
+        .inhold h1 {
+            margin-top: 10px;
+        }
+
+        .info {
+            position: fixed;
+            top: 56px;
+            right: 0;
+            width: 200px;
+            padding: 20px;
+            font-size: 0.9em;
+            text-align: left;
+            z-index: 1;
+            overflow-y: auto;
+            box-sizing: border-box;
+            border-radius: 8px;
+            height: calc(100vh - 56px);
+        }
+
+        .rad {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 32px;
+            margin-bottom: 20px;
+        }
+
+        .rad img {
+            width: 30vw;
+            max-width: 350px;
+            border-radius: 8px;
+            height: auto;
+        }
+    </style>
+    <title>Prosjekt</title>
+    <link rel="stylesheet" href="css/styling.css">
+</head>
+
+<body>
+    <!-- navigeringsmeny -->
+
+    <li><a id="menuButton"><i class="fa fa-bars"></i></a></li>
+    </ul>
+    <div class="flex-container">
+        <div class="bilde-kolonne" id="bilde-kolonne"></div>
+        <div class="inhold" id="inhold"></div>
+        <div class="info" id="info"></div>
+    </div>
+    <script>
+        // Prosjekt-array
+        const prosjekter = [
+            {
+                id: "film-plakat",
+                tittel: "Film plakat",
+                bilde: "Filmplakat_above-the-law.jpg",
+                tekstfil: "film-plakat.txt"
+            },
+            {
+                id: "portrett-intervju",
+                tittel: "Portrett intervju",
+                bilde: "bilder/prosjekt-bilder/portrett-intervju.png",
+                tekstfil: "tekst/portrett-intervju.txt"
+            },
+            {
+                id: "øve-oppgaver",
+                tittel: "Øve oppgaver",
+                bilde: "bilder/prosjekt-bilder/øve-oppgave.png",
+                tekstfil: "tekst/øve-oppgaver.txt"
+            },
+            {
+                id: "github",
+                tittel: "GitHub",
+                ikon: "fab fa-github",
+                tekstfil: "tekst/github.txt"
+            },
+            {
+                id: "khan-academy",
+                tittel: "Khan Academy",
+                bilde: "bilder/prosjekt-bilder/Khan_Academy.png",
+                tekstfil: "tekst/khan-academy.txt"
+            },
+
+        ];
+
+        // Hent prosjekt-ID fra URL
+        function getQueryParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
+
+        function visProsjekt() {
+            const id = getQueryParam('id');
+            const prosjekt = prosjekter.find(p => p.id === id);
+            if (!prosjekt) {
+                document.querySelector('.inhold').innerHTML = "<h1>Prosjekt ikke funnet</h1>";
+                document.querySelector('.bilde-kolonne').innerHTML = "";
+                document.querySelector('.info').innerHTML = "";
+                return;
+            }
+            // Bilde eller ikon
+            let bildeHtml = prosjekt.bilde
+                ? `<img src="${prosjekt.bilde}" alt="${prosjekt.tittel}">`
+                : `<i class="${prosjekt.ikon}" style="font-size:220px; color:#24292f; width:100%; height:450px; display:block; text-align:center; line-height:450px;"></i>`;
+            document.querySelector('.bilde-kolonne').innerHTML = bildeHtml;
+
+            // Hent tekst fra fil
+            fetch(prosjekt.tekstfil)
+                .then(response => response.text())
+                .then(data => {
+                    const deler = data.split('---');
+                    // Behold avsnitt: del opp på dobbel linjeskift og lag <p> for hvert
+                    const avsnitt = deler[0]
+                        .split(/\n\s*\n/) // Del på tom linje (avsnitt)
+                        .map(a => `<p>${a.trim()}</p>`)
+                        .join('');
+                    document.querySelector('.inhold').innerHTML = `
+            <h1>${prosjekt.tittel}</h1>
+            ${avsnitt}
+          `;
+                    if (deler[1]) {
+                        // Del opp info-delen på linjeskift
+                        const infoItems = deler[1].split('\n').filter(line => line.trim() !== '');
+                        // Del opp i vanlige info og linker
+                        const infoList = infoItems
+                            .filter(item => !item.includes('<a'))
+                            .map(item => `<li>${item}</li>`).join('');
+                        const linkList = infoItems
+                            .filter(item => item.includes('<a'))
+                            .join('<br>');
+                        // Vis liste og linker separat
+                        document.querySelector('.info').innerHTML =
+                            (infoList ? `<ul>${infoList}</ul>` : '') +
+                            (linkList ? `<div class="link">${linkList}</div>` : '');
+                    } else {
+                        document.querySelector('.info').innerHTML = "";
+                    }
+                })
+                .catch(() => {
+                    document.querySelector('.inhold').innerHTML = `
+            <h1>${prosjekt.tittel}</h1>
+            <p>Fant ikke prosjektbeskrivelse.</p>
+          `;
+                });
+
+            // Info-boks
+            document.querySelector('.info').innerHTML = `
+        <p><strong>Teknologi:</strong> ${prosjekt.tittel.includes("GitHub") ? "GitHub" : "HTML, CSS, JS"}</p>
+        <p><strong>År:</strong> 2024</p>
+      `;
+        }
+
+        document.getElementById('menuButton').addEventListener('click', function () {
+            var menuContent = document.getElementById('menuContent');
+            menuContent.classList.toggle('hidden');
+        });
+
+        document.addEventListener('DOMContentLoaded', visProsjekt);
+    </script>
+    <script src="Js/icon-color.js"></script>
+</body>
+
+</html>
