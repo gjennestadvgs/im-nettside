@@ -90,3 +90,9 @@ img {
     transform: scale(1.03);
     /* Eller 1.03, velg en standard */
 }
+
+/* bildene på hovudsiden */
+.move-img {
+    position: absolute;
+    translate(-50%, -50%);
+}
