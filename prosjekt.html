@@ -95,7 +95,7 @@
 <body>
     <!-- navigeringsmeny -->
 
-    <li><a id="menuButton"><i class="fa fa-bars"></i></a></li>
+    <li><a id="menuButton"><i></i></a></li>
     </ul>
     <div class="flex-container">
         <div class="bilde-kolonne" id="bilde-kolonne"></div>
@@ -183,12 +183,6 @@
                         const linkList = infoItems
                             .filter(item => item.includes('<a'))
                             .join('<br>');
-                        // Vis liste og linker separat
-                        document.querySelector('.info').innerHTML =
-                            (infoList ? `<ul>${infoList}</ul>` : '') +
-                            (linkList ? `<div class="link">${linkList}</div>` : '');
-                    } else {
-                        document.querySelector('.info').innerHTML = "";
                     }
                 })
                 .catch(() => {
@@ -198,17 +192,7 @@
           `;
                 });
 
-            // Info-boks
-            document.querySelector('.info').innerHTML = `
-        <p><strong>Teknologi:</strong> ${prosjekt.tittel.includes("GitHub") ? "GitHub" : "HTML, CSS, JS"}</p>
-        <p><strong>År:</strong> 2024</p>
-      `;
         }
-
-        document.getElementById('menuButton').addEventListener('click', function () {
-            var menuContent = document.getElementById('menuContent');
-            menuContent.classList.toggle('hidden');
-        });
 
         document.addEventListener('DOMContentLoaded', visProsjekt);
     </script>
