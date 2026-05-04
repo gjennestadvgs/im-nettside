@@ -108,13 +108,13 @@
             {
                 id: "film-plakat",
                 tittel: "Film plakat",
-                bilde: "Filmplakat_above-the-law.jpg",
-                tekstfil: "film-plakat.txt"
+                bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
+                tekstfil: "Assets/tekst/film-plakat.txt"
             },
             {
                 id: "portrett-intervju",
                 tittel: "Portrett intervju",
-                bilde: "bilder/prosjekt-bilder/portrett-intervju.png",
+                bilde: "Assets/bilder/portrett-intervju.png",
                 tekstfil: "tekst/portrett-intervju.txt"
             },
             {
@@ -150,7 +150,6 @@
             if (!prosjekt) {
                 document.querySelector('.inhold').innerHTML = "<h1>Prosjekt ikke funnet</h1>";
                 document.querySelector('.bilde-kolonne').innerHTML = "";
-                document.querySelector('.info').innerHTML = "";
                 return;
             }
             // Bilde eller ikon
@@ -190,6 +189,7 @@
             <h1>${prosjekt.tittel}</h1>
             <p>Fant ikke prosjektbeskrivelse.</p>
           `;
+                    document.querySelector('.info').innerHTML = "";
                 });
 
         }
