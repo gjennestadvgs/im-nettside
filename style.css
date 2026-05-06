@@ -1,5 +1,52 @@
 body {
+    background-color: white;
     margin: 0;
     padding: 25px;
     overflow-x: hidden;
+}
+
+#knapper li a {
+    color: rgb(0, 0, 0);
+    /* tekstfarge på knappene til navigasjonsbaren */
+}
+
+#knapper .menuContent li a.active {
+    text-decoration: underline;
+}
+
+/* navigerings bar */
+#knapper {
+    cursor: pointer;
+    position: fixed;
+    right: 20px;
+    top: 0;
+    font-size: 20px;
+    font-family: Britannic, sans-serif;
+    list-style-type: none;
+    display: flex;
+    justify-content: flex-end;
+
+}
+
+#menuContent {
+    font-size: 18px;
+    font-family: Britannic, sans-serif;
+    position: fixed;
+    top: 56px;
+    right: 0;
+    z-index: 1003;
+    padding: 0;
+    min-width: 180px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+#menuContent.hidden {
+    display: none;
+}
+
+#menuContent ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
 }

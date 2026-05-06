@@ -1,4 +1,4 @@
-let bgColour = [120,0,120]
+let bgColour = [120, 0, 120]
 //document.body.style.backgroundColor = "rgb(" + bgColour[0] + "," + bgColour[1] + "," + bgColour[2] + ")"
 
 let title = document.querySelector("h2")
@@ -10,10 +10,18 @@ let blue = document.querySelector("#blue")
 function makeNumber(check) {
     if (isNaN(check)) { // Tusen takk MDN web docs
         check = 0
-        console.log(typeof(check))
+        console.log(typeof (check))
     }
     return check
 }
+document.getElementById('menuButton').addEventListener('click', function () {
+    var menuContent = document.getElementById('menuContent');
+    if (menuContent.classList.contains('hidden')) {
+        menuContent.classList.remove('hidden');
+    } else {
+        menuContent.classList.add('hidden');
+    }
+});
 
 
 title.addEventListener("click", function () {
