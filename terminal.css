@@ -1,0 +1,111 @@
+/* Flytende knapp som åpner terminalen */
+#terminal-knapp {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    border: none;
+    font-family: 'Courier New', monospace;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 9998;
+}
+
+#terminal-knapp:hover {
+    background-color: #333333;
+}
+
+/* Selve terminalvinduet */
+#terminal-vindu {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 750px;
+    max-width: calc(100vw - 40px);
+    height: 600px;
+    max-height: calc(100vh - 100px);
+    background-color: #0d0d0d;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+#terminal-vindu.skjult {
+    display: none;
+}
+
+/* Topplinje med tittel og lukkeknapp */
+#terminal-topp {
+    background-color: #1a1a1a;
+    color: #aaaaaa;
+    padding: 6px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+#terminal-lukk {
+    background: none;
+    border: none;
+    color: #aaaaaa;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    line-height: 1;
+}
+
+#terminal-lukk:hover {
+    color: #ffffff;
+}
+
+/* Området der tekst skrives ut */
+#terminal-output {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.terminal-linje {
+    margin: 0 0 4px 0;
+}
+
+/* Input-raden nederst */
+#terminal-input-rad {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-top: 1px solid #2a2a2a;
+}
+
+#terminal-input-rad .prompt {
+    color: #ffffff;
+    margin-right: 8px;
+}
+
+#terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    outline: none;
+}
