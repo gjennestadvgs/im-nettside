@@ -4,11 +4,29 @@
 <head>
     <title>IM nettside</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 
 <body>
-    <h1>IM nettside</h1>
-    <br>
+    <ul id="knapper">
+        <li><a id="menuButton"><i class="fa-solid fa-bars"></i></a></li>
+    </ul>
+
+
+    <div id="menuContent" class="hidden">
+        <ul>
+            <li><a id="prosjekter">Prosjekter</a></li>
+            <li><a href="kontakt.html">Kontakt</a></li>
+            <li><a href="om-meg.html">Om meg</a></li>
+        </ul>
+    </div>
+
+    <div id="prosjekt-liste" class="hidden">
+        <ul>
+            <li><a href="prosjekt.html?id=test-id">test</a></li>
+        </ul>
+    </div>
+
     <div class="prosjekt-grid">
         <a href="prosjekt.html?id=test-id">
             <img src="Assets/bilder/filmplakat_above-the-law.jpg"
@@ -16,5 +34,6 @@
         </a>
     </div>
 </body>
+<script src="script.js"></script>
 
 </html>

@@ -1,4 +1,4 @@
-let bgColour = [120,0,120]
+let bgColour = [120, 0, 120]
 //document.body.style.backgroundColor = "rgb(" + bgColour[0] + "," + bgColour[1] + "," + bgColour[2] + ")"
 
 let title = document.querySelector("h2")
@@ -10,10 +10,43 @@ let blue = document.querySelector("#blue")
 function makeNumber(check) {
     if (isNaN(check)) { // Tusen takk MDN web docs
         check = 0
-        console.log(typeof(check))
+        console.log(typeof (check))
     }
     return check
 }
+let button = document.getElementById('prosjekter');
+
+document.getElementById('menuButton').addEventListener('click', function () {
+    var menuContent = document.getElementById('menuContent');
+    if (menuContent.classList.contains('hidden')) {
+        menuContent.classList.remove('hidden');
+    } else {
+        menuContent.classList.add('hidden');
+    }
+});
+let hideTimeout;
+
+document.getElementById('prosjekter').addEventListener('mouseenter', function () {
+    clearTimeout(hideTimeout); // Stopper menyen fra å forsvinne hvis vi går tilbake
+    document.getElementById('prosjekt-liste').classList.remove('hidden');
+});
+
+document.getElementById('prosjekter').addEventListener('mouseleave', function () {
+    // Venter litt før den skjules, slik at vi rekker å flytte musen ned til listen
+    hideTimeout = setTimeout(function () {
+        document.getElementById('prosjekt-liste').classList.add('hidden');
+    }, 200);
+});
+
+document.getElementById('prosjekt-liste').addEventListener('mouseenter', function () {
+    clearTimeout(hideTimeout); // Holder menyen åpen når vi har musen over listen
+});
+
+document.getElementById('prosjekt-liste').addEventListener('mouseleave', function () {
+    hideTimeout = setTimeout(function () {
+        document.getElementById('prosjekt-liste').classList.add('hidden');
+    }, 200);
+});
 
 
 title.addEventListener("click", function () {
