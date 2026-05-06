@@ -11,9 +11,20 @@
             <script src="script.js"></script>
             <script>
                 const images = document.querySelectorAll('img.move-img');
+                
+                const zoomSpeed = 1
                 let x = 50, y = 50;
                 let centerDistance = 0;
-                let moveX = -1, moveY = 0;
+                let moveX, moveY;
+
+                function setDir() {
+                    let dir = Math.random() * 320;
+                    let angleInRadians = dir * (Math.PI / 180);
+                    moveX = zoomSpeed * Math.cos(angleInRadians);
+                    moveY = zoomSpeed * Math.sin(angleInRadians);
+                    x = 50, y = 50;
+                }
+                setDir();
 
                 function moveImages() {
                     x += moveX;
@@ -25,16 +36,13 @@
                         img.style.height = centerDistance + 'vh';
                         img.style.zIndex = centerDistance;
                     });
-                    if (isElementOffScreen(images[0])) {
-                        
-                    }
+                    if (isElementOffScreen(images[0])) {setDir()}
 
 
                     requestAnimationFrame(moveImages)
-
                 }
 
-                moveImages()
+                moveImages();
 
                 document.documentElement.style.overflow = 'hidden';
             </script>
