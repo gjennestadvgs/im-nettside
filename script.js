@@ -25,3 +25,34 @@ title.addEventListener("click", function () {
     document.body.style.backgroundColor = "rgb(" + bgColour[0] + "," + bgColour[1] + "," + bgColour[2] + ")"
 })
 bgColour[0] = Number("a")
+
+function getDistanceToCenter(element) {
+    const elemRect = element.getBoundingClientRect();
+    const elemCenterX = elemRect.left + elemRect.width / 2;
+    const elemCenterY = elemRect.top + elemRect.height / 2;
+
+    const pageCenterX = window.innerWidth / 2;
+    const pageCenterY = window.innerHeight / 2;
+
+    // Calculate distance in pixels
+    const deltaX = elemCenterX - pageCenterX;
+    const deltaY = elemCenterY - pageCenterY;
+    const distanceInPx = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+    // Calculate the maximum possible distance (corner to center)
+    const maxDistance = Math.sqrt(pageCenterX ** 2 + pageCenterY ** 2);
+
+    // Convert to percentage
+    return (distanceInPx / maxDistance) * 100;
+}
+
+function isElementOffScreen(img) {
+  const rect = img.getBoundingClientRect();
+  const isVisible = !(
+    rect.top > window.innerHeight || 
+    rect.bottom < 0 || 
+    rect.left > window.innerWidth || 
+    rect.right < 0
+  );
+  return !isVisible; // Returns true if the image is off-screen
+}

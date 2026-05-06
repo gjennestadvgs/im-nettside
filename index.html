@@ -5,25 +5,36 @@
             <link rel="stylesheet" href="style.css">
         </head>
         <body>
-            <h1 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">Overskrift her</h1>
+            <h1 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100;">Overskrift her</h1>
             <img src="Assets/bilder/filmplakat_above-the-law.jpg" alt="Bilde" class="move-img" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
             
             <script src="script.js"></script>
             <script>
                 const images = document.querySelectorAll('img.move-img');
-                let x = 0, y = 50, Hsize = 
-                let moveX = 0, moveY = 0;
-
+                let x = 50, y = 50;
+                let centerDistance = 0;
+                let moveX = -1, moveY = 0;
 
                 function moveImages() {
                     x += moveX;
                     y += moveY;
+                    centerDistance = getDistanceToCenter(images[0])
                     images.forEach(img => {
-                        img.style.left = x + '%';
+                        img.style.left = x + 'vw';
+                        img.style.top = y + 'vh';
+                        img.style.height = centerDistance + 'vh';
+                        img.style.zIndex = centerDistance;
                     });
+                    if (isElementOffScreen(images[0])) {
+                        
+                    }
+
+
+                    requestAnimationFrame(moveImages)
 
                 }
 
+                moveImages()
 
                 document.documentElement.style.overflow = 'hidden';
             </script>

@@ -6,4 +6,5 @@ body {
 .move-img {
     position: absolute;
     transform: translate(-50%, -50%);
+    object-fit: cover;
 }
