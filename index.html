@@ -11,10 +11,25 @@
 
             <script src="script.js"></script>
             <script>
-                class move-img {
-                     constructor(imageId) {
-                
-                     }
+                const images = document.querySelectorAll('img.move-img');
+                let x = 0, y = 50
+                let moveX = 0, moveY = 0;
+
+
+                function moveImages() {
+                    x += moveX;
+                    y += moveY;
+                    img.forEach(img => {
+                        img.style.left = x + '%';
+                    });
+
+                }
+
+
+
+
+
+
                 document.documentElement.style.overflow = 'hidden';
                 
 
