@@ -14,39 +14,48 @@ function makeNumber(check) {
     }
     return check
 }
-let button = document.getElementById('prosjekter');
+document.querySelectorAll('.hover-knapp').forEach(function (knapp) {
+    let timeout;
+    let menyId = knapp.getAttribute('data-target'); // Finner ID-en til menyen
+    let meny = document.getElementById(menyId);
 
-document.getElementById('menuButton').addEventListener('click', function () {
-    var menuContent = document.getElementById('menuContent');
-    if (menuContent.classList.contains('hidden')) {
-        menuContent.classList.remove('hidden');
-    } else {
-        menuContent.classList.add('hidden');
-    }
-});
-let hideTimeout;
+    if (!meny) return;
 
-document.getElementById('prosjekter').addEventListener('mouseenter', function () {
-    clearTimeout(hideTimeout); // Stopper menyen fra å forsvinne hvis vi går tilbake
-    document.getElementById('prosjekt-liste').classList.remove('hidden');
-});
+    knapp.addEventListener('mouseenter', function () {
+        clearTimeout(timeout);
+        meny.classList.remove('hidden');
+    });
 
-document.getElementById('prosjekter').addEventListener('mouseleave', function () {
-    // Venter litt før den skjules, slik at vi rekker å flytte musen ned til listen
-    hideTimeout = setTimeout(function () {
-        document.getElementById('prosjekt-liste').classList.add('hidden');
-    }, 200);
-});
+    knapp.addEventListener('mouseleave', function () {
+        timeout = setTimeout(function () {
+            meny.classList.add('hidden');
+        }, 200);
+    });
 
-document.getElementById('prosjekt-liste').addEventListener('mouseenter', function () {
-    clearTimeout(hideTimeout); // Holder menyen åpen når vi har musen over listen
+    meny.addEventListener('mouseenter', function () {
+        clearTimeout(timeout);
+    });
+
+    meny.addEventListener('mouseleave', function () {
+        timeout = setTimeout(function () {
+            meny.classList.add('hidden');
+        }, 200);
+    });
 });
 
-document.getElementById('prosjekt-liste').addEventListener('mouseleave', function () {
-    hideTimeout = setTimeout(function () {
-        document.getElementById('prosjekt-liste').classList.add('hidden');
-    }, 200);
+// FOR ALLE KLIKK-KNAPPER
+document.querySelectorAll('.klikk-knapp').forEach(function (knapp) {
+    let menyId = knapp.getAttribute('data-target');
+    let meny = document.getElementById(menyId);
+
+    if (!meny) return;
+
+    knapp.addEventListener('click', function () {
+        meny.classList.toggle('hidden');
+    });
 });
+
+
 
 
 title.addEventListener("click", function () {
