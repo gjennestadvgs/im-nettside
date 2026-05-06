@@ -26,11 +26,140 @@ function skrivLinje(tekst) {
     lagre();
 }
 
+// Skriver et bilde inn i terminalen (brukes f.eks. av /meme).
+// Bilder lagres ikke i historikken siden filer kan flyttes/slettes.
+function skrivBilde(src, alt) {
+    const linje = document.createElement('div');
+    linje.classList.add('terminal-linje');
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = alt || '';
+    linje.appendChild(img);
+    terminalOutput.appendChild(linje);
+    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+}
+
 // Tømmer alt som er skrevet ut.
 function tømOutput() {
     terminalOutput.innerHTML = '';
     terminalLinjer = [];
     lagre();
+}
+
+// Velkomstmelding. Kalles ved første besøk og etter /clear.
+function visVelkomst() {
+    skrivLinje('Velkommen til IM-terminalen!');
+    skrivLinje('Skriv "/help" for å se hva du kan gjøre.');
+}
+
+// --- Sidestil: bg-farge, tekstfarge og font lagres mellom sidebytter ---
+
+function settBgColor(farge) {
+    document.body.style.backgroundColor = farge;
+    localStorage.setItem('side_bg', farge);
+}
+
+function settTxtColor(farge) {
+    document.body.style.color = farge;
+    localStorage.setItem('side_txt', farge);
+}
+
+function settFont(font) {
+    document.body.style.fontFamily = font;
+    localStorage.setItem('side_font', font);
+}
+
+function lastInnSidestil() {
+    const bg = localStorage.getItem('side_bg');
+    const txt = localStorage.getItem('side_txt');
+    const font = localStorage.getItem('side_font');
+    if (bg) document.body.style.backgroundColor = bg;
+    if (txt) document.body.style.color = txt;
+    if (font) document.body.style.fontFamily = font;
+}
+
+// Setter sidestilen tilbake til standard (det CSS-en bestemmer).
+function nullstillSidestil() {
+    localStorage.removeItem('side_bg');
+    localStorage.removeItem('side_txt');
+    localStorage.removeItem('side_font');
+    document.body.style.backgroundColor = '';
+    document.body.style.color = '';
+    document.body.style.fontFamily = '';
+}
+
+// Åpner nettleserens innebygde fargevelger og kaller callback med valgt farge.
+function åpneColorPicker(callback) {
+    const input = document.createElement('input');
+    input.type = 'color';
+    input.style.position = 'fixed';
+    input.style.left = '-9999px';
+    document.body.appendChild(input);
+    input.addEventListener('change', function () {
+        callback(input.value);
+        document.body.removeChild(input);
+    });
+    input.click();
+}
+
+// Matrix easter egg: fullskjerm-overlay med rullende tegn.
+// Avsluttes med klikk eller Esc.
+function startMatrix() {
+    if (document.getElementById('matrix-overlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'matrix-overlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:black;z-index:99999;cursor:pointer;';
+
+    const canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    overlay.appendChild(canvas);
+
+    const beskjed = document.createElement('div');
+    beskjed.textContent = 'Klikk eller trykk Esc for å avslutte';
+    beskjed.style.cssText = 'position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#0F0;font-family:monospace;font-size:12px;opacity:0.6;';
+    overlay.appendChild(beskjed);
+
+    document.body.appendChild(overlay);
+
+    const ctx = canvas.getContext('2d');
+    const TEGN = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン01';
+    const fontSize = 16;
+    const kolonner = Math.floor(canvas.width / fontSize);
+    const drops = new Array(kolonner).fill(1);
+
+    let kjører = true;
+    function tegnFrame() {
+        if (!kjører) return;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0F0';
+        ctx.font = fontSize + 'px monospace';
+        for (let i = 0; i < drops.length; i++) {
+            const c = TEGN[Math.floor(Math.random() * TEGN.length)];
+            ctx.fillText(c, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+        requestAnimationFrame(tegnFrame);
+    }
+    tegnFrame();
+
+    function stopp() {
+        kjører = false;
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        document.removeEventListener('keydown', escHandler);
+    }
+
+    function escHandler(e) {
+        if (e.key === 'Escape') stopp();
+    }
+
+    overlay.addEventListener('click', stopp);
+    document.addEventListener('keydown', escHandler);
 }
 
 // --- Intern logikk ---
@@ -107,6 +236,9 @@ function kjørKommando(linje) {
 
 // Bygger terminalens HTML og setter alt i gang.
 function startTerminal() {
+    // 0. Gjenopprett bakgrunnsfarge / tekstfarge / font fra forrige besøk
+    lastInnSidestil();
+
     // 1. Sett HTML inn i body
     document.body.insertAdjacentHTML('beforeend', `
         <button id="terminal-knapp" title="Åpne terminal">&gt;_</button>
@@ -138,8 +270,7 @@ function startTerminal() {
 
     // 4. Hvis det er første besøk, vis velkomstmelding
     if (terminalLinjer.length === 0) {
-        skrivLinje('Velkommen til IM-terminalen!');
-        skrivLinje('Skriv /help for å se tilgjengelige kommandoer.');
+        visVelkomst();
     }
 
     // 5. Bind hendelser
