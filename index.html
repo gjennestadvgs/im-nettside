@@ -12,7 +12,7 @@
             <script>
                 const images = document.querySelectorAll('img.move-img');
                 
-                const zoomSpeed = 1
+                const zoomSpeed = 1;
                 let x = 50, y = 50;
                 let centerDistance = 0;
                 let moveX, moveY;
@@ -27,9 +27,9 @@
                 setDir();
 
                 function moveImages() {
+                    centerDistance = getDistanceToCenter(images[0])
                     x += moveX;
                     y += moveY;
-                    centerDistance = getDistanceToCenter(images[0])
                     images.forEach(img => {
                         img.style.left = x + 'vw';
                         img.style.top = y + 'vh';
