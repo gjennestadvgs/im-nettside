@@ -3,3 +3,7 @@ body {
     padding: 25px;
     overflow-x: hidden;
 }
+.move-img {
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
