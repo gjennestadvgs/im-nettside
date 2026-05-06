@@ -6,13 +6,25 @@
         </head>
         <body>
             <h1>Overskrift her</h1>
-            <h2>Underskrift her</h2>
-            <br>
-            <p>
-                Dette er <br>
-                hovudtexten
-            </p>
 
             <script src="script.js"></script>
+            <script>
+                const images = document.querySelectorAll('img.move-img');
+                let x = 0, y = 50
+                let moveX = 0, moveY = 0;
+
+
+                function moveImages() {
+                    x += moveX;
+                    y += moveY;
+                    images.forEach(img => {
+                        img.style.left = x + '%';
+                    });
+
+                }
+
+
+                document.documentElement.style.overflow = 'hidden';
+            </script>
         </body>
     </html>
