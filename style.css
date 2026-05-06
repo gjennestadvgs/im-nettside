@@ -5,20 +5,20 @@ body {
     overflow-x: hidden;
 }
 
+a {
+    color: #000000;
+}
+
 #knapper li a {
     color: rgb(0, 0, 0);
     /* tekstfarge på knappene til navigasjonsbaren */
-}
-
-#knapper .menuContent li a.active {
-    text-decoration: underline;
 }
 
 /* navigerings bar */
 #knapper {
     cursor: pointer;
     position: fixed;
-    right: 20px;
+    left: 0px;
     top: 0;
     font-size: 20px;
     font-family: Britannic, sans-serif;
@@ -29,19 +29,41 @@ body {
 }
 
 #menuContent {
+    color: black;
     font-size: 18px;
     font-family: Britannic, sans-serif;
     position: fixed;
-    top: 56px;
-    right: 0;
+    top: 20px;
+    left: 70px;
     z-index: 1003;
     padding: 0;
-    min-width: 180px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+}
+
+#prosjekt-liste {
+    color: black;
+    font-size: 18px;
+    font-family: Britannic, sans-serif;
+    position: fixed;
+    top: 50px;
+    left: 70px;
+    z-index: 1003;
+    padding: 0;
+}
+
+#prosjekt-liste ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 #menuContent.hidden {
+    display: none;
+}
+
+#prosjekt-liste.hidden {
     display: none;
 }
 
@@ -49,4 +71,7 @@ body {
     list-style-type: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
 }

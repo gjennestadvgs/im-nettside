@@ -14,6 +14,8 @@ function makeNumber(check) {
     }
     return check
 }
+let button = document.getElementById('prosjekter');
+
 document.getElementById('menuButton').addEventListener('click', function () {
     var menuContent = document.getElementById('menuContent');
     if (menuContent.classList.contains('hidden')) {
@@ -21,6 +23,29 @@ document.getElementById('menuButton').addEventListener('click', function () {
     } else {
         menuContent.classList.add('hidden');
     }
+});
+let hideTimeout;
+
+document.getElementById('prosjekter').addEventListener('mouseenter', function () {
+    clearTimeout(hideTimeout); // Stopper menyen fra å forsvinne hvis vi går tilbake
+    document.getElementById('prosjekt-liste').classList.remove('hidden');
+});
+
+document.getElementById('prosjekter').addEventListener('mouseleave', function () {
+    // Venter litt før den skjules, slik at vi rekker å flytte musen ned til listen
+    hideTimeout = setTimeout(function () {
+        document.getElementById('prosjekt-liste').classList.add('hidden');
+    }, 200);
+});
+
+document.getElementById('prosjekt-liste').addEventListener('mouseenter', function () {
+    clearTimeout(hideTimeout); // Holder menyen åpen når vi har musen over listen
+});
+
+document.getElementById('prosjekt-liste').addEventListener('mouseleave', function () {
+    hideTimeout = setTimeout(function () {
+        document.getElementById('prosjekt-liste').classList.add('hidden');
+    }, 200);
 });
 
 
