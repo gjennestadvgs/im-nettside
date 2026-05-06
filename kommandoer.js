@@ -86,9 +86,16 @@ kommandoer["joke"] = {
     beskrivelse: "Forteller en tilfeldig vits",
     kjør: function (args) {
         const vitser = [
-            "Hvorfor liker programmerere mørke tema? Fordi lys tiltrekker bugs.",
-            "Det er 10 typer mennesker i verden: De som forstår binær, og de som ikke gjør det.",
-            "Hvorfor ble HTML-eleven slått opp med? Hun fant noen med bedre attributter."
+            "Hvorfor liker programmerere mørke tema? \nFordi lys tiltrekker bugs.",
+            "Det er 10 typer mennesker i verden: \nDe som forstår binær, og de som ikke gjør det.",
+            "Hvorfor ble HTML-eleven slått opp med? \nHun fant noen med bedre attributter.",
+            "IT-ansvarlig: Har du noen vinduer oppe? \nKontormedarbeider: Nei, men døra mi står på vidt gap.",
+            "Hvorfor er JavaScript så dårlig til å holde på hemmeligheter? \nFordi det alltid lekker variabler.",
+            "Har du om han som ble så forkjølet da han satt foran PC-en? \nNei. \nHan hadde for mange vinduer åpne.",
+            "Hva står det på grava til Super Mario? \nGame over.",
+            "Pappa, hvorfor kan ikke katter spille data? \nDe spiser bare opp musa.",
+            "Hvorfor er det så vanskelig å forklare en vits til en programmerer? \nDe tar alt bokstavelig.",
+            "Vet du hva DATA står for? \nSvar: Dobbelt Arbeid Til Alle."
         ];
         const tilfeldig = vitser[Math.floor(Math.random() * vitser.length)];
         skrivLinje(tilfeldig);
