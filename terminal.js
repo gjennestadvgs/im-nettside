@@ -10,12 +10,16 @@ let terminalLinjer = [];
 let historikk = [];
 let historikkIndeks = -1;
 
+// Tilstand for autocomplete-popupen
+let aktiveForslag = [];
+let valgtForslag = -1;
+
 // Maks antall linjer / kommandoer som lagres - beskytter mot at
 // localStorage fylles opp etter veldig lang bruk.
 const MAKS_LAGRET = 200;
 
 // Element-referanser. Settes i init() etter at HTML-en er bygget.
-let terminalKnapp, terminalVindu, terminalLukk, terminalOutput, terminalInput;
+let terminalKnapp, terminalVindu, terminalLukk, terminalOutput, terminalInput, forslagBoks;
 
 // --- Hjelpefunksjoner som kommandoer kan bruke ---
 
@@ -214,6 +218,98 @@ function lukkTerminal() {
     lagre();
 }
 
+// --- Autocomplete ---
+
+// Regner ut hvilke forslag som passer det brukeren har skrevet.
+// Støtter ord 1 (kommandonavn) og ord 2 (første argument).
+function regnUtForslag(input) {
+    if (!input.startsWith('/')) return [];
+    const tokens = input.slice(1).split(' ');
+
+    if (tokens.length === 1) {
+        const prefix = tokens[0].toLowerCase();
+        return Object.keys(kommandoer)
+            .filter(function (navn) { return navn.toLowerCase().startsWith(prefix); })
+            .map(function (navn) { return '/' + navn; });
+    }
+
+    if (tokens.length === 2) {
+        const navn = tokens[0].toLowerCase();
+        const cmd = kommandoer[navn];
+        if (!cmd || !cmd.valg) return [];
+        const valg = typeof cmd.valg === 'function' ? cmd.valg() : cmd.valg;
+        const prefix = tokens[1].toLowerCase();
+        return valg
+            .filter(function (v) { return v.toLowerCase().startsWith(prefix); })
+            .map(function (v) { return '/' + navn + ' ' + v; });
+    }
+
+    return [];
+}
+
+// Oppdater popupen basert på det som står i input-feltet.
+function oppdaterForslag() {
+    aktiveForslag = regnUtForslag(terminalInput.value);
+
+    // Skjul hvis det ikke er noe å foreslå, eller hvis eneste forslag
+    // er det brukeren allerede har skrevet.
+    if (aktiveForslag.length === 0 ||
+        (aktiveForslag.length === 1 && aktiveForslag[0] === terminalInput.value)) {
+        skjulForslag();
+        return;
+    }
+
+    valgtForslag = 0;
+    visForslag();
+}
+
+function visForslag() {
+    forslagBoks.innerHTML = '';
+    for (let i = 0; i < aktiveForslag.length; i++) {
+        const rad = document.createElement('div');
+        rad.classList.add('terminal-forslag-rad');
+        if (i === valgtForslag) rad.classList.add('aktiv');
+        rad.textContent = aktiveForslag[i];
+        const indeks = i;
+        rad.addEventListener('mousedown', function (e) {
+            e.preventDefault(); // unngå at input mister fokus
+            velgForslag(indeks);
+        });
+        forslagBoks.appendChild(rad);
+    }
+    forslagBoks.classList.remove('skjult');
+
+    // Sørg for at den valgte raden er synlig hvis lista er lang
+    const aktivRad = forslagBoks.querySelector('.aktiv');
+    if (aktivRad) aktivRad.scrollIntoView({ block: 'nearest' });
+}
+
+function skjulForslag() {
+    aktiveForslag = [];
+    valgtForslag = -1;
+    forslagBoks.classList.add('skjult');
+}
+
+function velgForslag(indeks) {
+    if (indeks < 0 || indeks >= aktiveForslag.length) return;
+    let valgt = aktiveForslag[indeks];
+
+    // Hvis vi nettopp fullførte et kommandonavn (ingen mellomrom i input ennå)
+    // og kommandoen tar et argument, legg til mellomrom så bruker kan skrive videre.
+    const ingenMellomrom = terminalInput.value.indexOf(' ') === -1;
+    if (ingenMellomrom) {
+        const navn = valgt.slice(1);
+        if (kommandoer[navn] && kommandoer[navn].valg) {
+            valgt = valgt + ' ';
+        }
+    }
+
+    terminalInput.value = valgt;
+    skjulForslag();
+    terminalInput.focus();
+    oppdaterForslag(); // ev. vis argument-forslag etter completing
+}
+
 // Tar en linje skrevet inn av brukeren, finner riktig kommando og kjører den.
 function kjørKommando(linje) {
     if (!linje.startsWith('/')) {
@@ -249,6 +345,7 @@ function startTerminal() {
             </div>
             <div id="terminal-output"></div>
             <div id="terminal-input-rad">
+                <div id="terminal-forslag" class="skjult"></div>
                 <span class="prompt">&gt;</span>
                 <input id="terminal-input" type="text" autocomplete="off" spellcheck="false" />
             </div>
@@ -261,6 +358,7 @@ function startTerminal() {
     terminalLukk = document.getElementById('terminal-lukk');
     terminalOutput = document.getElementById('terminal-output');
     terminalInput = document.getElementById('terminal-input');
+    forslagBoks = document.getElementById('terminal-forslag');
 
     // 3. Last inn lagret state og gjenopprett linjer
     lastInnState();
@@ -289,8 +387,20 @@ function startTerminal() {
         terminalInput.focus();
     });
 
+    // Oppdater forslag mens brukeren skriver
+    terminalInput.addEventListener('input', oppdaterForslag);
+
     terminalInput.addEventListener('keydown', function (e) {
+        const harForslag = aktiveForslag.length > 0;
+
         if (e.key === 'Enter') {
+            // Hvis popupen er åpen, oppfører Enter seg som Tab og fullfører forslaget
+            if (harForslag) {
+                e.preventDefault();
+                velgForslag(valgtForslag);
+                return;
+            }
+
             const linje = terminalInput.value.trim();
             if (linje === '') return;
 
@@ -301,25 +411,44 @@ function startTerminal() {
             terminalInput.value = '';
             lagre();
 
+        } else if (e.key === 'Tab') {
+            // Tab: fullfør valgt forslag (om det finnes)
+            e.preventDefault();
+            if (harForslag) velgForslag(valgtForslag);
+
         } else if (e.key === 'ArrowUp') {
-            if (historikkIndeks > 0) {
+            e.preventDefault();
+            if (harForslag) {
+                // Naviger oppover i forslagslisten
+                valgtForslag = (valgtForslag - 1 + aktiveForslag.length) % aktiveForslag.length;
+                visForslag();
+            } else if (historikkIndeks > 0) {
+                // Bla bakover i kommandohistorikken
                 historikkIndeks--;
                 terminalInput.value = historikk[historikkIndeks];
             }
-            e.preventDefault();
 
         } else if (e.key === 'ArrowDown') {
-            if (historikkIndeks < historikk.length - 1) {
+            e.preventDefault();
+            if (harForslag) {
+                // Naviger nedover i forslagslisten
+                valgtForslag = (valgtForslag + 1) % aktiveForslag.length;
+                visForslag();
+            } else if (historikkIndeks < historikk.length - 1) {
                 historikkIndeks++;
                 terminalInput.value = historikk[historikkIndeks];
             } else {
                 historikkIndeks = historikk.length;
                 terminalInput.value = '';
             }
-            e.preventDefault();
 
         } else if (e.key === 'Escape') {
-            lukkTerminal();
+            // Esc lukker forslagslisten først, ellers terminalen
+            if (harForslag) {
+                skjulForslag();
+            } else {
+                lukkTerminal();
+            }
         }
     });
 

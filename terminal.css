@@ -96,10 +96,44 @@
 
 /* Input-raden nederst */
 #terminal-input-rad {
+    position: relative;
     display: flex;
     align-items: center;
     padding: 8px 12px;
     border-top: 1px solid #2a2a2a;
+}
+
+/* Popup med autocomplete-forslag, ligger rett over input-raden */
+#terminal-forslag {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    background-color: #1a1a1a;
+    border-top: 1px solid #2a2a2a;
+    max-height: 160px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+}
+
+#terminal-forslag.skjult {
+    display: none;
+}
+
+.terminal-forslag-rad {
+    padding: 4px 12px;
+    color: #cccccc;
+    cursor: pointer;
+}
+
+.terminal-forslag-rad:hover {
+    background-color: #2a2a2a;
+}
+
+.terminal-forslag-rad.aktiv {
+    background-color: #2a4a6a;
+    color: #ffffff;
 }
 
 #terminal-input-rad .prompt {

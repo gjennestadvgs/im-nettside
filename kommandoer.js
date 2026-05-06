@@ -13,6 +13,9 @@
 //   settFont(font)        - endre font på siden
 //   åpneColorPicker(cb)   - åpne fargevelger; cb(farge) kjøres når man har valgt
 //   startMatrix()         - start Matrix easter egg
+//
+// Valgfri "valg" på en kommando er en liste over forslag for første argument
+// (vises i autocomplete-popupen). Eks: valg: ["lys", "mørk", "retro"].
 
 // --- Konfigurasjon: utvid disse listene for å legge til flere valg ---
 
@@ -79,7 +82,7 @@ kommandoer["echo"] = {
     }
 };
 
-kommandoer["vits"] = {
+kommandoer["joke"] = {
     beskrivelse: "Forteller en tilfeldig vits",
     kjør: function (args) {
         const vitser = [
@@ -94,6 +97,7 @@ kommandoer["vits"] = {
 
 kommandoer["bgcolor"] = {
     beskrivelse: "Endrer bakgrunnsfarge. /bgcolor [navn] eller /bgcolor pick",
+    valg: Object.keys(FARGER).concat(['pick']),
     kjør: function (args) {
         if (args.length === 0) {
             skrivLinje("Bruk: /bgcolor [navn]   eller   /bgcolor pick");
@@ -117,6 +121,7 @@ kommandoer["bgcolor"] = {
 
 kommandoer["txtcolor"] = {
     beskrivelse: "Endrer tekstfarge. /txtcolor [navn] eller /txtcolor pick",
+    valg: Object.keys(FARGER).concat(['pick']),
     kjør: function (args) {
         if (args.length === 0) {
             skrivLinje("Bruk: /txtcolor [navn]   eller   /txtcolor pick");
@@ -140,6 +145,7 @@ kommandoer["txtcolor"] = {
 
 kommandoer["font"] = {
     beskrivelse: "Endrer font på siden. /font [navn]",
+    valg: Object.keys(FONTER),
     kjør: function (args) {
         if (args.length === 0) {
             skrivLinje("Bruk: /font [navn]");
@@ -166,6 +172,7 @@ kommandoer["reset"] = {
 
 kommandoer["theme"] = {
     beskrivelse: "Bytter fargetema. /theme [navn]",
+    valg: Object.keys(TEMAER),
     kjør: function (args) {
         if (args.length === 0) {
             skrivLinje("Bruk: /theme [navn]");
@@ -185,6 +192,7 @@ kommandoer["theme"] = {
 
 kommandoer["game"] = {
     beskrivelse: "Åpner et spill. /game [navn]",
+    valg: Object.keys(SPILL),
     kjør: function (args) {
         if (args.length === 0) {
             skrivLinje("Bruk: /game [navn]");
