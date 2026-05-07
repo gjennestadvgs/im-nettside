@@ -27,11 +27,14 @@
     let isDragging = false;
     let currentImage = null;
     let offsetX, offsetY;
+    let maxZ = 1;
 
     img.forEach(img => {
         img.addEventListener('mousedown', (e) => {
             isDragging = true;
+            maxZ += 1;
             currentImage = img;
+            currentImage.style.zIndex = maxZ;
             offsetX = e.clientX - img.getBoundingClientRect().left;
             offsetY = e.clientY - img.getBoundingClientRect().top;
             e.preventDefault();
