@@ -1,9 +1,10 @@
 body {
-    background-color: white;
     margin: 0;
     padding: 0px;
     overflow: hidden;
-
+    background-image: url("Assets/bilder/imnettsidebakgrunn-1.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 a {
