@@ -37,7 +37,7 @@
     document.addEventListener('mousemove', (e) => {
         if (isDragging && currentImage) {
             currentImage.style.left = (e.clientX - offsetX) + 'px';
-            currentImage.style.right = (e.clientY - offsetY) + 'px';
+            currentImage.style.top = (e.clientY - offsetY) + 'px';
         }
     });
 
