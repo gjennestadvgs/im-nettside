@@ -1,3 +1,5 @@
 
 Dette er et kult og visuelt slående prosjekt! 
 
+"Dette er forferdelig"
+- Knut
