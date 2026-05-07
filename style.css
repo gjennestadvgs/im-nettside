@@ -2,7 +2,8 @@ body {
     background-color: white;
     margin: 0;
     padding: 0px;
-    overflow-x: hidden;
+    overflow: hidden;
+
 }
 
 a {
@@ -10,12 +11,14 @@ a {
 }
 
 #knapper li a {
+
     color: rgb(0, 0, 0);
     /* tekstfarge på knappene til navigasjonsbaren */
 }
 
 /* navigerings bar */
 #knapper {
+    z-index: 1005;
     cursor: pointer;
     position: fixed;
     left: 0px;
