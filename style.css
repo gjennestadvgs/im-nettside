@@ -75,3 +75,7 @@ a {
     flex-direction: row;
     gap: 20px;
 }
+
+.main-assets {
+    position: absolute;
+}

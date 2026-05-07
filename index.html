@@ -8,8 +8,8 @@
 </head>
 
 <div class="prosjekt-grid">
-    <a href="prosjekt.html?id=test-id">
-        <img src="Assets/bilder/filmplakat_above-the-law.jpg"
+    <a /*href="prosjekt.html?id=test-id"*/>
+        <img src="Assets/bilder/filmplakat_above-the-law.jpg" class="main-assets"
             style="max-width:70vw;max-height:70vh;border-radius:12px;box-shadow:0 0 24px #000;" alt="test">
     </a>
 </div>
@@ -17,5 +17,34 @@
 <script src="script.js"></script>
 <script src="terminal.js"></script>
 <script src="kommandoer.js"></script>
+
+<script>
+    const img = document.querySelectorAll('.main-assets')
+    let isDragging = false;
+    let currentImage = null;
+    let offsetX, offsetY;
+
+    img.forEach(img => {
+        img.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            currentImage = img;
+            offsetX = e.clientX - img.getBoundingClientRect().left;
+            offsetY = e.clientY - img.getBoundingClientRect().top;
+            e.preventDefault();
+        });
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging && currentImage) {
+            currentImage.style.left = (e.clientX - offsetX) + 'px';
+            currentImage.style.right = (e.clientY - offsetY) + 'px';
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        currentImage = null;
+    })
+</script>
 
 </html>
