@@ -1,143 +1,283 @@
 <!doctype html>
-<html>
+<html lang="no">
 
 <head>
-    <title>Prosjekt</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="terminal.css">
+    <meta charset="UTF-8">
+
     <style>
-        .flex-container::before {
-            top: 15px;
+        body {
+            background: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 30px;
         }
 
-        .flex-container::after {
-            bottom: 15px;
-        }
-
-        .bilde-kolonne {
+        .flex-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            width: 100%;
+            align-items: center;
+            gap: 50px;
         }
 
-        .bilde-kolonne img,
-        .bilde-kolonne video {
+        /* VIDEO */
+
+        .player-wrapper {
             width: 100%;
-            max-width: 350px;
-            height: auto;
-            border-radius: 4px;
-            border: 2px solid #333;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
-            /* Litt dempet farge og kontrast for en klassisk film-look */
-            filter: grayscale(15%) sepia(10%);
+            display: flex;
+            justify-content: center;
         }
+
+        #player {
+            width: 100%;
+            max-width: 1000px;
+            aspect-ratio: 16 / 9;
+
+            border-radius: 10px;
+            overflow: hidden;
+
+            border: 2px solid #333;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        /* INNHOLD */
+
+        .main-content {
+            width: 100%;
+            max-width: 1400px;
+
+            display: flex;
+            gap: 40px;
+
+            align-items: flex-start;
+        }
+
+        /* TEKST */
 
         .inhold {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            text-align: left;
-            background: rgba(255, 255, 255, 0.04);
+            flex: 2;
+
             padding: 30px;
-            border-left: 4px solid #666;
-            border-radius: 6px;
+
+            border-top: 2px solid #444;
+            border-bottom: 2px solid #444;
+
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .inhold h1 {
             margin-top: 0;
-            color: #fff;
-            text-transform: uppercase;
+
+            font-size: 2.4rem;
+
             letter-spacing: 2px;
+
             border-bottom: 1px solid #444;
+
             padding-bottom: 15px;
-            font-size: 2.2rem;
         }
 
         .inhold p {
-            line-height: 1.7;
-            font-size: 1.15rem;
+            line-height: 1.8;
+
             color: #ddd;
+
+            font-size: 1.1rem;
+        }
+
+        /* BILDER */
+
+        .bilde-kolonne {
+            flex: 1;
+
+            display: flex;
+            flex-direction: column;
+
+            gap: 20px;
+        }
+
+        .bilde-kolonne img {
+            width: 100%;
+
+            max-width: 350px;
+
+            border-radius: 6px;
+
+            border: 2px solid #333;
+
+            box-shadow:
+                0 5px 15px rgba(0, 0, 0, 0.7);
+
+            filter:
+                grayscale(15%) sepia(10%);
         }
     </style>
 </head>
 
 <body>
+
     <div class="flex-container">
-        <div class="bilde-kolonne" id="bilde-kolonne"></div>
-        <div class="inhold" id="inhold"></div>
-        <div class="film" id="film"></div>
+
+        <!-- VIDEO -->
+        <div class="player-wrapper">
+            <div id="player"></div>
+        </div>
+
+        <!-- TEKST + BILDE -->
+        <div class="main-content">
+
+            <div class="inhold" id="inhold"></div>
+
+            <div class="bilde-kolonne" id="bilde-kolonne"></div>
+
+        </div>
+
     </div>
+
     <script>
-        // Prosjekt-array
+
         const prosjekter = [
             {
                 id: "test-id",
-                tittel: "test",
+
+                tittel: "Above The Law",
+
                 bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
+
+                film: "https://www.youtube.com/watch?v=c6O5J-8dz90",
+
                 tekstfil: "Assets/tekst/test.txt",
             }
         ];
 
-        // Hent prosjekt-ID fra URL
+        // FINN URL PARAMETER
+
         function getQueryParam(name) {
+
             const url = new URL(window.location.href);
+
             return url.searchParams.get(name);
         }
 
+        // HENT YOUTUBE VIDEO ID FRA LINK
+
+        function hentYoutubeID(url) {
+
+            const regExp =
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
+
+            const match = url.match(regExp);
+
+            return match ? match[1] : null;
+        }
+
+        // LAST SIDE
+
         function visProsjekt() {
+
             const id = getQueryParam('id');
-            const prosjekt = prosjekter.find(p => p.id === id);
+
+            const prosjekt =
+                prosjekter.find(p => p.id === id);
+
             if (!prosjekt) {
-                document.querySelector('.inhold').innerHTML = "<h1>Prosjekt ikke funnet</h1>";
-                document.querySelector('.bilde-kolonne').innerHTML = "";
+
+                document.querySelector('.inhold').innerHTML =
+                    "<h1>Prosjekt ikke funnet</h1>";
+
                 return;
             }
 
-            // film
-            let filmHtml = prosjekt.film
-                ? `<video controls style="width:100%; max-width:350px; border-radius:8px; margin:0 auto; display:block;">
-                    <source src="${prosjekt.film}" type="video/mp4">
-                    Nettleseren din støtter ikke videoavspilling.
-                  </video>`
-                : '';
+            // BILDE
 
-            // Bilde eller ikon
-            let bildeHtml = prosjekt.bilde
-                ? `<img src="${prosjekt.bilde}" alt="${prosjekt.tittel}">`
-                : prosjekt.ikon ? `<i class="${prosjekt.ikon}" style="font-size:220px; color:#24292f; width:100%; height:450px; display:block; text-align:center; line-height:450px;"></i>` : '';
+            document.querySelector('.bilde-kolonne').innerHTML = `
+                <img src="${prosjekt.bilde}">
+            `;
 
-            document.querySelector('.bilde-kolonne').innerHTML = filmHtml + bildeHtml;
+            // TEKST
 
-            // Hent tekst fra fil
             fetch(prosjekt.tekstfil)
+
                 .then(response => response.text())
+
                 .then(data => {
-                    const deler = data.split('---');
-                    // Behold avsnitt: del opp på dobbel linjeskift og lag <p> for hvert
-                    const avsnitt = deler[0]
-                        .split(/\n\s*\n/) // Del på tom linje (avsnitt)
+
+                    const avsnitt = data
+
+                        .split(/\n\s*\n/)
+
                         .map(a => `<p>${a.trim()}</p>`)
+
                         .join('');
+
                     document.querySelector('.inhold').innerHTML = `
-            <h1>${prosjekt.tittel}</h1>
-            ${avsnitt}
-          `;
-                })
-                .catch(() => {
-                    document.querySelector('.inhold').innerHTML = `
-            <h1>${prosjekt.tittel}</h1>
-            <p>Fant ikke prosjektbeskrivelse.</p>   
-          `;
+                        <h1>${prosjekt.tittel}</h1>
+                        ${avsnitt}
+                    `;
                 });
 
+            // YOUTUBE
+
+            const videoId =
+                hentYoutubeID(prosjekt.film);
+
+            startYouTube(videoId);
         }
 
-        document.addEventListener('DOMContentLoaded', visProsjekt);
+        // LAST INN YOUTUBE API
+
+        let player;
+
+        function startYouTube(videoId) {
+
+            const tag =
+                document.createElement('script');
+
+            tag.src =
+                "https://www.youtube.com/iframe_api";
+
+            document.body.appendChild(tag);
+
+            window.onYouTubeIframeAPIReady =
+                function () {
+
+                    player = new YT.Player('player', {
+
+                        videoId: videoId,
+
+                        playerVars: {
+                            autoplay: 1,
+                            mute: 1,
+                            controls: 0,
+                            modestbranding: 0,
+                            rel: 1,
+                            showinfo: 1,
+                            iv_load_policy: 1,
+                            fs: 1,
+                            disablekb: 1,
+                            playsinline: 1,
+                            loop: 1,
+                            playlist: videoId
+                        },
+
+                        events: {
+
+                            onReady: function (event) {
+
+                                event.target.playVideo();
+                            }
+                        }
+                    });
+                };
+        }
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            visProsjekt
+        );
+
     </script>
+
 </body>
-
-<script src="terminal.js"></script>
-<script src="kommandoer.js"></script>
-
-</html>
