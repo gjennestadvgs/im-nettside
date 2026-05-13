@@ -387,6 +387,16 @@ function startTerminal() {
         terminalInput.focus();
     });
 
+    // Klikk utenfor terminalen -> lukk den
+    document.addEventListener('mousedown', function (e) {
+        if (terminalVindu.classList.contains('skjult')) return;
+        if (terminalVindu.contains(e.target)) return;
+        if (terminalKnapp.contains(e.target)) return;
+        // Ikke lukk mens Matrix-overlayet er aktivt
+        if (document.getElementById('matrix-overlay')) return;
+        lukkTerminal();
+    });
+
     // Oppdater forslag mens brukeren skriver
     terminalInput.addEventListener('input', oppdaterForslag);
 
