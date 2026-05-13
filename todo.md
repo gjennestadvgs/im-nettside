@@ -1,7 +1,6 @@
-I DAG
-- [ ] index.html
-- [ ] css fil (style.css)
+til neste gang:
+- [ ] teste elementer
 
-I MORGEN
-- [ ] javascript
-- [ ] flere sider
+uke 23:
+- [ ] Galleri
+- [ ] fungere på telefon

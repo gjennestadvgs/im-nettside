@@ -5,18 +5,70 @@
     <title>IM nettside</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="terminal.css">
+    <style>
+        body {
+            background-image: url('Assets/bilder/Uten navn.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; 
+        }
+    </style>
 </head>
-
+<body>
 <div class="prosjekt-grid">
-    <a href="prosjekt.html?id=test-id">
-        <img src="Assets/bilder/filmplakat_above-the-law.jpg"
-            style="max-width:70vw;max-height:70vh;border-radius:12px;box-shadow:0 0 24px #000;" alt="test">
-    </a>
+    <img src="Assets\bilder\test-bilde.jpg" class="main-assets" data-link="film-rull.html?id=test-id"
+            style="max-width:30vw;max-height:30vh; top: 60vh; left: 80vw" alt="test">
+    <img src="Assets\bilder\Filmplakat_above-the-law.jpg" class="main-assets" data-link="polaroid.html?id=test-id"
+            style="max-width:25vw;max-height:25vh; top: 10vh; left: 5vw" alt="test">
+    <img src="Assets\bilder\sticky-note.png" class="main-assets"
+            style="max-width:20vw;max-height:20vh; top: 10vh; left: 5vw" alt="test">
 </div>
 </body>
 <script src="script.js"></script>
 <script src="prosjekter.js"></script>
 <script src="terminal.js"></script>
 <script src="kommandoer.js"></script>
+
+<script>
+    const img = document.querySelectorAll('.main-assets')
+    let isDragging = false;
+    let currentImage = null;
+    let offsetX, offsetY;
+    let maxZ = 1;
+    let mouseHasMoved = false;
+    let imgLink = null;
+
+    img.forEach(img => {
+        img.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            mouseHasMoved = false;
+            imgLink = img.dataset.link;
+            maxZ += 1;
+            currentImage = img;
+            currentImage.style.zIndex = maxZ;
+            offsetX = e.clientX - img.getBoundingClientRect().left;
+            offsetY = e.clientY - img.getBoundingClientRect().top;
+            e.preventDefault();
+        });
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging && currentImage) {
+            mouseHasMoved = true;
+            currentImage.style.left = (e.clientX - offsetX) + 'px';
+            currentImage.style.top = (e.clientY - offsetY) + 'px';
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (!mouseHasMoved && imgLink) {
+            console.log(imgLink);
+            window.location.assign(imgLink);
+        }
+        isDragging = false;
+        currentImage = null;
+    })
+</script>
+</body>
 
 </html>
