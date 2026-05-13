@@ -6,11 +6,9 @@
 
     <style>
         body {
-            background: #111;
-            color: white;
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 30px;
+            padding: 10px 30px 30px 30px;
         }
 
         .flex-container {
@@ -30,16 +28,26 @@
 
         #player {
             width: 100%;
-            max-width: 1000px;
+            max-width: 800px;
             aspect-ratio: 16 / 9;
 
-            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
             overflow: hidden;
+            border-radius: 20px;
+        }
 
-            border: 2px solid #333;
-
-            box-shadow:
-                0 10px 30px rgba(0, 0, 0, 0.8);
+        #player iframe {
+            display: block;
+            width: 101%;
+            height: 101%;
+            position: relative;
+            margin: 0;
+            border: 0;
+            outline: none;
+            background: transparent;
         }
 
         /* INNHOLD */
@@ -60,11 +68,6 @@
             flex: 2;
 
             padding: 30px;
-
-            border-top: 2px solid #444;
-            border-bottom: 2px solid #444;
-
-            background: rgba(255, 255, 255, 0.03);
         }
 
         .inhold h1 {
@@ -73,8 +76,6 @@
             font-size: 2.4rem;
 
             letter-spacing: 2px;
-
-            border-bottom: 1px solid #444;
 
             padding-bottom: 15px;
         }
@@ -104,14 +105,6 @@
             max-width: 350px;
 
             border-radius: 6px;
-
-            border: 2px solid #333;
-
-            box-shadow:
-                0 5px 15px rgba(0, 0, 0, 0.7);
-
-            filter:
-                grayscale(15%) sepia(10%);
         }
     </style>
 </head>
@@ -146,7 +139,7 @@
 
                 bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
 
-                film: "https://www.youtube.com/watch?v=yv3bVFX2lXA",
+                videoEmbed: `<iframe width="560" height="315" src="https://www.youtube.com/embed/yv3bVFX2lXA?si=D0rhYQHylAjppMyq&autoplay=1&mute=1&playsinline=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
 
                 tekstfil: "Assets/tekst/test.txt",
             }
@@ -159,18 +152,6 @@
             const url = new URL(window.location.href);
 
             return url.searchParams.get(name);
-        }
-
-        // HENT YOUTUBE VIDEO ID FRA LINK
-
-        function hentYoutubeID(url) {
-
-            const regExp =
-                /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
-
-            const match = url.match(regExp);
-
-            return match ? match[1] : null;
         }
 
         // LAST SIDE
@@ -218,59 +199,9 @@
                     `;
                 });
 
-            // YOUTUBE
+            // VIDEO
 
-            const videoId =
-                hentYoutubeID(prosjekt.film);
-
-            startYouTube(videoId);
-        }
-
-        // LAST INN YOUTUBE API
-
-        let player;
-
-        function startYouTube(videoId) {
-
-            const tag =
-                document.createElement('script');
-
-            tag.src =
-                "https://www.youtube.com/iframe_api";
-
-            document.body.appendChild(tag);
-
-            window.onYouTubeIframeAPIReady =
-                function () {
-
-                    player = new YT.Player('player', {
-
-                        videoId: videoId,
-
-                        playerVars: {
-                            autoplay: 1,
-                            mute: 1,
-                            controls: 0,
-                            modestbranding: 0,
-                            rel: 1,
-                            showinfo: 1,
-                            iv_load_policy: 1,
-                            fs: 1,
-                            disablekb: 1,
-                            playsinline: 1,
-                            loop: 1,
-                            playlist: videoId
-                        },
-
-                        events: {
-
-                            onReady: function (event) {
-
-                                event.target.playVideo();
-                            }
-                        }
-                    });
-                };
+            document.querySelector('#player').innerHTML = prosjekt.videoEmbed;
         }
 
         document.addEventListener(
