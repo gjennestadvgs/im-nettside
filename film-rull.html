@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px 30px 30px 30px;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px;
+        }
+
+        /* VIDEO */
+
+        .player-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        #player {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16 / 9;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        #player iframe {
+            display: block;
+            width: 101%;
+            height: 101%;
+            position: relative;
+            margin: 0;
+            border: 0;
+            outline: none;
+            background: transparent;
+        }
+
+        /* INNHOLD */
+
+        .main-content {
+            width: 100%;
+            max-width: 1400px;
+
+            display: flex;
+            gap: 40px;
+
+            align-items: flex-start;
+        }
+
+        /* TEKST */
+
+        .inhold {
+            flex: 2;
+
+            padding: 30px;
+        }
+
+        .inhold h1 {
+            margin-top: 0;
+
+            font-size: 2.4rem;
+
+            letter-spacing: 2px;
+
+            padding-bottom: 15px;
+        }
+
+        .inhold p {
+            line-height: 1.8;
+
+            color: #ddd;
+
+            font-size: 1.1rem;
+        }
+
+        /* BILDER */
+
+        .bilde-kolonne {
+            flex: 1;
+
+            display: flex;
+            flex-direction: column;
+
+            gap: 20px;
+        }
+
+        .bilde-kolonne img {
+            width: 100%;
+
+            max-width: 350px;
+
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="flex-container">
+
+        <!-- VIDEO -->
+        <div class="player-wrapper">
+            <div id="player"></div>
+        </div>
+
+        <!-- TEKST + BILDE -->
+        <div class="main-content">
+
+            <div class="inhold" id="inhold"></div>
+
+            <div class="bilde-kolonne" id="bilde-kolonne"></div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const prosjekter = [
+            {
+                id: "test-id",
+
+                tittel: "Above The Law",
+
+                bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
+
+                videoEmbed: `<iframe width="560" height="315" src="https://www.youtube.com/embed/yv3bVFX2lXA?si=D0rhYQHylAjppMyq&autoplay=1&mute=1&playsinline=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
+
+                tekstfil: "Assets/tekst/test.txt",
+            }
+        ];
+
+        // FINN URL PARAMETER
+
+        function getQueryParam(name) {
+
+            const url = new URL(window.location.href);
+
+            return url.searchParams.get(name);
+        }
+
+        // LAST SIDE
+
+        function visProsjekt() {
+
+            const id = getQueryParam('id');
+
+            const prosjekt =
+                prosjekter.find(p => p.id === id);
+
+            if (!prosjekt) {
+
+                document.querySelector('.inhold').innerHTML =
+                    "<h1>Prosjekt ikke funnet</h1>";
+
+                return;
+            }
+
+            // BILDE
+
+            document.querySelector('.bilde-kolonne').innerHTML = `
+                <img src="${prosjekt.bilde}">
+            `;
+
+            // TEKST
+
+            fetch(prosjekt.tekstfil)
+
+                .then(response => response.text())
+
+                .then(data => {
+
+                    const avsnitt = data
+
+                        .split(/\n\s*\n/)
+
+                        .map(a => `<p>${a.trim()}</p>`)
+
+                        .join('');
+
+                    document.querySelector('.inhold').innerHTML = `
+                        <h1>${prosjekt.tittel}</h1>
+                        ${avsnitt}
+                    `;
+                });
+
+            // VIDEO
+
+            document.querySelector('#player').innerHTML = prosjekt.videoEmbed;
+        }
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            visProsjekt
+        );
+
+    </script>
+
+</body>

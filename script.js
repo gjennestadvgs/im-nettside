@@ -16,45 +16,72 @@ function makeNumber(check) {
 }
 let button = document.getElementById('prosjekter');
 
-document.getElementById('menuButton').addEventListener('click', function () {
-    var menuContent = document.getElementById('menuContent');
-    if (menuContent.classList.contains('hidden')) {
-        menuContent.classList.remove('hidden');
-    } else {
-        menuContent.classList.add('hidden');
-    }
-});
+let menuButton = document.getElementById('menuButton');
+if (menuButton) {
+    menuButton.addEventListener('click', function () {
+        var menuContent = document.getElementById('menuContent');
+        if (menuContent) {
+            if (menuContent.classList.contains('hidden')) {
+                menuContent.classList.remove('hidden');
+            } else {
+                menuContent.classList.add('hidden');
+            }
+        }
+    });
+}
+
 let hideTimeout;
 
-document.getElementById('prosjekter').addEventListener('mouseenter', function () {
-    clearTimeout(hideTimeout); // Stopper menyen fra å forsvinne hvis vi går tilbake
-    document.getElementById('prosjekt-liste').classList.remove('hidden');
-});
+if (button) {
+    button.addEventListener('mouseenter', function () {
+        clearTimeout(hideTimeout); // Stopper menyen fra å forsvinne hvis vi går tilbake
+        let liste = document.getElementById('prosjekt-liste');
+        if (liste) liste.classList.remove('hidden');
+    });
 
-document.getElementById('prosjekter').addEventListener('mouseleave', function () {
-    // Venter litt før den skjules, slik at vi rekker å flytte musen ned til listen
-    hideTimeout = setTimeout(function () {
-        document.getElementById('prosjekt-liste').classList.add('hidden');
-    }, 200);
-});
+    button.addEventListener('mouseleave', function () {
+        // Venter litt før den skjules, slik at vi rekker å flytte musen ned til listen
+        hideTimeout = setTimeout(function () {
+            let liste = document.getElementById('prosjekt-liste');
+            if (liste) liste.classList.add('hidden');
+        }, 200);
+    });
+}
 
-document.getElementById('prosjekt-liste').addEventListener('mouseenter', function () {
-    clearTimeout(hideTimeout); // Holder menyen åpen når vi har musen over listen
-});
+let prosjektListe = document.getElementById('prosjekt-liste');
+if (prosjektListe) {
+    prosjektListe.addEventListener('mouseenter', function () {
+        clearTimeout(hideTimeout); // Holder menyen åpen når vi har musen over listen
+    });
 
-document.getElementById('prosjekt-liste').addEventListener('mouseleave', function () {
-    hideTimeout = setTimeout(function () {
-        document.getElementById('prosjekt-liste').classList.add('hidden');
-    }, 200);
-});
+    prosjektListe.addEventListener('mouseleave', function () {
+        hideTimeout = setTimeout(function () {
+            let liste = document.getElementById('prosjekt-liste');
+            if (liste) liste.classList.add('hidden');
+        }, 200);
+    });
+}
 
 
-title.addEventListener("click", function () {
-    bgColour = [red.value, green.value, blue.value]
-    for (let colour = 0; colour < bgColour.length; colour++) {
-        bgColour[colour] = makeNumber(bgColour[colour])
-    }
-    console.log(bgColour)
-    document.body.style.backgroundColor = "rgb(" + bgColour[0] + "," + bgColour[1] + "," + bgColour[2] + ")"
-})
+if (title) {
+    title.addEventListener("click", function () {
+        if (red && green && blue) {
+            bgColour = [red.value, green.value, blue.value]
+            for (let colour = 0; colour < bgColour.length; colour++) {
+                bgColour[colour] = makeNumber(bgColour[colour])
+            }
+            console.log(bgColour)
+            document.body.style.backgroundColor = "rgb(" + bgColour[0] + "," + bgColour[1] + "," + bgColour[2] + ")"
+        }
+    })
+}
 bgColour[0] = Number("a")
+
+window.addEventListener("load", function () {
+    const loader = document.querySelector(".loader-wrapper");
+
+    // Vi legger til en liten forsinkelse (f.eks 1 sek) så man faktisk rekker å se overgangen
+    setTimeout(() => {
+        loader.classList.add("loader-hidden");
+    }, 500);
+});

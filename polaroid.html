@@ -54,7 +54,7 @@
         // Prosjekt-array
         const prosjekter = [
             {
-                id: "test-id",
+                id: "",
                 tittel: "test",
                 bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
                 tekstfil: "Assets/tekst/test.txt",
@@ -75,14 +75,6 @@
                 document.querySelector('.bilde-kolonne').innerHTML = "";
                 return;
             }
-
-            // film
-            let filmHtml = prosjekt.film
-                ? `<video controls style="width:100%; max-width:350px; border-radius:8px; margin:0 auto; display:block;">
-                    <source src="${prosjekt.film}" type="video/mp4">
-                    Nettleseren din støtter ikke videoavspilling.
-                  </video>`
-                : '';
 
             // Bilde eller ikon
             let bildeHtml = prosjekt.bilde
