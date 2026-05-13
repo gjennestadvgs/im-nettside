@@ -50,17 +50,8 @@
         <div class="inhold" id="inhold"></div>
         <div class="film" id="film"></div>
     </div>
+    <script src="prosjekter.js"></script>
     <script>
-        // Prosjekt-array
-        const prosjekter = [
-            {
-                id: "test-id",
-                tittel: "test",
-                bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
-                tekstfil: "Assets/tekst/test.txt",
-            }
-        ];
-
         // Hent prosjekt-ID fra URL
         function getQueryParam(name) {
             const url = new URL(window.location.href);
