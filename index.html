@@ -8,33 +8,30 @@
     <style>
         body {
             background-image: url('Assets/bilder/Uten navn.png');
+            background-color: transparent;
             background-size: cover;
             background-position: center;
-            background-attachment: fixed; 
+            background-attachment: fixed;
+            margin: 0;
         }
-        .oppslagstavle {
+        .main-assets {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 20vw;
-            height: 20vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: none; 
+            cursor: grab;
+            user-select: none;
+        }
+        .main-assets img,
+        .main-assets {
+            display: block;
         }
     </style>
 </head>
 <body>
-<div class="oppslagstavle" id="oppslagstavle">
-    <img src="Assets\bilder\oppslagstavle.png" alt="oppslagstavle">
-</div>
 <div class="prosjekt-grid">
-    <img src="Assets\bilder\test-bilde.jpg" class="main-assets" data-link="film-rull.html?id=test-id"
+    <img src="Assets/bilder/test-bilde.jpg" class="main-assets" data-link="film-rull.html?id=test-id"
             style="max-width:30vw;max-height:30vh; top: 60vh; left: 80vw" alt="test">
-    <img src="Assets\bilder\Filmplakat_above-the-law.jpg" class="main-assets" data-link="polaroid.html?id=test-id"
+    <img src="Assets/bilder/Filmplakat_above-the-law.jpg" class="main-assets" data-link="polaroid.html?id=test-id"
             style="max-width:25vw;max-height:25vh; top: 10vh; left: 5vw" alt="test">
-    <img src="Assets\bilder\sticky-note.png" class="main-assets"
+    <img src="Assets/bilder/sticky-note.png" class="main-assets"
             style="max-width:20vw;max-height:20vh; top: 10vh; left: 5vw" alt="test">
 </div>
 <script src="script.js"></script>
