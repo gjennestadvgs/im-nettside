@@ -5,77 +5,18 @@ body {
     overflow-x: hidden;
 }
 
-a {
-    color: #000000;
+/* Galleri / paper-grid bilder: begrens størrelse og gjør responsive */
+.paper-grid { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.paper-grid .photo { flex: 1 1 calc(33.333% - 12px); max-width: 300px; }
+.paper-grid .photo img { width: 100%; height: auto; display: block; object-fit: cover; }
+
+@media (max-width: 720px) {
+    .paper-grid .photo { flex: 1 1 calc(50% - 10px); max-width: 45%; }
 }
 
-#knapper li a {
-    color: rgb(0, 0, 0);
-    /* tekstfarge på knappene til navigasjonsbaren */
+@media (max-width: 420px) {
+    .paper-grid .photo { flex: 1 1 100%; max-width: 100%; }
 }
 
-/* navigerings bar */
-#knapper {
-    cursor: pointer;
-    position: fixed;
-    left: 0px;
-    top: 0;
-    font-size: 20px;
-    font-family: Britannic, sans-serif;
-    list-style-type: none;
-    display: flex;
-    justify-content: flex-end;
-
-}
-
-#menuContent {
-    color: black;
-    font-size: 18px;
-    font-family: Britannic, sans-serif;
-    position: fixed;
-    top: 20px;
-    left: 70px;
-    z-index: 1003;
-    padding: 0;
-}
-
-#prosjekt-liste {
-    color: black;
-    font-size: 18px;
-    font-family: Britannic, sans-serif;
-    position: fixed;
-    top: 50px;
-    left: 70px;
-    z-index: 1003;
-    padding: 0;
-}
-
-#prosjekt-liste ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-#menuContent.hidden {
-    display: none;
-}
-
-#prosjekt-liste.hidden {
-    display: none;
-}
-
-#menuContent ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
-}
-
-.main-assets {
-    position: absolute;
-}
+/* Skjul figcaption (tallet under bildet) */
+.paper-grid .photo .photo-label { display: none; }
