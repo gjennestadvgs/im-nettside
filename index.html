@@ -12,6 +12,9 @@
             background-position: center;
             background-attachment: fixed; 
         }
+        .main-assets {
+            position: absolute;
+        }
     </style>
 </head>
 <body>
@@ -67,6 +70,12 @@
         isDragging = false;
         currentImage = null;
     })
+
+    function loop() {
+        if (isDragging) {
+            img.style.cursor = 'grab';
+        }
+    }
 </script>
 </body>
 
