@@ -1,5 +1,5 @@
 til neste gang:
-- [ ] teste elementer
+- [x] teste elementer
 
 uke 23:
 - [ ] Galleri
