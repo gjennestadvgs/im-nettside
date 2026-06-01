@@ -35,6 +35,21 @@
         /* Høyre panel: enkel info - teksten fjernes hvor ønsket */
         .info-block { padding: 12px; background: transparent; border: none; }
         .info-block h1 { margin: 0 0 8px; font-size: 1.4rem; }
+        /* Galleri / paper-grid bilder: begrens størrelse og gjør responsive */
+.paper-grid { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.paper-grid .photo { flex: 1 1 calc(33.333% - 12px); max-width: 300px; }
+.paper-grid .photo img { width: 100%; height: auto; display: block; object-fit: cover; }
+
+@media (max-width: 720px) {
+    .paper-grid .photo { flex: 1 1 calc(50% - 10px); max-width: 45%; }
+}
+
+@media (max-width: 420px) {
+    .paper-grid .photo { flex: 1 1 100%; max-width: 100%; }
+}
+
+/* Skjul figcaption (tallet under bildet) */
+.paper-grid .photo .photo-label { display: none; }
 
         /* Responsivt: stabler panelene på små skjermer */
         @media (max-width: 980px) { .panel-shell { grid-template-columns: 1fr; } }
@@ -72,8 +87,8 @@
     <script>
         // Lokale prosjektdata (id, title, text og bilder)
         const projects = [
-            { id: 'test-id', title: 'test', text: 'Et enkelt testprosjekt.', images: ['Assets/bilder/Filmplakat_above-the-law.jpg'] },
-            { id: 'layout', title: 'layout', text: 'Struktur og flater.', images: ['Assets/bilder/Uten navn.png'] },
+            { id: 'test-id', title: 'test', text: 'Et enkelt testprosjekt.', images: ['Assets/bilder/Filmplakat_above-the-law.jpg', 'Assets/bilder/test-bilde.jpg'] },
+            { id: 'layout', title: 'layout', text: 'Struktur og flater.', images: ['Assets/bilder/Uten navn.png', 'Assets/bilder/sticky-note.png'] },
             { id: 'poster', title: 'poster', text: 'Plakat og visning.', images: ['Assets/bilder/Filmplakat_above-the-law.jpg'] }
         ];
 
