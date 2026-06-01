@@ -37,7 +37,6 @@
     <img src="Assets\bilder\sticky-note.png" class="main-assets"
             style="max-width:20vw;max-height:20vh; top: 10vh; left: 5vw" alt="test">
 </div>
-</body>
 <script src="script.js"></script>
 <script src="prosjekter.js"></script>
 <script src="terminal.js"></script>
@@ -62,6 +61,8 @@
             currentImage.style.zIndex = maxZ;
             offsetX = e.clientX - img.getBoundingClientRect().left;
             offsetY = e.clientY - img.getBoundingClientRect().top;
+            currentImage.style.cursor = 'grabbing';
+            document.body.style.cursor = 'grabbing';
             e.preventDefault();
         });
     });
@@ -80,6 +81,9 @@
             window.location.assign(imgLink);
         }
         isDragging = false;
+        // reset cursors
+        document.body.style.cursor = '';
+        img.forEach(i => i.style.cursor = 'grab');
         currentImage = null;
     })
 </script>
