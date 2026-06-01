@@ -4,3 +4,19 @@ body {
     padding: 25px;
     overflow-x: hidden;
 }
+
+/* Galleri / paper-grid bilder: begrens størrelse og gjør responsive */
+.paper-grid { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.paper-grid .photo { flex: 1 1 calc(33.333% - 12px); max-width: 300px; }
+.paper-grid .photo img { width: 100%; height: auto; display: block; object-fit: cover; }
+
+@media (max-width: 720px) {
+    .paper-grid .photo { flex: 1 1 calc(50% - 10px); max-width: 45%; }
+}
+
+@media (max-width: 420px) {
+    .paper-grid .photo { flex: 1 1 100%; max-width: 100%; }
+}
+
+/* Skjul figcaption (tallet under bildet) */
+.paper-grid .photo .photo-label { display: none; }
