@@ -14,6 +14,8 @@
         }
         .main-assets {
             position: absolute;
+            cursor: grab;
+            user-select: none;
         }
     </style>
 </head>
@@ -50,6 +52,8 @@
             currentImage.style.zIndex = maxZ;
             offsetX = e.clientX - img.getBoundingClientRect().left;
             offsetY = e.clientY - img.getBoundingClientRect().top;
+            currentImage.style.cursor = 'grabbing';
+            document.body.style.cursor = 'grabbing';
             e.preventDefault();
         });
     });
@@ -68,14 +72,11 @@
             window.location.assign(imgLink);
         }
         isDragging = false;
+        // reset cursors
+        document.body.style.cursor = '';
+        img.forEach(i => i.style.cursor = 'grab');
         currentImage = null;
     })
-
-    function loop() {
-        if (isDragging) {
-            img.style.cursor = 'grab';
-        }
-    }
 </script>
 </body>
 
