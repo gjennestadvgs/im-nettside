@@ -12,14 +12,23 @@
             background-position: center;
             background-attachment: fixed; 
         }
-        .main-assets {
+        .oppslagstavle {
             position: absolute;
-            cursor: grab;
-            user-select: none;
+            top: 0;
+            left: 0;
+            width: 20vw;
+            height: 20vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none; 
         }
     </style>
 </head>
 <body>
+<div class="oppslagstavle" id="oppslagstavle">
+    <img src="Assets\bilder\oppslagstavle.png" alt="oppslagstavle">
+</div>
 <div class="prosjekt-grid">
     <img src="Assets\bilder\test-bilde.jpg" class="main-assets" data-link="film-rull.html?id=test-id"
             style="max-width:30vw;max-height:30vh; top: 60vh; left: 80vw" alt="test">
