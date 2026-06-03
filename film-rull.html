@@ -120,6 +120,11 @@
             <div id="player"></div>
         </div>
 
+        <div class="back-title-band">
+            <button class="back-button" type="button">Tilbake</button>
+            <h1 id="prosjekt-tittel"></h1>
+        </div>
+
         <!-- TEKST + BILDE -->
         <div class="main-content">
 
@@ -167,11 +172,15 @@
 
             if (!prosjekt) {
 
+                document.getElementById('prosjekt-tittel').textContent = 'Prosjekt ikke funnet';
+
                 document.querySelector('.inhold').innerHTML =
-                    "<h1>Prosjekt ikke funnet</h1>";
+                    "";
 
                 return;
             }
+
+            document.getElementById('prosjekt-tittel').textContent = prosjekt.tittel;
 
             // BILDE
 
@@ -196,7 +205,6 @@
                         .join('');
 
                     document.querySelector('.inhold').innerHTML = `
-                        <h1>${prosjekt.tittel}</h1>
                         ${avsnitt}
                     `;
                 });
@@ -213,6 +221,7 @@
 
     </script>
 <script src="script.js"></script>
+    <script src="back-button.js"></script>
 <script src="terminal.js"></script>
 <script src="kommandoer.js"></script>
 

@@ -10,3 +10,43 @@ body {
     --background-color: #f8f9fa;
     --text-color: #212529;
 }
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+}
+
+.back-button:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.back-button--fixed {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 1000;
+}
+
+.back-title-band {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 1400px;
+    padding: 0 30px;
+    box-sizing: border-box;
+    justify-content: center;
+}
+
+.back-title-band h1 {
+    margin: 0;
+    padding-bottom: 0;
+}
