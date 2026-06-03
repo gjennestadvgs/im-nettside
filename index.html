@@ -8,22 +8,32 @@
     <style>
         body {
             background-image: url('Assets/bilder/Uten navn.png');
+            background-color: transparent;
             background-size: cover;
             background-position: center;
-            background-attachment: fixed; 
+            background-attachment: fixed;
+            margin: 0;
+            overflow: hidden;
+        }
+        .main-assets {
+            position: absolute;
+            cursor: grab;
+            user-select: none;
+        }
+        .main-assets {
+            display: block;
         }
     </style>
 </head>
 <body>
 <div class="prosjekt-grid">
-    <img src="Assets\bilder\test-bilde.jpg" class="main-assets" data-link="film-rull.html?id=test-id"
+    <img src="Assets/bilder/test-bilde.jpg" class="main-assets" data-link="film-rull.html?id=test-id"
             style="max-width:30vw;max-height:30vh; top: 60vh; left: 80vw" alt="test">
-    <img src="Assets\bilder\Filmplakat_above-the-law.jpg" class="main-assets" data-link="polaroid.html?id=test-id"
+    <img src="Assets/bilder/Filmplakat_above-the-law.jpg" class="main-assets" data-link="polaroid.html?id=test-id"
             style="max-width:25vw;max-height:25vh; top: 10vh; left: 5vw" alt="test">
-    <img src="Assets\bilder\sticky-note.png" class="main-assets"
+    <img src="Assets/bilder/sticky-note.png" class="main-assets"
             style="max-width:20vw;max-height:20vh; top: 10vh; left: 5vw" alt="test">
 </div>
-</body>
 <script src="script.js"></script>
 <script src="prosjekter.js"></script>
 <script src="terminal.js"></script>
@@ -48,6 +58,8 @@
             currentImage.style.zIndex = maxZ;
             offsetX = e.clientX - img.getBoundingClientRect().left;
             offsetY = e.clientY - img.getBoundingClientRect().top;
+            currentImage.style.cursor = 'grabbing';
+            document.body.style.cursor = 'grabbing';
             e.preventDefault();
         });
     });
@@ -66,6 +78,9 @@
             window.location.assign(imgLink);
         }
         isDragging = false;
+        // reset cursors
+        document.body.style.cursor = '';
+        img.forEach(i => i.style.cursor = 'grab');
         currentImage = null;
     })
 </script>
