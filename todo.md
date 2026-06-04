@@ -2,5 +2,5 @@ til neste gang:
 - [x] teste elementer
 
 uke 23:
-- [ ] Galleri
+- [x] Galleri
 - [ ] fungere på telefon
