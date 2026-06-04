@@ -51,9 +51,69 @@
 /* Skjul figcaption (tallet under bildet) */
 .paper-grid .photo .photo-label { display: none; }
 
-        /* Responsivt: stabler panelene på små skjermer */
-        @media (max-width: 980px) { .panel-shell { grid-template-columns: 1fr; } }
-    </style>
+                /* Responsivt: stabler panelene på små skjermer */
+                @media (max-width: 980px) { .panel-shell { grid-template-columns: 1fr; } }
+
+                /* Mellomstore skjermer: gjør kodelåsen mer kompakt */
+                @media (max-width: 850px) {
+                    .project-grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        gap: 6px;
+                    }
+
+                    .project-key {
+                        padding: 8px 6px;
+                        font-size: 0.95rem;
+                    }
+
+                    .red-button-wrap { margin-top: 10px; }
+                    .print-button { min-height: 64px; }
+                    .zone { padding: 8px; }
+                }
+
+                /* Galleri / paper-grid bilder: begrens størrelse og gjør responsive */
+                .paper-grid { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+                .paper-grid .photo { flex: 1 1 calc(33.333% - 12px); max-width: 300px; }
+                .paper-grid .photo img { width: 100%; height: auto; display: block; object-fit: cover; }
+
+                /* Skjul figcaption (tallet under bildet) */
+                .paper-grid .photo .photo-label { display: none; }
+
+                /* Mobilspesifikke justeringer: kodelås + info ved siden av hverandre øverst, bilde under */
+                @media (max-width: 480px) {
+                    body { padding: 12px; }
+                    .panel-shell {
+                        gap: 8px;
+                        grid-template-columns: 1fr 1fr;
+                        grid-template-rows: auto 1fr;
+                        align-items: start;
+                        height: auto;
+                    }
+
+                    .left-panel { grid-column: 1 / 2; grid-row: 1 / 2; padding: 8px; }
+                    .right-panel { grid-column: 2 / 3; grid-row: 1 / 2; padding: 8px; }
+                    .center-panel { grid-column: 1 / -1; grid-row: 2 / 3; padding: 8px; }
+
+                      /* Gjør prosjekt-knappene stabler vertikalt for bedre touch-tilgjengelighet */
+                      .project-grid { display: flex; flex-direction: column; gap: 8px; overflow: visible; -webkit-overflow-scrolling: touch; }
+                      .project-key { width: 100%; box-sizing: border-box; flex: 0 0 auto; padding: 12px; font-size: 1rem; text-align: left; }
+
+                    /* Tilpass print-knappen og papir-området */
+                    .print-button { min-height: 64px; border-radius: 12px; }
+                    .print-slot { width: 100%; min-height: auto; }
+                    .paper { padding: 8px; }
+
+                    /* Mindre bilder på telefon */
+                    .paper-grid { gap: 8px; }
+                    .paper-grid .photo { max-width: 200px; }
+
+                      .info-block h1 { font-size: 1.1rem; }
+
+                      /* Sørg for at høyre panel (info) ikke ligger utenfor skjermen */
+                      .right-panel { overflow: visible; }
+                }
+
+        </style>
 </head>
 
 <body>
