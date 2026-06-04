@@ -4,209 +4,528 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Photobooth panel</title>
+    <title>Galleri</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="terminal.css">
+    <link rel="stylesheet" href="https://use.typekit.net/nar4tne.css">
     <style>
-        * { box-sizing: border-box; }
-        html, body { margin: 0; padding: 0; height: 100%; }
-        body { font-family: Arial, Helvetica, sans-serif; color: initial; background: initial; }
+        :root {
+            --background-color: #ebe1d3;
+            --panel-color: rgba(255, 248, 238, 0.92);
+            --panel-border: rgba(32, 24, 18, 0.18);
+            --text-color: #241c17;
+            --accent-color: #c65b34;
+            --shadow-color: rgba(33, 24, 18, 0.2);
+            --grabber-width: 400px;
+        }
 
-        /* Tre-soners layout: venstre (knapper), midten (print), høyre (info) */
-        .page { min-height: 100vh; padding: 16px; }
-        .panel-shell { display: grid; grid-template-columns: 260px 1fr 280px; gap: 12px; height: calc(100vh - 32px); }
+        body {
+            margin: 0;
+            height: 100vh;
+            background:
+                radial-gradient(circle at top, rgba(255, 255, 255, 0.5), transparent 32%),
+                linear-gradient(135deg, #f6ecdd 0%, #dfc9aa 48%, #cfa07b 100%);
+            color: var(--text-color);
+            overflow: hidden;
+        }
 
-        /* Sonene holdes helt nøytrale: ingen border, ingen bakgrunn */
-        .zone { background: transparent; border: none; box-shadow: none; padding: 12px; }
+        .page {
+            height: 100vh;
+            padding: 16px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
 
-        /* Kodelås: tett rutenett med taster */
-        .project-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .project-key { padding: 10px; cursor: pointer; background: transparent; border: none; text-align: left; }
+        .panel-shell {
+            width: min(1440px, 100%);
+            height: 100%;
+            max-height: calc(100vh - 32px);
+            display: grid;
+            grid-template-columns: minmax(200px, 240px) minmax(0, 1fr) minmax(260px, 330px);
+            gap: 18px;
+            align-items: stretch;
+            overflow: hidden;
+        }
 
-        /* Stor knapp men uten farge eller border */
-        .red-button-wrap { margin-top: 14px; display: flex; justify-content: center; }
-        .print-button { width: 100%; min-height: 88px; border-radius: 50%; background: transparent; border: none; cursor: pointer; }
+        .zone {
+            border: 1px solid var(--panel-border);
+            border-radius: 28px;
+            background: var(--panel-color);
+            box-shadow: 0 20px 60px var(--shadow-color);
+            backdrop-filter: blur(10px);
+        }
 
-        /* Midtsonen: print-slot uten dekorasjoner */
-        .print-slot { width: min(100%, 520px); min-height: 420px; background: transparent; padding: 12px; }
-        .paper { background: transparent; color: inherit; border: none; opacity: 0; transform: translateY(-8px) scale(0.98); transition: transform 200ms ease, opacity 200ms ease; }
-        .paper.visible { opacity: 1; transform: translateY(0) scale(1); }
+        .left-panel,
+        .right-panel,
+        .center-panel {
+            position: relative;
+            overflow: hidden;
+        }
 
-        /* Høyre panel: enkel info - teksten fjernes hvor ønsket */
-        .info-block { padding: 12px; background: transparent; border: none; }
-        .info-block h1 { margin: 0 0 8px; font-size: 1.4rem; }
-        /* Galleri / paper-grid bilder: begrens størrelse og gjør responsive */
-.paper-grid { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
-.paper-grid .photo { flex: 1 1 calc(33.333% - 12px); max-width: 300px; }
-.paper-grid .photo img { width: 100%; height: auto; display: block; object-fit: cover; }
+        .left-panel {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            min-height: 0;
+        }
 
-@media (max-width: 720px) {
-    .paper-grid .photo { flex: 1 1 calc(50% - 10px); max-width: 45%; }
-}
+        .panel-label {
+            font-size: 0.8rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: rgba(36, 28, 23, 0.72);
+        }
 
-@media (max-width: 420px) {
-    .paper-grid .photo { flex: 1 1 100%; max-width: 100%; }
-}
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
 
-/* Skjul figcaption (tallet under bildet) */
-.paper-grid .photo .photo-label { display: none; }
+        .project-key {
+            aspect-ratio: 1/1;
+            width: 86px;
+            height: 86px;
+            border: none;
+            border-radius: 0;
+            background-color: transparent;
+            background-image: url('Assets/elementer/buttonMachineNotPressed.svg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: 72% 72%;
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            gap: 4px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+            font: inherit;
+        }
 
-                /* Responsivt: stabler panelene på små skjermer */
-                @media (max-width: 980px) { .panel-shell { grid-template-columns: 1fr; } }
+        .project-key:hover,
+        .project-key:focus-visible {
+            transform: translateY(-2px);
+            filter: brightness(1.02);
+            outline: none;
+        }
 
-                /* Mellomstore skjermer: gjør kodelåsen mer kompakt */
-                @media (max-width: 850px) {
-                    .project-grid {
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                        gap: 6px;
-                    }
+        .project-key.active {
+            background-image: url('Assets/elementer/buttonMachineYesPressed.svg');
+            color: #fff;
+        }
 
-                    .project-key {
-                        padding: 8px 6px;
-                        font-size: 0.95rem;
-                    }
+        .key-number {
+            font-size: 1.4rem;
+            font-weight: 800;
+            line-height: 1;
+            margin: 0;
+        }
 
-                    .red-button-wrap { margin-top: 10px; }
-                    .print-button { min-height: 64px; }
-                    .zone { padding: 8px; }
-                }
+        .key-label {
+            display: block;
+            font-size: 0.72rem;
+            text-transform: none;
+            letter-spacing: 0.02em;
+            white-space: normal;
+            text-align: center;
+            margin-top: 6px;
+            color: var(--text-color);
+        }
 
-                /* Galleri / paper-grid bilder: begrens størrelse og gjør responsive */
-                .paper-grid { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
-                .paper-grid .photo { flex: 1 1 calc(33.333% - 12px); max-width: 300px; }
-                .paper-grid .photo img { width: 100%; height: auto; display: block; object-fit: cover; }
+        .key-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 4px;
+        }
 
-                /* Skjul figcaption (tallet under bildet) */
-                .paper-grid .photo .photo-label { display: none; }
+        .lock-display {
+            min-height: 2.8rem;
+            border-radius: 999px;
+            border: 1px solid rgba(36, 28, 23, 0.18);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(232, 214, 190, 0.88));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            text-indent: 0;
+            cursor: pointer;
+            font: inherit;
+            color: var(--text-color);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+            transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+        }
 
-                /* Mobilspesifikke justeringer: kodelås + info ved siden av hverandre øverst, bilde under */
-                @media (max-width: 480px) {
-                    body { padding: 12px; }
-                    .panel-shell {
-                        gap: 8px;
-                        grid-template-columns: 1fr 1fr;
-                        grid-template-rows: auto 1fr;
-                        align-items: start;
-                        height: auto;
-                    }
+        .lock-display:hover,
+        .lock-display:focus-visible {
+            transform: translateY(-1px);
+            border-color: rgba(198, 91, 52, 0.55);
+            box-shadow: 0 10px 18px rgba(33, 24, 18, 0.12);
+            outline: none;
+        }
 
-                    .left-panel { grid-column: 1 / 2; grid-row: 1 / 2; padding: 8px; }
-                    .right-panel { grid-column: 2 / 3; grid-row: 1 / 2; padding: 8px; }
-                    .center-panel { grid-column: 1 / -1; grid-row: 2 / 3; padding: 8px; }
+        .print-button {
+            min-height: 2.8rem;
+            border-radius: 999px;
+            border: 1px solid rgba(36, 28, 23, 0.18);
+            background: linear-gradient(180deg, rgba(235, 117, 67, 0.95), rgba(193, 83, 43, 0.95));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            cursor: pointer;
+            font: inherit;
+            box-shadow: 0 12px 20px rgba(33, 24, 18, 0.14);
+            transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+        }
 
-                      /* Gjør prosjekt-knappene stabler vertikalt for bedre touch-tilgjengelighet */
-                      .project-grid { display: flex; flex-direction: column; gap: 8px; overflow: visible; -webkit-overflow-scrolling: touch; }
-                      .project-key { width: 100%; box-sizing: border-box; flex: 0 0 auto; padding: 12px; font-size: 1rem; text-align: left; }
+        .print-button:hover,
+        .print-button:focus-visible {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 24px rgba(33, 24, 18, 0.18);
+            filter: brightness(1.03);
+            outline: none;
+        }
 
-                    /* Tilpass print-knappen og papir-området */
-                    .print-button { min-height: 64px; border-radius: 12px; }
-                    .print-slot { width: 100%; min-height: auto; }
-                    .paper { padding: 8px; }
+        .center-panel {
+            min-height: 0;
+            background:
+                radial-gradient(circle at center top, rgba(255, 255, 255, 0.7), transparent 38%),
+                linear-gradient(180deg, rgba(255, 250, 243, 0.92), rgba(226, 203, 173, 0.72));
+        }
 
-                    /* Mindre bilder på telefon */
-                    .paper-grid { gap: 8px; }
-                    .paper-grid .photo { max-width: 200px; }
+        .paper-container {
+            position: absolute;
+            inset: 0;
+            padding: 14px;
+            box-sizing: border-box;
+        }
 
-                      .info-block h1 { font-size: 1.1rem; }
+        .picture-grabber {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(400px, 76%);
+            z-index: 3;
+            pointer-events: none;
+            filter: drop-shadow(0 16px 28px rgba(33, 24, 18, 0.24));
+        }
 
-                      /* Sørg for at høyre panel (info) ikke ligger utenfor skjermen */
-                      .right-panel { overflow: visible; }
-                }
+        .picture-grabber img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
 
-        </style>
+        .paper {
+            position: absolute;
+            inset: 118px 14px 14px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center; /* center grid under grabber */
+            overflow: hidden;
+        }
+
+        .paper-grid {
+            width: var(--grabber-width);
+            max-width: 100%;
+            height: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            align-items: start;
+            align-content: start;
+            overflow: visible;
+            margin: 0 auto;
+        }
+
+        .photo {
+            margin: 0;
+        }
+
+        .photo img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            border-radius: 0;
+            box-shadow: 0 18px 35px rgba(33, 24, 18, 0.18);
+            transition: transform 600ms cubic-bezier(.2,.8,.2,1), opacity 400ms ease;
+            max-width: var(--grabber-width);
+        }
+
+        .paper-empty {
+            text-align: center;
+            max-width: 28rem;
+            color: rgba(36, 28, 23, 0.75);
+            line-height: 1.55;
+        }
+
+        .right-panel {
+            padding: 16px;
+            min-height: 0;
+        }
+
+        .info-block {
+            position: relative;
+            height: 100%;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .info-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            filter: drop-shadow(0 16px 28px rgba(33, 24, 18, 0.18));
+        }
+
+        .info-overlay img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: fill;
+        }
+
+        .info-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            padding: 64px 34px 34px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            text-align: left;
+        }
+
+        .info-content h1 {
+            margin: 0 0 8px;
+            font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+            line-height: 0.98;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .info-content p {
+            margin: 0;
+            max-width: 18rem;
+            font-size: 1.02rem;
+            line-height: 1.65;
+        }
+
+        .project-key.is-selected {
+            background-image: url('Assets/elementer/buttonMachineYesPressed.svg');
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 1080px) {
+            .panel-shell {
+                grid-template-columns: 1fr;
+                max-height: none;
+            }
+
+            .center-panel {
+                min-height: 520px;
+            }
+
+            .info-overlay img {
+                object-fit: cover;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .page {
+                padding: 10px;
+            }
+
+            .left-panel,
+            .right-panel {
+                padding: 14px;
+            }
+
+            .paper {
+                inset: 112px 12px 12px;
+            }
+
+            .info-content {
+                padding: 34px 24px 24px;
+            }
+        }
+    </style>
 </head>
 
 <body>
     <main class="page">
-        <section class="panel-shell" aria-label="Photobooth kontrollpanel">
-            <aside class="zone left-panel">
-                <!-- Kodelås - beholdes som før, men uten etiketttekst -->
-                <div class="project-grid" id="projectButtons"></div>
-                <div class="red-button-wrap">
-                    <!-- Rød knapp beholdes i funksjon, men uten farge/border -->
-                    <button class="print-button" id="printButton" type="button">Print</button>
-                </div>
+        <section class="panel-shell" aria-label="Galleri med kodelås">
+            <aside class="zone left-panel" aria-label="Kodelås">
+                <div class="panel-label">Prosjektvalg</div>
+                <div class="keypad" id="projectButtons" aria-label="Tastatur med ni knapper"></div>
+                <button class="print-button" id="printButton" type="button">Print</button>
             </aside>
 
-            <section class="zone center-panel">
-                    <!-- Papiret som vises ved print; innhold settes av JS -->
-                    <div class="paper" id="paperOutput" aria-live="polite"></div>
+            <section class="zone center-panel" aria-label="Bildevisning">
+                <div class="paper-container">
+                    <div class="picture-grabber" aria-hidden="true">
+                        <img src="Assets/elementer/pictureGrabber.svg" alt="">
+                    </div>
+                    <div class="paper" id="paperOutput" aria-live="polite">
+                        <div class="paper-empty">
+                            Skriv inn en kode på venstre side for å få bildene til å gli ut fra pictureGrabber-mekanismen.
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <aside class="zone right-panel">
-                <!-- Prosjektinfo: etikett fjernet, prosjektkode fjernet fra visning -->
+            <aside class="zone right-panel" aria-label="Informasjon">
                 <div class="info-block">
-                    <h1 id="projectTitle">Velg en knapp</h1>
-                    <p id="projectText">Trykk på en knapp til venstre for å se kort info her.</p>
+                    <div class="info-overlay" aria-hidden="true">
+                        <img src="Assets/elementer/screentastic.svg" alt="">
+                    </div>
+                    <div class="info-content">
+                        <h1 id="projectTitle">Velg en kode</h1>
+                        <p id="projectText">Bruk knappene til venstre for å låse opp et prosjekt og vise bildene i midten.</p>
+                    </div>
                 </div>
             </aside>
         </section>
     </main>
 
     <script>
-        // Lokale prosjektdata (id, title, text og bilder)
         const projects = [
-            { id: 'test-id', title: 'test', text: 'Et enkelt testprosjekt.', images: ['Assets/bilder/Filmplakat_above-the-law.jpg', 'Assets/bilder/test-bilde.jpg'] },
-            { id: 'layout', title: 'layout', text: 'Struktur og flater.', images: ['Assets/bilder/Uten navn.png', 'Assets/bilder/sticky-note.png'] },
-            { id: 'poster', title: 'poster', text: 'Plakat og visning.', images: ['Assets/bilder/Filmplakat_above-the-law.jpg'] }
+            { id: 'p1', title: 'Above The Law', text: 'Klassisk filmposter i retrostil.', images: ['Assets/bilder/Filmplakat_above-the-law.jpg'], buttonLabel: '1' },
+            { id: 'p2', title: 'Layout Study', text: 'Eksperiment med grid og typografi.', images: ['Assets/bilder/Uten navn.png'], buttonLabel: '2' },
+            { id: 'p3', title: 'Test Shot', text: 'Makrostudie av farge og kontrast.', images: ['Assets/bilder/test-bilde.jpg'], buttonLabel: '3' },
+            { id: 'p4', title: 'Sticky Notes', text: 'Notater og raske skisser.', images: ['Assets/bilder/sticky-note.png'], buttonLabel: '4' },
+            { id: 'p5', title: 'Oppslagstavle', text: 'Moodboard og collage.', images: ['Assets/bilder/oppslagstavle.png'], buttonLabel: '5' },
+            { id: 'p6', title: 'Placeholder Red', text: 'Midlertidig illustrasjon - rød.', images: ['Assets/bilder/placeholder-1.svg'], buttonLabel: '6' },
+            { id: 'p7', title: 'Placeholder Green', text: 'Midlertidig illustrasjon - grønn.', images: ['Assets/bilder/placeholder-2.svg'], buttonLabel: '7' },
+            { id: 'p8', title: 'Placeholder Dark', text: 'Midlertidig illustrasjon - mørk.', images: ['Assets/bilder/placeholder-3.svg'], buttonLabel: '8' },
+            { id: 'p9', title: 'Placeholder Warm', text: 'Midlertidig illustrasjon - varm fargepalett.', images: ['Assets/bilder/placeholder-4.svg'], buttonLabel: '9' }
         ];
 
-        // DOM-referanser
         const projectButtons = document.getElementById('projectButtons');
         const printButton = document.getElementById('printButton');
-        const printHint = document.getElementById('printHint');
         const paperOutput = document.getElementById('paperOutput');
         const projectTitle = document.getElementById('projectTitle');
         const projectText = document.getElementById('projectText');
 
         let activeProjectIndex = 0;
+        let hasPrinted = false;
 
-        // Generer knappene i kodelåsen
         function renderButtons() {
-            projectButtons.innerHTML = projects.map((p, i) => `
-                <button class="project-key ${i === activeProjectIndex ? 'active' : ''}" data-index="${i}">
-                    <span class="key-number">0${i+1}</span>
-                    <span class="key-title">${p.title}</span>
-                </button>
+            projectButtons.innerHTML = projects.map((project, index) => `
+                <div class="key-wrap">
+                    <button class="project-key" type="button" data-index="${index}">
+                        <span class="key-number">${project.buttonLabel}</span>
+                    </button>
+                    <div class="key-label">${project.title}</div>
+                </div>
             `).join('');
 
-            // Legg til click-handlere
-            projectButtons.querySelectorAll('.project-key').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    activeProjectIndex = Number(btn.dataset.index);
+            projectButtons.querySelectorAll('.project-key').forEach((button) => {
+                button.addEventListener('click', () => {
+                    activeProjectIndex = Number(button.dataset.index);
+                    hasPrinted = false;
                     updateInfo();
-                    clearPrint();
-                    renderButtons();
+                    clearProject();
                 });
             });
         }
 
-        // Oppdater høyre panel (kun tittel og kort tekst)
         function updateInfo() {
-            const p = projects[activeProjectIndex];
-            projectTitle.textContent = p.title;
-            projectText.textContent = p.text;
+            const project = projects[activeProjectIndex];
+            projectTitle.textContent = project.title;
+            projectText.textContent = project.text;
+
+            projectButtons.querySelectorAll('.project-key').forEach((button) => {
+                button.classList.toggle('is-selected', Number(button.dataset.index) === activeProjectIndex);
+            });
         }
 
-        // Vis papir med bilder ved print
-        function doPrint() {
-            const p = projects[activeProjectIndex];
+        function clearProject() {
+            hasPrinted = false;
+            paperOutput.innerHTML = '';
+        }
+
+        function showProject() {
+            const project = projects[activeProjectIndex];
+            hasPrinted = true;
             paperOutput.innerHTML = `
-                <div class="paper-header"><h2>${p.title}</h2><p>${p.text}</p></div>
                 <div class="paper-grid">
-                    ${p.images.map((s, i) => `<figure class="photo"><img src="${s}" alt="${p.title} ${i+1}"><figcaption class="photo-label">${i+1}</figcaption></figure>`).join('')}
+                    ${project.images.map((source, index) => `
+                        <figure class="photo"><img src="${source}" alt="${project.title} ${index + 1}"></figure>
+                    `).join('')}
                 </div>
             `;
-            paperOutput.classList.add('visible');
-            printHint.textContent = '';
+
+            requestAnimationFrame(() => {
+                const grabber = document.querySelector('.picture-grabber');
+                if (!grabber) {
+                    return;
+                }
+
+                // ensure grabber width variable is up to date before animating images
+                syncGrabberWidth();
+
+                const grabberRect = grabber.getBoundingClientRect();
+                const grabberCenterX = grabberRect.left + grabberRect.width / 2;
+                const grabberCenterY = grabberRect.top + grabberRect.height / 2;
+
+                requestAnimationFrame(() => {
+                    document.querySelectorAll('.paper-grid .photo img').forEach((image) => {
+                        const imageRect = image.getBoundingClientRect();
+                        const imageCenterX = imageRect.left + imageRect.width / 2;
+                        const imageCenterY = imageRect.top + imageRect.height / 2;
+                        const deltaX = grabberCenterX - imageCenterX;
+                        const deltaY = grabberCenterY - imageCenterY;
+
+                        image.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.25)`;
+                        image.style.opacity = '0';
+
+                        requestAnimationFrame(() => {
+                            image.style.transform = '';
+                            image.style.opacity = '';
+                        });
+                    });
+                });
+            });
         }
 
-        printButton.addEventListener('click', doPrint);
+        printButton.addEventListener('click', () => {
+            showProject();
+        });
+
+        function syncGrabberWidth() {
+            const grabber = document.querySelector('.picture-grabber');
+            if (!grabber) return;
+            const img = grabber.querySelector('img') || grabber;
+            const rect = img.getBoundingClientRect();
+            if (rect.width > 0) {
+                document.documentElement.style.setProperty('--grabber-width', `${Math.round(rect.width)}px`);
+            }
+        }
+
+        window.addEventListener('resize', syncGrabberWidth);
 
         renderButtons();
         updateInfo();
-        clearPrint();
+        clearProject();
+        syncGrabberWidth();
     </script>
 <script src="script.js"></script>
 <script src="back-button.js"></script>
