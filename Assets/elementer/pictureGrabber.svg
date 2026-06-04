@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1192 392">
+  <defs>
+    <style>
+      .cls-1 {
+        letter-spacing: .04em;
+      }
+
+      .cls-2 {
+        letter-spacing: 0em;
+      }
+
+      .cls-3 {
+        letter-spacing: 0em;
+      }
+
+      .cls-4 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-4, .cls-5 {
+        stroke: #000;
+        stroke-miterlimit: 10;
+        stroke-width: 8px;
+      }
+
+      .cls-6 {
+        letter-spacing: .02em;
+      }
+
+      .cls-7 {
+        letter-spacing: .01em;
+      }
+
+      .cls-5 {
+        fill: #5a5a5a;
+      }
+
+      .cls-8 {
+        letter-spacing: .03em;
+      }
+
+      .cls-9 {
+        letter-spacing: 0em;
+      }
+
+      .cls-10 {
+        letter-spacing: -.01em;
+      }
+
+      .cls-11 {
+        letter-spacing: 0em;
+      }
+
+      .cls-12 {
+        fill: #fff;
+        font-family: TrajanPro3-Bold, 'Trajan Pro 3';
+        font-weight: 700;
+      }
+
+      .cls-13 {
+        font-size: 96px;
+      }
+
+      .cls-14 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-15 {
+        letter-spacing: 0em;
+      }
+
+      .cls-16 {
+        letter-spacing: 0em;
+      }
+
+      .cls-17 {
+        letter-spacing: .02em;
+      }
+
+      .cls-18 {
+        font-size: 57.6px;
+      }
+
+      .cls-19 {
+        letter-spacing: 0em;
+      }
+
+      .cls-20 {
+        letter-spacing: 0em;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="596" y1="368.69" x2="596" y2="272.69" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#323232"/>
+      <stop offset="1" stop-color="#000"/>
+    </linearGradient>
+  </defs>
+  <rect class="cls-5" x="4" y="4" width="1184" height="384"/>
+  <rect class="cls-4" x="53.33" y="272.69" width="1085.33" height="96"/>
+  <text class="cls-12" transform="translate(24.73 136.22) scale(.99 1)"><tspan class="cls-13"><tspan class="cls-14" x="0" y="0">G</tspan><tspan class="cls-1" x="85.54" y="0">R</tspan><tspan class="cls-20" x="166.94" y="0">AB </tspan><tspan class="cls-3" x="342.33" y="0">T</tspan><tspan class="cls-20" x="413.85" y="0">HE </tspan><tspan class="cls-16" x="603.36" y="0">PI</tspan><tspan class="cls-17" x="718.75" y="0">C</tspan><tspan class="cls-8" x="799.29" y="0">T</tspan><tspan class="cls-16" x="874.07" y="0">U</tspan><tspan class="cls-2" x="957.3" y="0">R</tspan><tspan class="cls-15" x="1035.45" y="0">ES</tspan></tspan><tspan class="cls-18"><tspan class="cls-19" x="419.18" y="90.24">y</tspan><tspan class="cls-11" x="455.99" y="90.24">o</tspan><tspan class="cls-9" x="505.87" y="90.24">u </tspan><tspan class="cls-6" x="567.67" y="90.24">f</tspan><tspan class="cls-7" x="602.98" y="90.24">o</tspan><tspan class="cls-10" x="653.32" y="90.24">o</tspan><tspan x="702.28" y="90.24">l</tspan></tspan></text>
+</svg>
