@@ -10,15 +10,8 @@
     <link rel="stylesheet" href="https://use.typekit.net/nar4tne.css">
     <style>
         :root {
-            --background-color: #ebe1d3;
-            --panel-color: rgba(255, 248, 238, 0.92);
-            --panel-border: rgba(32, 24, 18, 0.18);
-            --text-color: #241c17;
-            --accent-color: #c65b34;
-            --shadow-color: rgba(33, 24, 18, 0.2);
             --grabber-width: 400px;
         }
-
         body {
             margin: 0;
             height: 100vh;
@@ -407,15 +400,24 @@
 
     <script>
         const projects = [
-            { id: 'p1', title: 'Above The Law', text: 'Klassisk filmposter i retrostil.', images: ['Assets/bilder/Filmplakat_above-the-law.jpg'], buttonLabel: '1' },
-            { id: 'p2', title: 'Layout Study', text: 'Eksperiment med grid og typografi.', images: ['Assets/bilder/Uten navn.png'], buttonLabel: '2' },
-            { id: 'p3', title: 'Test Shot', text: 'Makrostudie av farge og kontrast.', images: ['Assets/bilder/test-bilde.jpg'], buttonLabel: '3' },
-            { id: 'p4', title: 'Sticky Notes', text: 'Notater og raske skisser.', images: ['Assets/bilder/sticky-note.png'], buttonLabel: '4' },
-            { id: 'p5', title: 'Oppslagstavle', text: 'Moodboard og collage.', images: ['Assets/bilder/oppslagstavle.png'], buttonLabel: '5' },
-            { id: 'p6', title: 'Placeholder Red', text: 'Midlertidig illustrasjon - rød.', images: ['Assets/bilder/placeholder-1.svg'], buttonLabel: '6' },
-            { id: 'p7', title: 'Placeholder Green', text: 'Midlertidig illustrasjon - grønn.', images: ['Assets/bilder/placeholder-2.svg'], buttonLabel: '7' },
-            { id: 'p8', title: 'Placeholder Dark', text: 'Midlertidig illustrasjon - mørk.', images: ['Assets/bilder/placeholder-3.svg'], buttonLabel: '8' },
-            { id: 'p9', title: 'Placeholder Warm', text: 'Midlertidig illustrasjon - varm fargepalett.', images: ['Assets/bilder/placeholder-4.svg'], buttonLabel: '9' }
+            { id: 'p1', title: 'GVGS Lan', text: 'Vi rigger og arrangerer vårt eget gaming-event! Her styrer vi alt selv – fra nettverk og servere til lys, lyd og turneringer.'
+            , images: ['Assets/bilder/Filmplakat_above-the-law.jpg'], buttonLabel: '1' },
+            { id: 'p2', title: 'Logodesign', text: 'Her leker vi oss med visuell identitet. Vi lærer å utvikle ideer fra skisseblokka til ferdige logoer som ser proffe ut.'
+            , images: ['Assets/bilder/Uten navn.png'], buttonLabel: '2' },
+            { id: 'p3', title: 'Test Shot', text: 'Vår aller første møte med utstyret. Vi går ut og tester kameraer, linser og lyssetting for å finne ut hvordan vi fanger det perfekte bildet.'
+            , images: ['Assets/bilder/test-bilde.jpg'], buttonLabel: '3' },
+            { id: 'p4', title: 'Get Focused', text: 'Vi dro på en stor festival med over 3000 deltakere og styrte hele flerkameraproduksjonen live på storskjermene.'
+            , images: ['Assets/bilder/sticky-note.png'], buttonLabel: '4' },
+            { id: 'p5', title: 'Skole-NM', text: 'Da skolen arrangerte NM for anleggsgartnere, rigget vi opp full live-stream. Vi styrte kameraene og sendte konkurransen direkte ut til seerne.'
+            , images: ['Assets/bilder/oppslagstavle.png'], buttonLabel: '5' },
+            { id: 'p6', title: 'Bedriftsbesøk TV2', text: 'Vi dro på tur til TV2 for å se hvordan proffene jobber. Sykt gøy å se kontrollrommene og studioene vi vanligvis bare ser på skjermen.'
+            , images: ['Assets/bilder/placeholder-1.svg'], buttonLabel: '6' },
+            { id: 'p7', title: 'Portrett-oppgave', text: 'Vi lærer å fange personligheten til folk foran kamera. Her jobber vi med kult lys, fete bakgrunner og intervjuteknikk, både i studio og ute.'
+            , images: ['Assets/bilder/placeholder-2.svg'], buttonLabel: '7' },
+            { id: 'p8', title: 'Tønsberg Frikirke', text: 'Som en del av praksisen vår reiser vi til Tønsberg Frikirke og filmer live.'
+            , images: ['Assets/bilder/placeholder-3.svg'], buttonLabel: '8' },
+            { id: 'p9', title: 'Filmplakater', text: 'Vi tar egne bilder og bruker Photoshop til å lage fete filmplakater. Her lærer vi triksene som gjør at plakaten gir skikkelig Hollywood-vibes.'
+            , images: ['Assets/bilder/placeholder-4.svg'], buttonLabel: '9' }
         ];
 
         const projectButtons = document.getElementById('projectButtons');
