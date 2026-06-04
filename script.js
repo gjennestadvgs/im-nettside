@@ -80,6 +80,10 @@ bgColour[0] = Number("a")
 window.addEventListener("load", function () {
     const loader = document.querySelector(".loader-wrapper");
 
+    if (!loader) {
+        return;
+    }
+
     // Vi legger til en liten forsinkelse (f.eks 1 sek) så man faktisk rekker å se overgangen
     setTimeout(() => {
         loader.classList.add("loader-hidden");
