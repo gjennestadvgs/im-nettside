@@ -56,7 +56,6 @@
             min-height: 0;
         }
 
-
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -185,13 +184,16 @@
 
         .picture-grabber {
             position: absolute;
-            top: 8px;
+            top: 270px;
             left: 50%;
             transform: translateX(-50%);
-            width: min(400px, 76%);
+            width: min(300px, 65%);
             z-index: 3;
             pointer-events: none;
             filter: drop-shadow(0 16px 28px rgba(33, 24, 18, 0.24));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .picture-grabber img {
@@ -200,43 +202,73 @@
             height: auto;
         }
 
-        .paper {
+        .picture-grabber img.grabber-logo {
             position: absolute;
-            inset: 118px 14px 14px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center; /* center grid under grabber */
-            overflow: hidden;
+            top: -275px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 280px !important;
+            height: auto !important;
+            z-index: 4;
         }
 
+        /* CONTAINEREN SOM HOLDER ALT UT-PRINTET INNHOLD */
+        .paper {
+            z-index: 4; /* Sortert under grabberen (z-index 3) så arket kommer *ut* av maskinen */
+            position: absolute;
+            top: 350px; 
+            left: 14px;
+            width: calc(100% - 28px); 
+            bottom: 20px; /* Strekker seg helt ned til bunnen av panelet */
+            display: flex;
+            align-items: flex-start;
+            justify-content: center; 
+            overflow: hidden; 
+        }
+
+        /* GRID-SYSTEMET SOM RAMMER INN BILDET */
         .paper-grid {
-            width: var(--grabber-width);
-            max-width: 100%;
-            height: auto;
+            width: 100%;
+            max-width: 400px; 
+            height: 100%; /* Låser høyden til ramma */
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: 1fr; 
             gap: 14px;
+            justify-items: center; 
             align-items: start;
             align-content: start;
-            overflow: visible;
+            overflow: hidden; /* Forhindrer at griddet utvider seg */
             margin: 0 auto;
         }
 
+        /* DEN INTERNE RULLEBOKSEN FOR BILDET */
         .photo {
             margin: 0;
+            width: 280px;          
+            height: 100%; /* Fyller den tilgjengelige skjermhøyden i griddet */
+            display: block;        
+            overflow-y: auto; /* Gir kun denne boksen lov til å scrolle! */
+            position: relative;
+            
+            /* Skjuler scrollbjelker */
+            scrollbar-width: none; 
         }
 
+        .photo::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* SELVE BILDET (Fikser den voldsomme zoomen) */
         .photo img {
-            width: 100%;
-            height: auto;
+            width: 100%; /* Tvinger bildet til å holde seg innenfor de 280 pikslene */
+            height: auto; /* Beholder riktig bilde-proposjon */
             display: block;
-            object-fit: cover;
+            object-fit: contain;
             border-radius: 0;
             box-shadow: 0 18px 35px rgba(33, 24, 18, 0.18);
             transition: transform 600ms cubic-bezier(.2,.8,.2,1), opacity 400ms ease;
-            max-width: var(--grabber-width);
         }
-
+        
         .paper-empty {
             text-align: center;
             max-width: 28rem;
@@ -350,6 +382,8 @@
             <section class="zone center-panel" aria-label="Bildevisning">
                 <div class="paper-container">
                     <div class="picture-grabber" aria-hidden="true">
+                        <img src="Assets/elementer/stealOfApproval.png" class="grabber-logo" alt="Emblem">
+
                         <img src="Assets/elementer/pictureGrabber.svg" alt="">
                     </div>
                     <div class="paper" id="paperOutput" aria-live="polite">
@@ -450,6 +484,12 @@
                     `).join('')}
                 </div>
             `;
+            document.querySelectorAll('.photo').forEach((container) => {
+                setTimeout(() => {
+                    // Dette drar scrollen ned til bunnen av arket med en gang det printes
+                    container.scrollTop = container.scrollHeight;
+                }, 30); // Økt ørlite grann så bildet rekker å lastes inn ordentlig i nettleseren først
+            });
 
             requestAnimationFrame(() => {
                 const grabber = document.querySelector('.picture-grabber');
@@ -461,23 +501,33 @@
                 syncGrabberWidth();
 
                 const grabberRect = grabber.getBoundingClientRect();
-                const grabberCenterX = grabberRect.left + grabberRect.width / 2;
-                const grabberCenterY = grabberRect.top + grabberRect.height / 2;
+        
+        // --- ENDRING HER: Mål grabberens faktiske midtpunkt ---
+        const grabberCenterX = grabberRect.left + (grabberRect.width / 2);
+        const grabberCenterY = grabberRect.top + (grabberRect.height / 2);
+        // ----------------------------------------------------
 
+        requestAnimationFrame(() => {
+            document.querySelectorAll('.paper-grid .photo img').forEach((image) => {
+                const imageRect = image.getBoundingClientRect();
+
+                // --- ENDRING HER: Mål bildets faktiske midtpunkt ---
+                const imageCenterX = imageRect.left + (imageRect.width / 2);
+                const imageCenterY = imageRect.top + (imageRect.height / 2);
+                // ---------------------------------------------------
+
+                // Beregn avstanden (forskjellen) mellom midtpunktene
+                const deltaX = grabberCenterX - imageCenterX;
+                const deltaY = grabberCenterY - imageCenterY;
+
+                // Start animasjonen med bildet perfekt sentrert og skalert ned
+                image.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.25)`;
+                image.style.opacity = '0';
+
+                // Tillat nettleseren å tegne startposisjonen før vi trigger animasjonen ut
                 requestAnimationFrame(() => {
-                    document.querySelectorAll('.paper-grid .photo img').forEach((image) => {
-                        const imageRect = image.getBoundingClientRect();
-                        const imageCenterX = imageRect.left + imageRect.width / 2;
-                        const imageCenterY = imageRect.top + imageRect.height / 2;
-                        const deltaX = grabberCenterX - imageCenterX;
-                        const deltaY = grabberCenterY - imageCenterY;
-
-                        image.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.25)`;
-                        image.style.opacity = '0';
-
-                        requestAnimationFrame(() => {
-                            image.style.transform = '';
-                            image.style.opacity = '';
+                    image.style.transform = '';
+                    image.style.opacity = '';
                         });
                     });
                 });
