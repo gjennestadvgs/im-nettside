@@ -14,6 +14,7 @@ body {
     --secondary-color: #6c757d;
     --background-color: #f8f9fa;
     --text-color: #212529;
+    --secondary-text-color: #e1e1e1;
     --line-height-body: 1.15;
     --line-height-headings: 1.05;
 }
@@ -33,17 +34,23 @@ body, p, li, dd, dt, .info-content p {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 14px;
-    border: 0;
-    border-radius: 999px;
-    background: rgba(0, 0, 0, 0.65);
-    color: #fff;
-    font: inherit;
     cursor: pointer;
-}
+    
+    /* 1. Legg til bildet som bakgrunn her */
+    background-image: url("Assets/elementer/tilbake.png");
+    background-size: contain;     /* Sørger for at bildet krymper/strekker seg riktig */
+    background-repeat: no-repeat; /* Hindrer at bildet gjentar seg */
+    background-position: center;  /* Sentrerer bildet i knappen */
 
-.back-button:hover {
-    background: rgba(0, 0, 0, 0.8);
+    /* 2. Sett størrelsen på knappen (juster her så det passer ditt bilde) */
+    width: 50px;                  
+    height: 50px;                 
+
+    /* 3. Fjern standard HTML-knappestyling */
+    background-color: transparent; /* Fjerner den grå bakgrunnen */
+    border: none;                  /* Fjerner rammen rundt */
+    padding: 10px;                    /* Fjerner standard innside-margin */
+    outline: none;                 /* Fjerner den blå ringen ved klikk (kan beholdes for universell utforming) */
 }
 
 .back-button--fixed {
@@ -64,7 +71,3 @@ body, p, li, dd, dt, .info-content p {
     justify-content: center;
 }
 
-.back-title-band h1 {
-    margin: 0;
-    padding-bottom: 0;
-}

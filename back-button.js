@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fallbackButton = document.createElement('button');
     fallbackButton.type = 'button';
     fallbackButton.className = 'back-button back-button--fixed';
-    fallbackButton.textContent = 'Tilbake';
+    fallbackButton.setAttribute('aria-label', 'Tilbake');
     fallbackButton.addEventListener('click', goBack);
     document.body.appendChild(fallbackButton);
 });
