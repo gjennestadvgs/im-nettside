@@ -19,15 +19,18 @@
             position: absolute;
             cursor: grab;
             user-select: none;
-        }
-        .main-assets {
             display: block;
+            transition: transform 0.1s ease;
+            transform-origin: center;
+        }
+        .main-assets:active {
+            transform: scale(1.2)
         }
     </style>
 </head>
 <body>
 <div class="prosjekt-grid">
-    <img src="Assets\bilder/cff7d820e97b36e66dde6e52936a7d37.png" class="main-assets" data-link="polaroid.html?id=test-id"
+    <img src="Assets\bilder/cff7d820e97b36e66dde6e52936a7d37.png" class="main-assets" data-link="it-side.html?id=test-id"
             style="max-width:18vw;max-height:18vh; top: 30vh; left: 20vw" alt="test">
     <img src="Assets\bilder/dfc920ed0e5776d4450e18b812232729.png" class="main-assets" data-link="galleri.html"
             style="max-width:20vw;max-height:20vh; top: 10vh; right: 12vw" alt="test">
@@ -56,7 +59,6 @@
             currentImage.style.zIndex = maxZ;
             offsetX = e.clientX - img.getBoundingClientRect().left;
             offsetY = e.clientY - img.getBoundingClientRect().top;
-            currentImage.style.cursor = 'grabbing';
             document.body.style.cursor = 'grabbing';
             e.preventDefault();
         });
@@ -80,7 +82,7 @@
         document.body.style.cursor = '';
         img.forEach(i => i.style.cursor = 'grab');
         currentImage = null;
-    })
+    });
 </script>
 </body>
 

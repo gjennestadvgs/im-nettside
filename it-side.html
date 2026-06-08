@@ -138,6 +138,24 @@
       object-fit: cover;
     }
 
+    /* TERMINAL BUTTON GLOW */
+    #terminal-knapp {
+      border: none;
+      border-radius: 5px;
+      animation: pulse-glow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 0px #03e9f4; }
+      50% { box-shadow: 0 0 100px #03e9f4, 0 0 35px #03e9f4; }
+      100% { box-shadow: 0 0 0px #03e9f4; }
+    }
+
+    .no-animation {
+      animation: none !important;
+      box-shadow: 0 0 5px #03e9f4; 
+    }
+
     /* RESPONSIVE TWEAKS */
     @media (max-width: 768px) {
       .main-content {
@@ -190,6 +208,15 @@
 
   </div>
 
+    <dialog id="velkomst-popup">
+      <h1>Velkommen til Informasjonsteknologi</h1>
+    <p>Vi minner om at terminalen er tilgjengelig for bruk i hjørnet av siden.</p>
+    <button onclick="document.getElementById('velkomst-popup').close()">Lukk</button>
+  </dialog>
+  <script>
+    document.getElementById('velkomst-popup').showModal();
+  </script>
+
   <img src="Assets\border\Test-border.svg" class="border border-bottom" alt="decorative border">
 
   <script>
@@ -203,7 +230,7 @@
           <iframe 
             width="560" 
             height="315" 
-            src="https://www.youtube.com/embed/yv3bVFX2lXA?si=D0rhYQHylAjppMyq&autoplay=1&mute=1&playsinline=1" 
+            src="https://www.youtube.com/embed/OL1yG4cjVak?si=ll8g1zBpzp077vr5&autoplay=1&mute=1&playsinline=1" 
             title="YouTube video player" 
             frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -282,5 +309,26 @@
   <script src="back-button.js"></script>
   <script src="terminal.js"></script>
   <script src="kommandoer.js"></script>
+
+  <script>
+    // Stop terminal button glow after first click
+    function setupTerminalGlowStop() {
+        const btn = document.getElementById('terminal-knapp');
+        if (!btn) {
+            setTimeout(setupTerminalGlowStop, 100);
+            return;
+        }
+        
+        btn.addEventListener('click', function () {
+            btn.classList.add('no-animation');
+        }, { once: true });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupTerminalGlowStop);
+    } else {
+        setupTerminalGlowStop();
+    }
+  </script>
 </body>
 </html>
