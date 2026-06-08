@@ -64,12 +64,11 @@
 
         .project-key {
             aspect-ratio: 1/1;
-            width: 86px;
-            height: 86px;
+            width: 100px;
+            height: 100px;
             border: none;
             border-radius: 0;
-            background-color: transparent;
-            background-image: url('Assets/elementer/buttonMachineNotPressed.svg');
+            background-color: transparent; /* Fjernet background-image herfra */
             background-position: center center;
             background-repeat: no-repeat;
             background-size: 72% 72%;
@@ -85,15 +84,14 @@
             font: inherit;
         }
 
-        .project-key:hover,
-        .project-key:focus-visible {
-            transform: translateY(-2px);
-            filter: brightness(1.02);
-            outline: none;
+        /* Vi fjerner også bakgrunnsbildene fra aktiv-statene */
+        .project-key.active {
+            
+            /* Tom eller fjern helt */
         }
 
-        .project-key.active {
-            background-image: url('Assets/elementer/buttonMachineYesPressed.svg');
+        .project-key.is-selected {
+            transform: translateY(-1px);
         }
 
         .key-number {
@@ -440,14 +438,18 @@
         let hasPrinted = false;
 
         function renderButtons() {
-            projectButtons.innerHTML = projects.map((project, index) => `
-                <div class="key-wrap">
-                    <button class="project-key" type="button" data-index="${index}">
-                        <span class="key-number">${project.buttonLabel}</span>
-                    </button>
-                    <div class="key-label">${project.title}</div>
-                </div>
-            `).join('');
+            projectButtons.innerHTML = projects.map((project, index) => {
+                // Henter riktig bilde basert på tallet (1, 2, 3...)
+                const buttonImage = `Assets/elementer/knapper/knapper til photobooth-${project.buttonLabel}.png`;
+                
+                return `
+                    <div class="key-wrap">
+                        <button class="project-key" type="button" data-index="${index}" style="background-image: url('${buttonImage}');">
+                            </button>
+                        <div class="key-label">${project.title}</div>
+                    </div>
+                `;
+            }).join('');
 
             projectButtons.querySelectorAll('.project-key').forEach((button) => {
                 button.addEventListener('click', () => {
@@ -458,6 +460,8 @@
                 });
             });
         }
+     
+        
 
         function updateInfo() {
             const project = projects[activeProjectIndex];
