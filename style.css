@@ -14,6 +14,7 @@ body {
     --secondary-color: #6c757d;
     --background-color: #f8f9fa;
     --text-color: #212529;
+    --secondary-text-color: #e1e1e1;
     --line-height-body: 1.15;
     --line-height-headings: 1.05;
 }
