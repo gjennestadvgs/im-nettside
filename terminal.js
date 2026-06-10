@@ -218,6 +218,80 @@ function lukkTerminal() {
     lagre();
 }
 
+// --- Endre størrelse ---
+
+// Minste og største mål vinduet kan dras til.
+const MIN_BREDDE = 320;
+const MIN_HOYDE = 240;
+
+// Standardstørrelse (samme som i CSS) - brukes som utgangspunkt for
+// hvor stor teksten skal være.
+const BASE_BREDDE = 750;
+const BASE_HOYDE = 600;
+const BASE_FONT = 14;
+
+// Skalerer teksten i terminalen ut fra hvor stort vinduet er. Større
+// vindu => større tekst. Teksten blir aldri mindre enn standard (1x),
+// så den er alltid lesbar, og maks 2x så den ikke blir for stor.
+function settTekststorrelse(bredde, hoyde) {
+    const skala = Math.min(bredde / BASE_BREDDE, hoyde / BASE_HOYDE);
+    const begrenset = Math.max(1, Math.min(skala, 2));
+    terminalVindu.style.fontSize = (BASE_FONT * begrenset) + 'px';
+}
+
+// Gjenoppretter lagret størrelse fra forrige besøk (faller tilbake til
+// standardstørrelsen) og setter tekststørrelsen deretter.
+function lastInnStorrelse() {
+    const bredde = parseInt(localStorage.getItem('terminal_bredde'), 10) || BASE_BREDDE;
+    const hoyde = parseInt(localStorage.getItem('terminal_hoyde'), 10) || BASE_HOYDE;
+    terminalVindu.style.width = bredde + 'px';
+    terminalVindu.style.height = hoyde + 'px';
+    settTekststorrelse(bredde, hoyde);
+}
+
+// Kobler opp resize-håndtaket. Vinduet er forankret nede til høyre, så
+// når vi drar håndtaket (øvre venstre hjørne) utover blir vinduet større.
+function settOppResize() {
+    const handtak = document.getElementById('terminal-resize');
+
+    handtak.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startBredde = terminalVindu.offsetWidth;
+        const startHoyde = terminalVindu.offsetHeight;
+
+        // Maks-mål så vinduet ikke dras utenfor skjermen.
+        const maksBredde = window.innerWidth - 40;
+        const maksHoyde = window.innerHeight - 100;
+
+        function flytt(ev) {
+            // Drar man mot venstre/opp (mindre clientX/Y) blir vinduet større.
+            let nyBredde = startBredde + (startX - ev.clientX);
+            let nyHoyde = startHoyde + (startY - ev.clientY);
+
+            nyBredde = Math.max(MIN_BREDDE, Math.min(nyBredde, maksBredde));
+            nyHoyde = Math.max(MIN_HOYDE, Math.min(nyHoyde, maksHoyde));
+
+            terminalVindu.style.width = nyBredde + 'px';
+            terminalVindu.style.height = nyHoyde + 'px';
+            settTekststorrelse(nyBredde, nyHoyde);
+        }
+
+        function slipp() {
+            document.removeEventListener('mousemove', flytt);
+            document.removeEventListener('mouseup', slipp);
+            // Lagre den nye størrelsen så den overlever sidebytte.
+            localStorage.setItem('terminal_bredde', terminalVindu.offsetWidth);
+            localStorage.setItem('terminal_hoyde', terminalVindu.offsetHeight);
+        }
+
+        document.addEventListener('mousemove', flytt);
+        document.addEventListener('mouseup', slipp);
+    });
+}
+
 // --- Autocomplete ---
 
 // Regner ut hvilke forslag som passer det brukeren har skrevet.
@@ -341,6 +415,7 @@ function startTerminal() {
             <img id="pc-bilde" src="Assets/elementer/pc-forside.png" alt="Gammel PC" draggable="false">
             <button id="terminal-knapp" title="Åpne terminal">&gt;_</button>
             <div id="terminal-vindu" class="skjult">
+                <div id="terminal-resize" title="Dra for å endre størrelse"></div>
                 <div id="terminal-topp">
                     <span>im-terminal</span>
                     <button id="terminal-lukk" title="Lukk">×</button>
@@ -364,6 +439,7 @@ function startTerminal() {
     forslagBoks = document.getElementById('terminal-forslag');
 
     // 3. Last inn lagret state og gjenopprett linjer
+    lastInnStorrelse();
     lastInnState();
     for (const linje of terminalLinjer) {
         leggTilLinje(linje);
@@ -384,6 +460,9 @@ function startTerminal() {
     });
 
     terminalLukk.addEventListener('click', lukkTerminal);
+
+    // La brukeren endre størrelse ved å dra i hjørnehåndtaket
+    settOppResize();
 
     // Klikk hvor som helst i vinduet -> sett fokus tilbake på input
     terminalVindu.addEventListener('click', function () {
