@@ -46,6 +46,34 @@
     display: none;
 }
 
+/* Håndtak for å endre størrelse. Ligger i øvre venstre hjørne siden
+   vinduet er forankret nede til høyre - dra utover for å gjøre større. */
+#terminal-resize {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    z-index: 1;
+}
+
+/* Liten visuell indikator (diagonale streker) på håndtaket */
+#terminal-resize::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 7px;
+    height: 7px;
+    border-top: 2px solid #555555;
+    border-left: 2px solid #555555;
+}
+
+#terminal-resize:hover::before {
+    border-color: #888888;
+}
+
 /* Topplinje med tittel og lukkeknapp */
 #terminal-topp {
     background-color: #1a1a1a;
@@ -147,7 +175,7 @@
     border: none;
     color: #ffffff;
     font-family: 'Courier New', monospace;
-    font-size: 14px;
+    font-size: inherit;
     outline: none;
 }
 
