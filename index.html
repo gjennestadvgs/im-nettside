@@ -64,6 +64,17 @@
         #grid-flerkamera1 { max-width: 18vw; max-height: 18vh; top: 60vh; left: 80vw; }
         #grid-gjennestad  { max-width: 18vw; max-height: 18vh; top: 60vh; left: 80vw; }
 
+        /* --- Postit-lapper (PC / stor skjerm) --- */
+        #postit-it            { max-width: 12vw; max-height: 12vh; top: 5vh;  left: 5vw;  }
+        #postit-galleri       { max-width: 12vw; max-height: 12vh; top: 5vh;  left: 38vw; }
+        #postit-grafisk       { max-width: 12vw; max-height: 12vh; top: 5vh;  left: 70vw; }
+        #postit-internat      { max-width: 12vw; max-height: 12vh; top: 40vh; left: 5vw;  }
+        #postit-medie         { max-width: 12vw; max-height: 12vh; top: 40vh; left: 38vw; }
+        #postit-reklamer      { max-width: 12vw; max-height: 12vh; top: 40vh; left: 70vw; }
+        #postit-lan           { max-width: 12vw; max-height: 12vh; top: 75vh; left: 5vw;  }
+        #postit-praksis       { max-width: 12vw; max-height: 12vh; top: 75vh; left: 38vw; }
+        #postit-programmering { max-width: 12vw; max-height: 12vh; top: 75vh; left: 70vw; }
+
         /* --- Telefon (liten skjerm) --- */
         @media (max-width: 600px) {
             #grid-film        { max-width: 15vw; max-height: 15vh; top: 8vh;  left: 4vw;  right: auto; }
@@ -73,18 +84,39 @@
             #grid-flerkamera2 { max-width: 15vw; max-height: 15vh; top: 52vh; left: 4vw;  right: auto; }
             #grid-flerkamera1 { max-width: 15vw; max-height: 15vh; top: 52vh; left: 52vw; right: auto; }
             #grid-gjennestad  { max-width: 15vw; max-height: 15vh; top: 74vh; left: 4vw;  right: auto; }
+
+            /* Postit-lapper på telefon */
+            #postit-it            { max-width: 18vw; max-height: 18vh; top: 8vh;  left: 78vw; right: auto; }
+            #postit-galleri       { max-width: 18vw; max-height: 18vh; top: 8vh;  left: 28vw; right: auto; }
+            #postit-grafisk       { max-width: 18vw; max-height: 18vh; top: 30vh; left: 78vw; right: auto; }
+            #postit-internat      { max-width: 18vw; max-height: 18vh; top: 30vh; left: 28vw; right: auto; }
+            #postit-medie         { max-width: 18vw; max-height: 18vh; top: 52vh; left: 78vw; right: auto; }
+            #postit-reklamer      { max-width: 18vw; max-height: 18vh; top: 52vh; left: 28vw; right: auto; }
+            #postit-lan           { max-width: 18vw; max-height: 18vh; top: 74vh; left: 78vw; right: auto; }
+            #postit-praksis       { max-width: 18vw; max-height: 18vh; top: 74vh; left: 28vw; right: auto; }
+            #postit-programmering { max-width: 18vw; max-height: 18vh; top: 96vh; left: 28vw; right: auto; }
         }
     </style>
 </head>
 <body>
 <div class="prosjekt-grid">
-    <img id="grid-film" src="Assets\bilder/cff7d820e97b36e66dde6e52936a7d37.png" class="main-assets" data-link="film-rull.html?id=Internat og Gjennestad" alt="test">
-    <img id="grid-galleri" src="Assets\bilder/dfc920ed0e5776d4450e18b812232729.png" class="main-assets" data-link="galleri.html" alt="test">
     <img id="grid-bedrift1" src="Assets/elementer/polaroids/bedriftLogo1V2.png" class="main-assets" alt="test">
     <img id="grid-bedrift2" src="Assets/elementer/polaroids/bedriftLogo2V2.png" class="main-assets" alt="test">
     <img id="grid-flerkamera2" src="Assets/elementer/polaroids/flerkameraproduksjon2V2.png" class="main-assets" alt="test">
     <img id="grid-flerkamera1" src="Assets/elementer/polaroids/flerkameraproduksjon1V2.png" class="main-assets" alt="test">
     <img id="grid-gjennestad" src="Assets/elementer/polaroids/gjennestadV2.png" class="main-assets" alt="test">
+
+    <!-- Postit-lapper. data-link styrer hvilken side lappen leder til. -->
+    <img id="postit-it" src="Assets/elementer/postit notes/IT.png" class="main-assets" data-link="it-side.html?id=Informasjonsteknologi" alt="IT">
+    <img id="postit-galleri" src="Assets/elementer/postit notes/galleri.png" class="main-assets" data-link="galleri.html" alt="Galleri">
+    <img id="postit-grafisk" src="Assets/elementer/postit notes/grafiskDesign.png" class="main-assets" data-link="grafisk-design.html" alt="Grafisk design">
+    <img id="postit-internat" src="Assets/elementer/postit notes/internatGjennestad.png" class="main-assets" data-link="film-rull.html?id=Internat og Gjennestad" alt="Internat og Gjennestad">
+    <img id="postit-medie" src="Assets/elementer/postit notes/medie.png" class="main-assets" data-link="media.html" alt="Medie">
+    <img id="postit-reklamer" src="Assets/elementer/postit notes/reklamer.png" class="main-assets" data-link="Reklamefilm.html" alt="Reklamer">
+    <!-- TODO: midlertidige lenker – har ingen egen side ennå. Bytt ut når sidene finnes. -->
+    <img id="postit-lan" src="Assets/elementer/postit notes/lanIM.png" class="main-assets" data-link="#" alt="LAN IM">
+    <img id="postit-praksis" src="Assets/elementer/postit notes/praksis.png" class="main-assets" data-link="film-rull.html?id=Praksis" alt="Praksis">
+    <img id="postit-programmering" src="Assets/elementer/postit notes/programmeringsOppgave.png" class="main-assets" data-link="#" alt="Programmeringsoppgave">
 </div>
 <script src="script.js"></script>
 <script src="prosjekter.js"></script>
