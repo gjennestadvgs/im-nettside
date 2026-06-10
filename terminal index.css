@@ -46,6 +46,34 @@
     display: none;
 }
 
+/* Håndtak for å endre størrelse. Ligger i øvre venstre hjørne siden
+   vinduet er forankret nede til høyre - dra utover for å gjøre større. */
+#terminal-resize {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    z-index: 1;
+}
+
+/* Liten visuell indikator (diagonale streker) på håndtaket */
+#terminal-resize::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 7px;
+    height: 7px;
+    border-top: 2px solid #555555;
+    border-left: 2px solid #555555;
+}
+
+#terminal-resize:hover::before {
+    border-color: #888888;
+}
+
 /* Topplinje med tittel og lukkeknapp */
 #terminal-topp {
     background-color: #1a1a1a;
@@ -54,7 +82,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 12px;
+    /* Relativt til vinduets font-size (settes av terminal.js ut fra
+       terminalstørrelsen), så tittelen skalerer likt med teksten inni. */
+    font-size: 1.2em;
     border-bottom: 1px solid #2a2a2a;
 }
 
@@ -62,11 +92,13 @@
     background: none;
     border: none;
     color: #aaaaaa;
-    font-size: 18px;
+    /* Relativt til topplinjen, så kryssknappen følger samme skalering
+       som terminalen ellers. */
+    font-size: 1.6em;
     cursor: pointer;
     padding: 0;
-    width: 20px;
-    height: 20px;
+    width: 1.5em;
+    height: 1.5em;
     line-height: 1;
 }
 
@@ -114,7 +146,7 @@
     max-height: 160px;
     overflow-y: auto;
     font-family: 'Courier New', monospace;
-    font-size: 13px;
+    font-size: inherit;
 }
 
 #terminal-forslag.skjult {
@@ -147,7 +179,7 @@
     border: none;
     color: #ffffff;
     font-family: 'Courier New', monospace;
-    font-size: 14px;
+    font-size: inherit;
     outline: none;
 }
 

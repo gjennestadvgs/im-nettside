@@ -54,7 +54,7 @@
       align-items: center;
       gap: 50px;
       width: 100%;
-      max-width: 1400px;
+      max-width: 1700px;
       padding: 80px 20px; /* Increased top/bottom space from borders */
       position: relative;
       z-index: 1;
@@ -72,7 +72,7 @@
 
     #player {
       width: 100%;
-      max-width: 800px;
+      max-width: min(1400px, 90vw);
       aspect-ratio: 16 / 9;
       display: flex;
       align-items: center;
@@ -95,7 +95,7 @@
     .main-content {
       width: 100%;
       display: flex;
-      gap: 40px;
+      gap: clamp(30px, 3vw, 60px);
       align-items: flex-start;
       flex-wrap: wrap; /* Allow stacking on small screens */
     }
@@ -109,14 +109,14 @@
 
     .inhold h1 {
       margin-top: 0;
-      font-size: 2.4rem;
+      font-size: clamp(1.8rem, 1rem + 2.5vw, 4.5rem);
       letter-spacing: 2px;
       padding-bottom: 15px;
     }
 
     .inhold p {
       line-height: 1.8;
-      font-size: 1.1rem;
+      font-size: clamp(1rem, 0.8rem + 0.7vw, 2rem);
       margin-bottom: 1.5rem;
     }
 
@@ -132,7 +132,7 @@
 
     .bilde-kolonne img {
       width: 100%;
-      max-width: 350px;
+      max-width: 480px;
       border-radius: 6px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.3);
       object-fit: cover;
@@ -158,6 +158,11 @@
 
     /* RESPONSIVE TWEAKS */
     @media (max-width: 768px) {
+      .flex-container .back-button--fixed {
+        position: static;
+        align-self: flex-start;
+      }
+
       .main-content {
         flex-direction: column;
         align-items: center;
@@ -186,17 +191,16 @@
 </head>
 <body>
 
-  <img src="Assets\border\Test-border.svg" class="border border-top" alt="decorative border">
-
   <div class="flex-container">
-    
+
+    <button class="back-button back-button--fixed" type="button" aria-label="Tilbake"></button>
+
     <!-- VIDEO SECTION -->
     <div class="player-wrapper">
       <div id="player"></div>
     </div>
 
     <div class="back-title-band">
-      <button class="back-button" type="button">Tilbake</button>
       <h1 id="prosjekt-tittel">Informasjonsteknologi</h1>
     </div>
 
@@ -213,8 +217,6 @@
     <p>Vi minner om at terminalen er tilgjengelig for bruk i hjørnet av siden.</p>
     <button onclick="document.getElementById('velkomst-popup').close()">Lukk</button>
   </dialog>
-  
-  <img src="Assets\border\Test-border.svg" class="border border-bottom" alt="decorative border">
 
   <script>
 
@@ -223,14 +225,14 @@
     // Project Data
     const prosjekter = [
       {
-        id: "test-id",
+        id: "Informasjonsteknologi",
         tittel: " Informasjonsteknologi",
         bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
         videoEmbed: `
           <iframe 
             width="560" 
             height="315" 
-            src="https://www.youtube.com/embed/OL1yG4cjVak?si=ll8g1zBpzp077vr5&autoplay=1&mute=1&playsinline=1" 
+            src="https://www.youtube.com/embed/VhwFDFbLhZM?si=FCh6hTy-KyHo3wFE&autoplay=1&mute=1&playsinline=1" 
             title="YouTube video player" 
             frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
