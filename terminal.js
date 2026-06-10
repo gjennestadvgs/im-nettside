@@ -337,17 +337,20 @@ function startTerminal() {
 
     // 1. Sett HTML inn i body
     document.body.insertAdjacentHTML('beforeend', `
-        <button id="terminal-knapp" title="Åpne terminal">&gt;_</button>
-        <div id="terminal-vindu" class="skjult">
-            <div id="terminal-topp">
-                <span>im-terminal</span>
-                <button id="terminal-lukk" title="Lukk">×</button>
-            </div>
-            <div id="terminal-output"></div>
-            <div id="terminal-input-rad">
-                <div id="terminal-forslag" class="skjult"></div>
-                <span class="prompt">&gt;</span>
-                <input id="terminal-input" type="text" autocomplete="off" spellcheck="false" />
+        <div id="pc-forside">
+            <img id="pc-bilde" src="Assets/elementer/pc-forside.png" alt="Gammel PC" draggable="false">
+            <button id="terminal-knapp" title="Åpne terminal">&gt;_</button>
+            <div id="terminal-vindu" class="skjult">
+                <div id="terminal-topp">
+                    <span>im-terminal</span>
+                    <button id="terminal-lukk" title="Lukk">×</button>
+                </div>
+                <div id="terminal-output"></div>
+                <div id="terminal-input-rad">
+                    <div id="terminal-forslag" class="skjult"></div>
+                    <span class="prompt">&gt;</span>
+                    <input id="terminal-input" type="text" autocomplete="off" spellcheck="false" />
+                </div>
             </div>
         </div>
     `);

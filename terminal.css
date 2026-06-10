@@ -150,3 +150,14 @@
     font-size: 14px;
     outline: none;
 }
+
+/* På innholdssidene brukes ikke PC-bildet: gjør wrapperen "usynlig" for
+   layouten slik at knappen og terminalvinduet beholder sin egen
+   fixed-plassering, og skjul selve PC-bildet. */
+#pc-forside {
+    display: contents;
+}
+
+#pc-bilde {
+    display: none;
+}
