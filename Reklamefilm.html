@@ -4,11 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="terminal.css">
+    <link rel="stylesheet" href="https://use.typekit.net/nar4tne.css">
     <style>
         body {
             margin: 0;
-            padding: 10px 30px 30px 30px;
+            padding: 30px 90px 90px 90px;
         }
 
         .flex-container {
@@ -18,15 +20,15 @@
             gap: 50px;
         }
 
-        /* VIDEO */
+        /* BILDE */
 
-        .player-wrapper {
+        .bilde-wrapper {
             width: 100%;
             display: flex;
             justify-content: center;
         }
 
-        #player {
+        #bilde {
             width: 100%;
             max-width: 900px;
             aspect-ratio: 16 / 9;
@@ -39,16 +41,13 @@
             border-radius: 20px;
         }
 
-        #player iframe {
+        #bilde img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             display: block;
-            width: 101%;
-            height: 101%;
-            position: relative;
-            margin: 0;
-            border: 0;
-            outline: none;
-            background: transparent;
         }
+
 
         /* INNHOLD */
 
@@ -82,6 +81,7 @@
 
         .inhold p {
             line-height: 1.8;
+
             font-size: 1.1rem;
         }
 
@@ -104,18 +104,41 @@
             border-radius: 6px;
         }
 
-        /* MOBIL */
+        /* VIDEOER */
+
+        .video-seksjon {
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .video-grid iframe {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            height: auto;
+
+            border: none;
+            border-radius: 12px;
+        }
+
+        /* TELEFON */
 
         @media (max-width: 768px) {
+
             body {
-                padding: 10px 15px 30px 15px;
+                padding: 20px 15px 40px 15px;
             }
 
             .flex-container {
                 gap: 30px;
             }
 
-            #player {
+            #bilde {
                 border-radius: 12px;
             }
 
@@ -139,20 +162,21 @@
             .bilde-kolonne {
                 align-items: center;
             }
+
+            .video-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
         }
-        </style>
-        <link rel="stylesheet" href="https://use.typekit.net/nar4tne.css">
-        <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="terminal.css">
+    </style>
 </head>
 
 <body>
 
     <div class="flex-container">
 
-        <!-- VIDEO -->
-        <div class="player-wrapper">
-            <div id="player"></div>
+        <div class="bilde-wrapper">
+            <div id="bilde"></div>
         </div>
 
         <div class="back-title-band">
@@ -169,33 +193,35 @@
 
         </div>
 
+        <!-- VIDEOER (under teksten) -->
+        <div class="video-seksjon">
+            <div class="video-grid" id="video-grid"></div>
+        </div>
+
     </div>
 
     <script>
 
         const prosjekter = [
             {
-                id: "Internat og Gjennestad",
+                id: "Reklamefilm",
 
-                tittel: "Internat og Gjennestad",
+                tittel: "Reklamefilm",
 
                 bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
 
-                videoEmbed: `<iframe width="560" height="315" src="https://www.youtube.com/embed/yv3bVFX2lXA?si=D0rhYQHylAjppMyq&autoplay=1&mute=1&playsinline=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
+                tekstfil: "Assets/tekst/Reklamefilm",
 
-                tekstfil: "Assets/tekst/Internat og Gjennestad",
+                forside: "Assets/bilder/1IM_2026_1.jpg",
+
+                // Fire YouTube-videoer. Bytt ut ID-ene (delen etter "embed/").
+                videoer: [
+                    "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                    "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                    "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                    "https://www.youtube.com/embed/dQw4w9WgXcQ"
+                ]
             },
-            {
-                id: "Praksis",
-
-                tittel: "Yrkespraksis",
-
-                bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
-
-                videoEmbed: `<iframe width="560" height="315" src="https://www.youtube.com/embed/yv3bVFX2lXA?si=D0rhYQHylAjppMyq&autoplay=1&mute=1&playsinline=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
-
-                tekstfil: "Assets/tekst/Yrkespraksis.txt",
-            }
         ];
 
         // FINN URL PARAMETER
@@ -234,6 +260,24 @@
                 <img src="${prosjekt.bilde}">
             `;
 
+            document.getElementById('bilde').innerHTML = `
+                <img src="${prosjekt.forside || prosjekt.bilde}" alt="${prosjekt.tittel}">
+            `;
+
+            // VIDEOER
+
+            document.getElementById('video-grid').innerHTML =
+                (prosjekt.videoer || [])
+                    .map(url => `
+                        <iframe
+                            src="${url}"
+                            title="${prosjekt.tittel}"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    `)
+                    .join('');
+
             // TEKST
 
             fetch(prosjekt.tekstfil)
@@ -255,9 +299,6 @@
                     `;
                 });
 
-            // VIDEO
-
-            document.querySelector('#player').innerHTML = prosjekt.videoEmbed;
         }
 
         document.addEventListener(

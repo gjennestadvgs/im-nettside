@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="terminal.css">
     <link rel="stylesheet" href="https://use.typekit.net/nar4tne.css">
@@ -102,6 +103,43 @@
 
             border-radius: 6px;
         }
+
+        /* MOBIL */
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 15px 40px 15px;
+            }
+
+            .flex-container {
+                gap: 30px;
+            }
+
+            #bilde {
+                border-radius: 12px;
+            }
+
+            .main-content {
+                flex-direction: column;
+                gap: 25px;
+            }
+
+            .inhold {
+                padding: 0;
+            }
+
+            .inhold h1 {
+                font-size: 1.8rem;
+            }
+
+            .inhold p {
+                font-size: 1rem;
+            }
+
+            .bilde-kolonne {
+                align-items: center;
+            }
+        }
     </style>
 </head>
 
@@ -133,16 +171,16 @@
 
         const prosjekter = [
             {
-                id: "test-id",
+                id: "Grafisk-Design",
 
                 tittel: "Above The Law",
 
                 bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
 
-                tekstfil: "Assets/tekst/test.txt",
+                tekstfil: "Assets/tekst/Grafisk-Design.txt",
 
                 forside: "Assets/bilder/1IM_2026_1.jpg"
-            }
+            },
         ];
 
         // FINN URL PARAMETER

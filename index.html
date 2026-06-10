@@ -3,17 +3,30 @@
 
 <head>
     <title>IM nettside</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="terminal index.css">
     <link rel="stylesheet" href="https://use.typekit.net/nar4tne.css">
     <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            /* Klipp alt som havner utenfor skjermen, så siden ikke
+               blir bredere/høyere og zoomer ut på telefon. */
+            overflow: hidden;
+        }
         body {
-            background-image: url('Assets/bilder/forside-backgrunn-remastered.jpg');
+            background-image: url('Assets/bilder/bakgrunner/forside-uten-pc.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            margin: 0;
-            overflow: hidden;
+        }
+        @media (max-width: 768px) {
+            body {
+                background-image: url('Assets/bilder/bakgrunner/forside-tlf-uten-pc.jpg');
+            }
         }
         .main-assets {
             position: absolute;
@@ -22,18 +35,56 @@
             display: block;
             transition: transform 0.1s ease;
             transform-origin: center;
+            /* Bildene ligger over PC-en som standard. Når terminalen
+               åpnes, løftes PC-en over alt (se terminal index.css). */
+            z-index: 5000;
         }
         .main-assets:active {
             transform: scale(1.2)
+        }
+
+        /* ============================================================
+           PLASSERING AV BILDENE I prosjekt-grid
+
+           Hvert bilde har en egen id (#grid-...). Standard-delen under
+           gjelder PC/stor skjerm. Telefon-delen nederst (i media query)
+           overstyrer plasseringen på liten skjerm.
+
+           Endre top/left/right og max-width/max-height for å flytte og
+           skalere et enkelt bilde. vw = prosent av skjermbredden,
+           vh = prosent av skjermhøyden.
+           ============================================================ */
+
+        /* --- Standard (PC / stor skjerm) --- */
+        #grid-film        { max-width: 18vw; max-height: 18vh; top: 30vh; left: 20vw; }
+        #grid-galleri     { max-width: 20vw; max-height: 20vh; top: 10vh; right: 12vw; }
+        #grid-bedrift1    { max-width: 18vw; max-height: 18vh; top: 50vh; left: 50vw; }
+        #grid-bedrift2    { max-width: 18vw; max-height: 18vh; top: 70vh; left: 30vw; }
+        #grid-flerkamera2 { max-width: 18vw; max-height: 18vh; top: 20vh; left: 70vw; }
+        #grid-flerkamera1 { max-width: 18vw; max-height: 18vh; top: 60vh; left: 80vw; }
+        #grid-gjennestad  { max-width: 18vw; max-height: 18vh; top: 60vh; left: 80vw; }
+
+        /* --- Telefon (liten skjerm) --- */
+        @media (max-width: 600px) {
+            #grid-film        { max-width: 15vw; max-height: 15vh; top: 8vh;  left: 4vw;  right: auto; }
+            #grid-galleri     { max-width: 15vw; max-height: 15vh; top: 8vh;  left: 52vw; right: auto; }
+            #grid-bedrift1    { max-width: 15vw; max-height: 15vh; top: 30vh; left: 4vw;  right: auto; }
+            #grid-bedrift2    { max-width: 15vw; max-height: 15vh; top: 30vh; left: 52vw; right: auto; }
+            #grid-flerkamera2 { max-width: 15vw; max-height: 15vh; top: 52vh; left: 4vw;  right: auto; }
+            #grid-flerkamera1 { max-width: 15vw; max-height: 15vh; top: 52vh; left: 52vw; right: auto; }
+            #grid-gjennestad  { max-width: 15vw; max-height: 15vh; top: 74vh; left: 4vw;  right: auto; }
         }
     </style>
 </head>
 <body>
 <div class="prosjekt-grid">
-    <img src="Assets\bilder/cff7d820e97b36e66dde6e52936a7d37.png" class="main-assets" data-link="it-side.html?id=test-id"
-            style="max-width:18vw;max-height:18vh; top: 30vh; left: 20vw" alt="test">
-    <img src="Assets\bilder/dfc920ed0e5776d4450e18b812232729.png" class="main-assets" data-link="galleri.html"
-            style="max-width:20vw;max-height:20vh; top: 10vh; right: 12vw" alt="test">
+    <img id="grid-film" src="Assets\bilder/cff7d820e97b36e66dde6e52936a7d37.png" class="main-assets" data-link="film-rull.html?id=Internat og Gjennestad" alt="test">
+    <img id="grid-galleri" src="Assets\bilder/dfc920ed0e5776d4450e18b812232729.png" class="main-assets" data-link="galleri.html" alt="test">
+    <img id="grid-bedrift1" src="Assets/elementer/polaroids/bedriftLogo1V2.png" class="main-assets" alt="test">
+    <img id="grid-bedrift2" src="Assets/elementer/polaroids/bedriftLogo2V2.png" class="main-assets" alt="test">
+    <img id="grid-flerkamera2" src="Assets/elementer/polaroids/flerkameraproduksjon2V2.png" class="main-assets" alt="test">
+    <img id="grid-flerkamera1" src="Assets/elementer/polaroids/flerkameraproduksjon1V2.png" class="main-assets" alt="test">
+    <img id="grid-gjennestad" src="Assets/elementer/polaroids/gjennestadV2.png" class="main-assets" alt="test">
 </div>
 <script src="script.js"></script>
 <script src="prosjekter.js"></script>
@@ -45,34 +96,44 @@
     let isDragging = false;
     let currentImage = null;
     let offsetX, offsetY;
-    let maxZ = 1;
+    let maxZ = 5000;
     let mouseHasMoved = false;
     let imgLink = null;
 
-    img.forEach(img => {
-        img.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            mouseHasMoved = false;
-            imgLink = img.dataset.link;
-            maxZ += 1;
-            currentImage = img;
-            currentImage.style.zIndex = maxZ;
-            offsetX = e.clientX - img.getBoundingClientRect().left;
-            offsetY = e.clientY - img.getBoundingClientRect().top;
-            document.body.style.cursor = 'grabbing';
-            e.preventDefault();
-        });
-    });
+    function startDrag(img, clientX, clientY) {
+        isDragging = true;
+        mouseHasMoved = false;
+        imgLink = img.dataset.link;
+        maxZ += 1;
+        currentImage = img;
+        currentImage.style.zIndex = maxZ;
+        offsetX = clientX - img.getBoundingClientRect().left;
+        offsetY = clientY - img.getBoundingClientRect().top;
+        document.body.style.cursor = 'grabbing';
+    }
 
-    document.addEventListener('mousemove', (e) => {
+    function moveDrag(clientX, clientY) {
         if (isDragging && currentImage) {
             mouseHasMoved = true;
-            currentImage.style.left = (e.clientX - offsetX) + 'px';
-            currentImage.style.top = (e.clientY - offsetY) + 'px';
-        }
-    });
 
-    document.addEventListener('mouseup', () => {
+            let nyLeft = clientX - offsetX;
+            let nyTop = clientY - offsetY;
+
+            // Hold bildet innenfor skjermen, så det aldri havner utenfor
+            // (og dermed ikke gjør siden bredere / zoomer ut på telefon).
+            const maxLeft = window.innerWidth - currentImage.offsetWidth;
+            const maxTop = window.innerHeight - currentImage.offsetHeight;
+            nyLeft = Math.max(0, Math.min(nyLeft, maxLeft));
+            nyTop = Math.max(0, Math.min(nyTop, maxTop));
+
+            // Bytt fra eventuell right/vw-plassering til ren px-styring
+            currentImage.style.right = 'auto';
+            currentImage.style.left = nyLeft + 'px';
+            currentImage.style.top = nyTop + 'px';
+        }
+    }
+
+    function endDrag() {
         if (!mouseHasMoved && imgLink) {
             console.log(imgLink);
             window.location.assign(imgLink);
@@ -82,7 +143,34 @@
         document.body.style.cursor = '';
         img.forEach(i => i.style.cursor = 'grab');
         currentImage = null;
+    }
+
+    img.forEach(img => {
+        img.addEventListener('mousedown', (e) => {
+            startDrag(img, e.clientX, e.clientY);
+            e.preventDefault();
+        });
+        img.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            startDrag(img, touch.clientX, touch.clientY);
+            e.preventDefault();
+        }, { passive: false });
     });
+
+    document.addEventListener('mousemove', (e) => {
+        moveDrag(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('touchmove', (e) => {
+        if (isDragging && currentImage) {
+            const touch = e.touches[0];
+            moveDrag(touch.clientX, touch.clientY);
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchend', endDrag);
 </script>
 </body>
 
