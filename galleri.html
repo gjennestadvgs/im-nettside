@@ -35,7 +35,11 @@
             height: 100%;
             max-height: calc(100vh - 32px);
             display: grid;
-            grid-template-columns: minmax(200px, 240px) minmax(0, 1fr) minmax(260px, 330px);
+            grid-template-columns: minmax(240px, 300px) minmax(0, 1fr) minmax(260px, 330px);
+            /* Tving den ene raden til å fylle hele høyden. Uten dette blir raden
+               like høy som innholdet (senterpanelet er absolutt-posisjonert = 0 høyt),
+               slik at panelene ikke fyller skjermen og screentastic ikke flukter med teksten. */
+            grid-template-rows: minmax(0, 1fr);
             gap: 18px;
             align-items: stretch;
             overflow: hidden;
@@ -56,23 +60,31 @@
             min-height: 0;
         }
 
+        /* Skyv etiketten til høyre for den faste tilbake-knappen (som vokser med
+           skjermen) så de ikke overlapper. Nullstilles på mobil der knappen ligger
+           over logoen i stedet. */
+        .panel-label {
+            padding-left: clamp(46px, 4.8vw, 92px);
+            font-size: clamp(0.95rem, 1.3vw, 1.7rem); /* Vokser med skjermbredden */
+        }
+
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 4px;
+            gap: 2px;
         }
 
         .project-key {
             aspect-ratio: 1/1;
-            width: 86px;
-            height: 86px;
+            width: 100%;       /* Endret: Bruker full bredde i rutenettet sitt */
+            max-width: 110px;   /* Sørger for at den ikke blir for stor på PC */
+            height: auto;
             border: none;
             border-radius: 0;
             background-color: transparent;
-            background-image: url('Assets/elementer/buttonMachineNotPressed.svg');
             background-position: center center;
             background-repeat: no-repeat;
-            background-size: 72% 72%;
+            background-size: 100% 100%; /* Sørger for at bildefilen strekker seg riktig */
             color: var(--text-color);
             cursor: pointer;
             display: flex;
@@ -84,16 +96,10 @@
             transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
             font: inherit;
         }
+        
 
-        .project-key:hover,
-        .project-key:focus-visible {
-            transform: translateY(-2px);
-            filter: brightness(1.02);
-            outline: none;
-        }
-
-        .project-key.active {
-            background-image: url('Assets/elementer/buttonMachineYesPressed.svg');
+        .project-key.is-selected {
+            transform: translateY(-1px);
         }
 
         .key-number {
@@ -105,7 +111,7 @@
 
         .key-label {
             display: block;
-            font-size: 0.72rem;
+            font-size: clamp(0.8rem, 1vw, 1.25rem); /* Vokser med skjermbredden */
             text-transform: none;
             letter-spacing: 0.02em;
             white-space: normal;
@@ -300,7 +306,12 @@
             position: relative;
             z-index: 2;
             height: 100%;
-            padding: 64px 34px 34px;
+            /* Sider/bunn følger det hvite feltet i screentastic.svg (~4,2 % sider).
+               Topp-paddingen vokser med skjermhøyden via clamp(vh) – liten på små
+               skjermer, større jo større skjermen blir (med et tak). flex-start
+               holder teksten forankret rett under denne toppmargen. */
+            padding: clamp(18px, 6vh, 90px) 9% 7%;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -309,7 +320,7 @@
 
         .info-content h1 {
             margin: 0 0 8px;
-            font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+            font-size: clamp(1.4rem, 2.6vw, 2.8rem); /* Vokser med skjermbredden */
             line-height: 0.98;
             text-transform: uppercase;
             letter-spacing: 0.04em;
@@ -317,8 +328,8 @@
 
         .info-content p {
             margin: 0;
-            max-width: 18rem;
-            font-size: 1.02rem;
+            max-width: 22rem;
+            font-size: clamp(1rem, 1.3vw, 1.6rem); /* Vokser med skjermbredden */
             line-height: 1.65;
         }
 
@@ -326,38 +337,192 @@
             background-image: url('Assets/elementer/buttonMachineYesPressed.svg');
             transform: translateY(-1px);
         }
+        /* Stor logo som kun vises på toppen på mobil */
+        .top-logo {
+            display: none;
+        }
 
-        @media (max-width: 1080px) {
+        /* Tilbake- og terminal-knappen vokser med skjermbredden (clamp).
+           Scoped til galleri-siden så de delte stilene ikke endres for andre sider. */
+        .back-button--fixed {
+            width: clamp(50px, 4.5vw, 96px);
+            height: clamp(50px, 4.5vw, 96px);
+        }
+        #terminal-knapp {
+            width: clamp(50px, 4.5vw, 96px);
+            height: clamp(50px, 4.5vw, 96px);
+            font-size: clamp(18px, 1.6vw, 34px);
+        }
+
+        /* STORE SKJERMER: la siden bruke mer av plassen og skaler opp innholdet
+           så det ikke blir liggende smått midt på med tomme felter rundt. */
+        @media (min-width: 1400px) {
             .panel-shell {
-                grid-template-columns: 1fr;
-                max-height: none;
+                width: min(1900px, 94vw); /* Bruker mer av brede skjermer */
+                gap: 28px;
+                grid-template-columns: minmax(320px, 420px) minmax(0, 1fr) minmax(340px, 440px);
             }
-
-            .center-panel {
-                min-height: 520px;
+            .keypad {
+                gap: 2px; /* Mindre mellomrom mellom knappene */
             }
-
-            .info-overlay img {
-                object-fit: cover;
+            .project-key {
+                max-width: 150px; /* Større knapper */
+            }
+            .key-number {
+                font-size: 1.8rem;
+            }
+            .print-button,
+            .lock-display {
+                min-height: 3.4rem;
+                font-size: 1.05rem;
+            }
+            /* Større utprinter og bilde så midten fylles bedre.
+               Logoen beholder sin opprinnelige plassering (-275px) så den
+               ikke klippes av panelets overflow. */
+            .picture-grabber {
+                width: min(420px, 58%);
+            }
+            .paper {
+                top: 380px;
+            }
+            .paper-grid {
+                max-width: 520px;
+            }
+            .photo {
+                width: 380px;
             }
         }
 
-        @media (max-width: 640px) {
+        /* NETTBRETT OG MINDRE DATASKJERMER */
+        @media (max-width: 1080px) {
+            .panel-shell {
+                grid-template-columns: minmax(180px, 220px) minmax(0, 1fr) minmax(220px, 280px);
+                gap: 12px;
+            }
+            .project-key {
+                max-width: 70px; /* Krymper knappene litt */
+            }
+            .key-label {
+                font-size: 0.65rem;
+            }
+        }
+
+        /* MOBILTELEFONER (Skjermer under 680px) */
+        @media (max-width: 680px) {
+            body {
+                padding: 8px; /* Mindre luft rundt skjermen */
+            }
+
             .page {
+                padding: 4px;
+            }
+
+            /* Mobil-layout:
+               1) stor logo øverst, 2) knapper til venstre med tekst ved siden av,
+               3) picturegrabber nederst. minmax(0,1fr) lar bilderaden krympe så
+               alt får plass uten scroll. */
+            .panel-shell {
+                grid-template-columns: 1fr 1fr; /* Knapper og tekst deler bredden likt */
+                grid-template-rows: auto auto minmax(0, 1fr);
+                grid-template-areas:
+                    "logo   logo"
+                    "left   right"
+                    "center center";
+                gap: 8px 12px;
+                align-items: start;
+                height: 100%;
+                max-height: calc(100vh - 16px);
+                min-height: 0;
+            }
+
+            .top-logo {
+                display: block;
+                grid-area: logo;
+                justify-self: center;
+                width: clamp(120px, 40vw, 190px);
+                height: auto;
+                margin-top: 2px;
+                filter: drop-shadow(0 6px 12px rgba(33, 24, 18, 0.18));
+            }
+
+            /* Knappene til venstre */
+            .left-panel {
+                grid-area: left;
                 padding: 10px;
+                gap: 8px;
+            }
+            .keypad {
+                gap: 6px;
+            }
+            .project-key {
+                max-width: none; /* Lar knappene vokse så de fyller sin halvdel av skjermen */
+            }
+            .key-label {
+                display: none; /* Skjuler teksten under knappene på mobil for å spare kritisk plass */
+            }
+            .panel-label {
+                font-size: 0.75rem;
+                padding-left: 0; /* På mobil ligger knappen over logoen, ikke etiketten */
             }
 
-            .left-panel,
+            /* Teksten ved siden av knappene */
             .right-panel {
-                padding: 14px;
+                grid-area: right;
+                padding: 0;
+                min-height: auto;
             }
-
-            .paper {
-                inset: 112px 12px 12px;
+            .info-block {
+                height: auto;
             }
-
             .info-content {
-                padding: 34px 24px 24px;
+                padding: 12px; /* Mye mindre padding så tekst ikke tar opp hele skjermen */
+            }
+            .info-content h1 {
+                font-size: 1.1rem;
+                margin-bottom: 2px;
+            }
+            .info-content p {
+                font-size: 0.85rem;
+                line-height: 1.4;
+                max-width: 100%;
+            }
+            .info-overlay {
+                display: none; /* Fjerner det tunge SVG-bakgrunnsbildet på mobil */
+            }
+
+            /* Picturegrabber nederst */
+            .center-panel {
+                grid-area: center;
+                min-height: 0; /* Lar panelet krympe så alt får plass uten scroll */
+                height: 100%; /* Fyller resten av skjermhøyden */
+            }
+            .picture-grabber {
+                top: 10px; /* Flytter mekanismen helt opp til toppen av det nederste panelet */
+                width: min(85%, 280px); /* Større utprinter på mobil */
+            }
+            .picture-grabber img.grabber-logo {
+                display: none; /* Skjuler logoen over grabberen på mobil for å unngå krasj med infoboksen */
+            }
+
+            /* Justerer arket slik at det kommer ut rett under grabberen */
+            .paper {
+                top: 70px;
+                left: 0;
+                width: 100%;
+                bottom: 5px;
+            }
+            .paper-grid {
+                max-width: 320px;
+            }
+            .photo {
+                width: min(80%, 280px); /* Bildet matcher den større mobil-grabberen */
+            }
+
+            /* Print-knappen fyller bredden under knapperutenettet */
+            .print-button {
+                width: 100%;
+                min-height: 2.2rem;
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -366,6 +531,7 @@
 <body>
     <main class="page">
         <section class="panel-shell" aria-label="Galleri med kodelås">
+            <img src="Assets/elementer/stealOfApproval.png" class="top-logo" alt="Emblem">
             <aside class="zone left-panel" aria-label="Kodelås">
                 <div class="panel-label">Prosjektvalg</div>
                 <div class="keypad" id="projectButtons" aria-label="Tastatur med ni knapper"></div>
@@ -433,14 +599,18 @@
         let hasPrinted = false;
 
         function renderButtons() {
-            projectButtons.innerHTML = projects.map((project, index) => `
-                <div class="key-wrap">
-                    <button class="project-key" type="button" data-index="${index}">
-                        <span class="key-number">${project.buttonLabel}</span>
-                    </button>
-                    <div class="key-label">${project.title}</div>
-                </div>
-            `).join('');
+            projectButtons.innerHTML = projects.map((project, index) => {
+                // Henter riktig bilde basert på tallet (1, 2, 3...)
+                const buttonImage = `Assets/elementer/knapper/knapper til photobooth-${project.buttonLabel}.png`;
+                
+                return `
+                    <div class="key-wrap">
+                        <button class="project-key" type="button" data-index="${index}" style="background-image: url('${buttonImage}');">
+                            </button>
+                        <div class="key-label">${project.title}</div>
+                    </div>
+                `;
+            }).join('');
 
             projectButtons.querySelectorAll('.project-key').forEach((button) => {
                 button.addEventListener('click', () => {
@@ -451,6 +621,8 @@
                 });
             });
         }
+     
+        
 
         function updateInfo() {
             const project = projects[activeProjectIndex];
