@@ -146,14 +146,14 @@
     }
 
     @keyframes pulse-glow {
-      0% { box-shadow: 0 0 0px #03e9f4; }
-      50% { box-shadow: 0 0 100px #03e9f4, 0 0 35px #03e9f4; }
-      100% { box-shadow: 0 0 0px #03e9f4; }
+      0% { box-shadow: 0 0 0px #ff0000; }
+      50% { box-shadow: 0 0 100px #ff0000, 0 0 35px #ff0000; }
+      100% { box-shadow: 0 0 0px #ff0000; }
     }
 
     .no-animation {
       animation: none !important;
-      box-shadow: 0 0 5px #03e9f4; 
+      box-shadow: 0 0 0px #ffffff00; 
     }
 
     /* RESPONSIVE TWEAKS */
@@ -219,13 +219,13 @@
     <p>Vi minner om at terminalen er tilgjengelig for bruk i hjørnet av siden.</p>
     <button onclick="document.getElementById('velkomst-popup').close()">Lukk</button>
   </dialog>
-  <script>
-    document.getElementById('velkomst-popup').showModal();
-  </script>
-
+  
   <img src="Assets\border\Test-border.svg" class="border border-bottom" alt="decorative border">
 
   <script>
+
+    document.getElementById('velkomst-popup').showModal();
+
     // Project Data
     const prosjekter = [
       {
