@@ -1,340 +1,270 @@
 <!doctype html>
 <html lang="no">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prosjekt</title>
-  <style>
-    /* RESET & BASE */
-    * {
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    body {
-      position: relative;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      /* Make body take full viewport height */
-      min-height: 100vh;
-      /* Center content vertically and horizontally */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      overflow-x: hidden; /* Prevent horizontal scroll from the border */
-    }
+    <style>
+        body {
+            margin: 0;
+            padding: 10px 30px 30px 30px;
+        }
 
-    /* BACKGROUND BORDER */
-    .border {
-      position: absolute;
-      left: 0;
-      width: 150%;
-      /* Center the 150% width element */
-      transform: translateX(-25%);
-      z-index: 0;
-      pointer-events: none;
-    }
+        .flex-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px;
+        }
 
-    .border-top {
-      top: 0;
-      bottom: auto;
-    }
+        /* VIDEO */
 
-    .border-bottom {
-      bottom: 0;
-      top: auto;
-    }
+        .player-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
 
-    /* MAIN CONTAINER */
-    .flex-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 50px;
-      width: 100%;
-      max-width: 1700px;
-      padding: 80px 20px; /* Increased top/bottom space from borders */
-      position: relative;
-      z-index: 1;
-      /* Ensure the container doesn't exceed screen width */
-      margin: 0 auto;
-    }
+        #player {
+            width: 100%;
+            max-width: min(1400px, 90vw);
+            aspect-ratio: 16 / 9;
 
-    /* VIDEO SECTION */
-    .player-wrapper {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-    #player {
-      width: 100%;
-      max-width: min(1400px, 90vw);
-      aspect-ratio: 16 / 9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      border-radius: 20px;
-      background: #000;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
+            overflow: hidden;
+            border-radius: 20px;
+        }
 
-    #player iframe {
-      display: block;
-      width: 100%;
-      height: 100%;
-      border: 0;
-      outline: none;
-    }
+        #player iframe {
+            display: block;
+            width: 101%;
+            height: 101%;
+            position: relative;
+            margin: 0;
+            border: 0;
+            outline: none;
+            background: transparent;
+        }
 
-    /* CONTENT SECTION (TEXT + IMAGES) */
-    .main-content {
-      width: 100%;
-      display: flex;
-      gap: clamp(30px, 3vw, 60px);
-      align-items: flex-start;
-      flex-wrap: wrap; /* Allow stacking on small screens */
-    }
+        /* INNHOLD */
 
-    /* TEXT COLUMN */
-    .inhold {
-      flex: 2;
-      min-width: 300px;
-      padding: 30px;
-    }
+        .main-content {
+            width: 100%;
+            max-width: 1700px;
 
-    .inhold h1 {
-      margin-top: 0;
-      font-size: clamp(1.8rem, 1rem + 2.5vw, 4.5rem);
-      letter-spacing: 2px;
-      padding-bottom: 15px;
-    }
+            display: flex;
+            gap: clamp(30px, 3vw, 60px);
 
-    .inhold p {
-      line-height: 1.8;
-      font-size: clamp(1rem, 0.8rem + 0.7vw, 2rem);
-      margin-bottom: 1.5rem;
-    }
+            align-items: flex-start;
+        }
 
-    /* IMAGE COLUMN */
-    .bilde-kolonne {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      align-items: center;
-      min-width: 250px;
-    }
+        /* TEKST */
 
-    .bilde-kolonne img {
-      width: 100%;
-      max-width: 480px;
-      border-radius: 6px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      object-fit: cover;
-    }
+        .inhold {
+            flex: 2;
 
-    /* TERMINAL BUTTON GLOW */
-    #terminal-knapp {
-      border: none;
-      border-radius: 5px;
-      animation: pulse-glow 2s infinite ease-in-out;
-    }
+            padding: 30px;
+        }
 
-    @keyframes pulse-glow {
-      0% { box-shadow: 0 0 0px #03e9f4; }
-      50% { box-shadow: 0 0 100px #03e9f4, 0 0 35px #03e9f4; }
-      100% { box-shadow: 0 0 0px #03e9f4; }
-    }
+        .inhold h1 {
+            margin-top: 0;
 
-    .no-animation {
-      animation: none !important;
-      box-shadow: 0 0 5px #03e9f4; 
-    }
+            font-size: clamp(1.8rem, 1rem + 2.5vw, 4.5rem);
 
-    /* RESPONSIVE TWEAKS */
-    @media (max-width: 768px) {
-      .flex-container .back-button--fixed {
-        position: static;
-        align-self: flex-start;
-      }
+            letter-spacing: 2px;
 
-      .main-content {
-        flex-direction: column;
-        align-items: center;
-        gap: 30px;
-      }
+            padding-bottom: 15px;
+        }
 
-      .inhold {
-        width: 100%;
-        text-align: center;
-      }
+        .inhold p {
+            line-height: 1.8;
+            font-size: clamp(1rem, 0.8rem + 0.7vw, 2rem);
+        }
 
-      .inhold h1 {
-        font-size: 2rem;
-      }
+        /* BILDER */
 
-      .bilde-kolonne {
-        width: 100%;
-        max-width: 400px;
-      }
-    }
-  </style>
-  
-  <!-- External stylesheets (keep if you have them, otherwise remove) -->
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="terminal.css">
+        .bilde-kolonne {
+            flex: 1;
+
+            display: flex;
+            flex-direction: column;
+
+            gap: 20px;
+        }
+
+        .bilde-kolonne img {
+            width: 100%;
+
+            max-width: 480px;
+
+            border-radius: 6px;
+        }
+
+        /* MOBIL */
+
+        @media (max-width: 768px) {
+            .flex-container .back-button--fixed {
+                position: static;
+                align-self: flex-start;
+            }
+
+            body {
+                padding: 10px 15px 30px 15px;
+            }
+
+            .flex-container {
+                gap: 30px;
+            }
+
+            #player {
+                border-radius: 12px;
+            }
+
+            .main-content {
+                flex-direction: column;
+                gap: 25px;
+            }
+
+            .inhold {
+                padding: 0;
+            }
+
+            .inhold h1 {
+                font-size: 1.8rem;
+            }
+
+            .inhold p {
+                font-size: 1rem;
+            }
+
+            .bilde-kolonne {
+                align-items: center;
+            }
+        }
+        </style>
+        <link rel="stylesheet" href="https://use.typekit.net/nar4tne.css">
+        <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="terminal.css">
 </head>
+
 <body>
 
-  <img src="Assets\border\Test-border.svg" class="border border-top" alt="decorative border">
+    <div class="flex-container">
 
-  <div class="flex-container">
+        <button class="back-button back-button--fixed" aria-label="Tilbake"></button>
 
-    <button class="back-button back-button--fixed" type="button" aria-label="Tilbake"></button>
+        <!-- VIDEO -->
+        <div class="player-wrapper">
+            <div id="player"></div>
+        </div>
 
-    <!-- VIDEO SECTION -->
-    <div class="player-wrapper">
-      <div id="player"></div>
+        <div class="back-title-band">
+            <h1 id="prosjekt-tittel"></h1>
+        </div>
+
+        <!-- TEKST + BILDE -->
+        <div class="main-content">
+
+            <div class="inhold" id="inhold"></div>
+
+            <div class="bilde-kolonne" id="bilde-kolonne"></div>
+
+        </div>
+
     </div>
 
-    <div class="back-title-band">
-      <h1 id="prosjekt-tittel">Informasjonsteknologi</h1>
-    </div>
+    <script>
 
-    <!-- TEXT + IMAGE SECTION -->
-    <div class="main-content">
-      <div class="inhold" id="inhold"></div>
-      <div class="bilde-kolonne" id="bilde-kolonne"></div>
-    </div>
+        const prosjekter = [
+            {
+                id: "media",
 
-  </div>
+                tittel: "Media",
 
-    <dialog id="velkomst-popup">
-      <h1>Velkommen til Informasjonsteknologi</h1>
-    <p>Vi minner om at terminalen er tilgjengelig for bruk i hjørnet av siden.</p>
-    <button onclick="document.getElementById('velkomst-popup').close()">Lukk</button>
-  </dialog>
-  <script>
-    document.getElementById('velkomst-popup').showModal();
-  </script>
+                bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
 
-  <img src="Assets\border\Test-border.svg" class="border border-bottom" alt="decorative border">
+                videoEmbed: `<iframe width="560" height="315" src="https://www.youtube.com/embed/yv3bVFX2lXA?si=D0rhYQHylAjppMyq&autoplay=1&mute=1&playsinline=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
 
-  <script>
-    // Project Data
-    const prosjekter = [
-      {
-        id: "Medieproduksjon",
-        tittel: "Medieproduksjon",
-        bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
-        videoEmbed: `
-          <iframe 
-            width="560" 
-            height="315" 
-            src="https://www.youtube.com/embed/OL1yG4cjVak?si=ll8g1zBpzp077vr5&autoplay=1&mute=1&playsinline=1" 
-            title="YouTube video player" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            referrerpolicy="strict-origin-when-cross-origin" 
-            allowfullscreen>
-          </iframe>
-        `,
-        tekstfil: "Assets/tekst/Medieproduksjon.txt",
-      }
-    ];
+                tekstfil: "Assets/tekst/medieproduksjon",
+            },
+        ];
 
-    // Helper: Get URL Parameter
-    function getQueryParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name);
-    }
+        // FINN URL PARAMETER
 
-    // Main Function: Load Project
-    function visProsjekt() {
-      const id = getQueryParam('id');
-      const prosjekt = prosjekter.find(p => p.id === id);
+        function getQueryParam(name) {
 
-      if (!prosjekt) {
-        document.querySelector('.inhold').innerHTML = "<h1>Prosjekt ikke funnet</h1>";
-        document.querySelector('.bilde-kolonne').innerHTML = "";
-        return;
-      }
+            const url = new URL(window.location.href);
 
-      // 1. Load Image
-      const bildeContainer = document.querySelector('.bilde-kolonne');
-      if (bildeContainer) {
-        bildeContainer.innerHTML = `<img src="${prosjekt.bilde}" alt="${prosjekt.tittel}">`;
-      }
-
-      // 2. Load Text
-      const tekstContainer = document.querySelector('.inhold');
-      if (tekstContainer) {
-        // Set title immediately
-        tekstContainer.innerHTML = `<h1>${prosjekt.tittel}</h1> Loading...`;
-        
-        fetch(prosjekt.tekstfil)
-          .then(response => {
-            if (!response.ok) throw new Error('Filen kunne ikke lastes');
-            return response.text();
-          })
-          .then(data => {
-            // Split text into paragraphs (handling empty lines)
-            const avsnitt = data
-              .split(/\n\s*\n/)
-              .filter(paragraph => paragraph.trim().length > 0) // Avoid empty paragraphs
-              .map(a => `<p>${a.trim()}</p>`)
-              .join('');
-            
-            // Replace content
-            tekstContainer.innerHTML = `<h1>${prosjekt.tittel}</h1>${avsnitt}`;
-          })
-          .catch(error => {
-            console.error('Feil ved lasting:', error);
-            tekstContainer.innerHTML = `<h1>${prosjekt.tittel}</h1><p>Kunne ikke laste teksten.</p>`;
-          });
-      }
-
-      // 3. Load Video
-      const playerContainer = document.querySelector('#player');
-      if (playerContainer) {
-        playerContainer.innerHTML = prosjekt.videoEmbed;
-      }
-    }
-
-    // Initialize on DOM Load
-    document.addEventListener('DOMContentLoaded', visProsjekt);
-  </script>
-
-  <!-- External scripts (keep if you have them, otherwise remove) -->
-  <script src="script.js"></script>
-  <script src="back-button.js"></script>
-  <script src="terminal.js"></script>
-  <script src="kommandoer.js"></script>
-
-  <script>
-    // Stop terminal button glow after first click
-    function setupTerminalGlowStop() {
-        const btn = document.getElementById('terminal-knapp');
-        if (!btn) {
-            setTimeout(setupTerminalGlowStop, 100);
-            return;
+            return url.searchParams.get(name);
         }
-        
-        btn.addEventListener('click', function () {
-            btn.classList.add('no-animation');
-        }, { once: true });
-    }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupTerminalGlowStop);
-    } else {
-        setupTerminalGlowStop();
-    }
-  </script>
-</body>
+        // LAST SIDE
+
+        function visProsjekt() {
+
+            const id = getQueryParam('id');
+
+            const prosjekt =
+                prosjekter.find(p => p.id === id);
+
+            if (!prosjekt) {
+
+                document.getElementById('prosjekt-tittel').textContent = 'Prosjekt ikke funnet';
+
+                document.querySelector('.inhold').innerHTML =
+                    "";
+
+                return;
+            }
+
+            document.getElementById('prosjekt-tittel').textContent = prosjekt.tittel;
+
+            // BILDE
+
+            document.querySelector('.bilde-kolonne').innerHTML = `
+                <img src="${prosjekt.bilde}">
+            `;
+
+            // TEKST
+
+            fetch(prosjekt.tekstfil)
+
+                .then(response => response.text())
+
+                .then(data => {
+
+                    const avsnitt = data
+
+                        .split(/\n\s*\n/)
+
+                        .map(a => `<p>${a.trim()}</p>`)
+
+                        .join('');
+
+                    document.querySelector('.inhold').innerHTML = `
+                        ${avsnitt}
+                    `;
+                });
+
+            // VIDEO
+
+            document.querySelector('#player').innerHTML = prosjekt.videoEmbed;
+        }
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            visProsjekt
+        );
+
+    </script>
+<script src="script.js"></script>
+    <script src="back-button.js"></script>
+<script src="terminal.js"></script>
+<script src="kommandoer.js"></script>
+
 </html>
+</body>
