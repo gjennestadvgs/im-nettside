@@ -207,14 +207,37 @@ function lastInnState() {
     historikkIndeks = historikk.length;
 }
 
+// Holder terminalvinduet innenfor den synlige flaten over tastaturet på mobil.
+// På iOS krymper ikke sidelayouten når tastaturet åpnes, så uten dette legger
+// tastaturet seg oppå input-feltet. VisualViewport forteller oss hvor stor og
+// hvor høyt oppe den faktisk synlige flaten er.
+function tilpassTilTastatur() {
+    if (!terminalVindu) return;
+    const vv = window.visualViewport;
+
+    // Bare på liten skjerm, og bare når terminalen er åpen. Ellers nullstiller
+    // vi de innebygde stilene så desktop-/lukket-visning følger CSS-en igjen.
+    if (!vv || window.innerWidth > 680 || terminalVindu.classList.contains('skjult')) {
+        terminalVindu.style.height = '';
+        terminalVindu.style.top = '';
+        return;
+    }
+
+    terminalVindu.style.height = vv.height + 'px';
+    terminalVindu.style.top = vv.offsetTop + 'px';
+    if (terminalOutput) terminalOutput.scrollTop = terminalOutput.scrollHeight;
+}
+
 function åpneTerminal() {
     terminalVindu.classList.remove('skjult');
     terminalInput.focus();
+    tilpassTilTastatur();
     lagre();
 }
 
 function lukkTerminal() {
     terminalVindu.classList.add('skjult');
+    tilpassTilTastatur(); // nullstiller de live-satte stilene
     lagre();
 }
 
@@ -461,6 +484,12 @@ function startTerminal() {
             }
         }
     });
+
+    // Hold vinduet over tastaturet når den synlige flaten endrer seg (mobil)
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', tilpassTilTastatur);
+        window.visualViewport.addEventListener('scroll', tilpassTilTastatur);
+    }
 
     // 6. Hvis terminalen var åpen forrige side, åpne den igjen
     if (localStorage.getItem('terminal_apent') === 'true') {
