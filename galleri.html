@@ -64,14 +64,15 @@
 
         .project-key {
             aspect-ratio: 1/1;
-            width: 100px;
-            height: 100px;
+            width: 100%;       /* Endret: Bruker full bredde i rutenettet sitt */
+            max-width: 86px;   /* Sørger for at den ikke blir for stor på PC */
+            height: auto;
             border: none;
             border-radius: 0;
-            background-color: transparent; /* Fjernet background-image herfra */
+            background-color: transparent;
             background-position: center center;
             background-repeat: no-repeat;
-            background-size: 72% 72%;
+            background-size: 100% 100%; /* Sørger for at bildefilen strekker seg riktig */
             color: var(--text-color);
             cursor: pointer;
             display: flex;
@@ -83,12 +84,7 @@
             transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
             font: inherit;
         }
-
-        /* Vi fjerner også bakgrunnsbildene fra aktiv-statene */
-        .project-key.active {
-            
-            /* Tom eller fjern helt */
-        }
+        
 
         .project-key.is-selected {
             transform: translateY(-1px);
@@ -247,13 +243,6 @@
             display: block;        
             overflow-y: auto; /* Gir kun denne boksen lov til å scrolle! */
             position: relative;
-            
-            /* Skjuler scrollbjelker */
-            scrollbar-width: none; 
-        }
-
-        .photo::-webkit-scrollbar {
-            display: none;
         }
 
         /* SELVE BILDET (Fikser den voldsomme zoomen) */
@@ -331,39 +320,144 @@
             background-image: url('Assets/elementer/buttonMachineYesPressed.svg');
             transform: translateY(-1px);
         }
-
+        .mobile-logo {
+            display: none;
+        }
+        /* NETTBRETT OG MINDRE DATASKJERMER */
         @media (max-width: 1080px) {
             .panel-shell {
-                grid-template-columns: 1fr;
-                max-height: none;
+                grid-template-columns: minmax(180px, 220px) minmax(0, 1fr) minmax(220px, 280px);
+                gap: 12px;
             }
-
-            .center-panel {
-                min-height: 520px;
+            .project-key {
+                max-width: 70px; /* Krymper knappene litt */
             }
-
-            .info-overlay img {
-                object-fit: cover;
+            .key-label {
+                font-size: 0.65rem;
             }
         }
 
-        @media (max-width: 640px) {
+        /* MOBILTELEFONER (Skjermer under 680px) */
+        @media (max-width: 680px) {
+            body {
+                padding: 8px; /* Mindre luft rundt skjermen */
+            }
+
             .page {
+                padding: 4px;
+            }
+
+            /* Endrer hele griddet til én vertikal kolonne */
+            .panel-shell {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr; /* Knapper øverst, info i midten, bilde nederst */
+                gap: 10px;
+                max-height: calc(100vh - 16px);
+            }
+
+            /* 1. ØVERSTE DEL: Tastaturet og printknappen */
+            .left-panel {
                 padding: 10px;
+                gap: 8px;
+                order: 1; /* Tvinges øverst */
+            }
+            .keypad {
+                gap: 6px;
+            }
+            .project-key {
+                max-width: 55px; /* Krymper knappene betraktelig på mobil */
+            }
+            .key-label {
+                display: none; /* Skjuler teksten under knappene på mobil for å spare kritisk plass */
+            }
+            .print-button {
+                min-height: 2.2rem;
+                font-size: 0.8rem;
+            }
+            .panel-label {
+                font-size: 0.75rem;
             }
 
-            .left-panel,
+            /* 2. MIDTERSTE DEL: Infoboksen (Tittel og tekst) */
             .right-panel {
-                padding: 14px;
+                padding: 0;
+                min-height: auto;
+                order: 2; /* Legges under knappene */
             }
-
-            .paper {
-                inset: 112px 12px 12px;
+            .info-block {
+                height: auto;
             }
-
             .info-content {
-                padding: 34px 24px 24px;
+                padding: 12px; /* Mye mindre padding så tekst ikke tar opp hele skjermen */
             }
+            .info-content h1 {
+                font-size: 1.1rem;
+                margin-bottom: 2px;
+            }
+            .info-content p {
+                font-size: 0.85rem;
+                line-height: 1.4;
+                max-width: 100%;
+            }
+            .info-overlay {
+                display: none; /* Fjerner det tunge SVG-bakgrunnsbildet på mobil */
+            }
+
+            /* 3. NEDERSTE DEL: Maskinen og bildeutskriften */
+            .center-panel {
+                order: 3; /* Plasseres helt nederst */
+                min-height: 0; /* Viktig for at den skal respektere gjenværende plass */
+                height: 100%;
+            }
+            .picture-grabber {
+                top: 10px; /* Flytter mekanismen helt opp til toppen av det nederste panelet */
+                width: 180px; /* Gjør selve "utprinteren" mindre */
+            }
+            .picture-grabber img.grabber-logo {
+                display: none; /* Skjuler logoen over grabberen på mobil for å unngå krasj med infoboksen */
+            }
+
+            /* Justerer arket slik at det kommer ut rett under den mindre grabberen */
+            .paper {
+                top: 45px; 
+                left: 0;
+                width: 100%;
+                bottom: 5px;
+            }
+            .paper-grid {
+                max-width: 240px;
+            }
+            .photo {
+                width: 180px; /* Bildet matcher den smalere mobil-grabberen */
+
+            }
+            @media (max-width: 680px) {
+    /* ... (behold de andre mobil-stilene dine her) ... */
+
+    /* Gjør om knappeområdet til en flexbox som legger ting ved siden av hverandre */
+    .mobile-action-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 14px; /* Mellomrom mellom print-knappen og logoen */
+        width: 100%;
+    }
+
+    .print-button {
+        flex: 1; /* Tvinger knappen til å ta opp resten av plassen */
+        min-height: 2.2rem;
+        font-size: 0.8rem;
+    }
+
+    /* Viser logoen KUN på mobil, og setter størrelsen */
+    .mobile-logo {
+        display: block; /* Gjør den synlig på mobil */
+        width: 45px;    /* Juster denne verdien hvis du vil ha logoen større/mindre */
+        height: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 8px rgba(33, 24, 18, 0.15)); /* Valgfri skygge */
+    }
+}
         }
     </style>
 </head>
@@ -374,7 +468,10 @@
             <aside class="zone left-panel" aria-label="Kodelås">
                 <div class="panel-label">Prosjektvalg</div>
                 <div class="keypad" id="projectButtons" aria-label="Tastatur med ni knapper"></div>
-                <button class="print-button" id="printButton" type="button">Print</button>
+                <div class="mobile-action-wrapper">
+                    <button class="print-button" id="printButton" type="button">Print</button>
+                    <img src="Assets/elementer/stealOfApproval.png" class="mobile-logo" alt="Emblem">
+                </div>    
             </aside>
 
             <section class="zone center-panel" aria-label="Bildevisning">
