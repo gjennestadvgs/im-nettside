@@ -150,3 +150,88 @@
     font-size: 14px;
     outline: none;
 }
+
+/* ============================================================
+   FORSIDE: gammel PC i hjørnet. Den mørke CRT-skjermen fungerer
+   som åpne-knapp for terminalen. PC-en skaleres med skjermen
+   (vw / media queries) slik at den også fungerer på telefon.
+   Selve terminalvinduet åpnes som det store, flytende vinduet
+   det alltid har vært (base-stilen lenger opp).
+   ============================================================ */
+
+/* PC-en festes nederst i høyre hjørne og skaleres med skjermen */
+#pc-forside {
+    position: fixed;
+    right: 0;
+    bottom: -6vh;
+    width: clamp(380px, 36vw, 680px);
+    z-index: 100;                  /* under bildene (z-index 5000) som standard */
+    container-type: inline-size;   /* gjør cqw-enhetene relative til PC-bredden */
+    pointer-events: none;          /* klikk går gjennom alt unntatt skjermflaten */
+}
+
+/* Når terminalvinduet er åpent, løftes hele PC-en over bildene */
+#pc-forside:has(#terminal-vindu:not(.skjult)) {
+    z-index: 10000;
+}
+
+#pc-bilde {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Den mørke skjermflaten på CRT-monitoren (prosent av PC-bildet).
+   Når terminalen er lukket fungerer den som åpne-knapp. */
+#pc-forside #terminal-knapp {
+    position: absolute;
+    left: 27%;
+    top: 16.5%;
+    width: 42.5%;
+    height: 41%;
+    right: auto;
+    bottom: auto;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #2bff5b;
+    font-size: clamp(10px, 4cqw, 26px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+#pc-forside #terminal-knapp:hover {
+    background: rgba(43, 255, 91, 0.07);
+}
+
+/* Terminalvinduet beholder sin opprinnelige flytende plassering.
+   Wrapperen har pointer-events: none, så vinduet må slå den på igjen. */
+#pc-forside #terminal-vindu {
+    pointer-events: auto;
+}
+
+/* Telefon: litt mindre PC, flyttet lenger opp og mot høyre kant */
+@media (max-width: 600px) {
+    #pc-forside {
+        width: min(75vw, 475px);
+        right: -6vw;
+        bottom: 3vh;
+    }
+}
+
+/* Lave/liggende skjermer: ikke la PC-en bli høyere enn skjermen */
+@media (max-height: 520px) {
+    #pc-forside {
+        width: auto;
+        height: 96vh;
+    }
+    #pc-bilde {
+        width: auto;
+        height: 100%;
+    }
+}
