@@ -3,14 +3,15 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 50px;
-    height: 50px;
+    /* Vokser flytende med skjermbredden, akkurat som på galleriet */
+    width: clamp(50px, 4.5vw, 96px);
+    height: clamp(50px, 4.5vw, 96px);
     border-radius: 50%;
     background-color: #1a1a1a;
     color: #ffffff;
     border: none;
     font-family: 'Courier New', monospace;
-    font-size: 18px;
+    font-size: clamp(18px, 1.6vw, 34px);
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -188,4 +189,21 @@
 
 #pc-bilde {
     display: none;
+}
+
+/* STORE SKJERMER: skaler opp terminalen så den ikke blir liggende liten i
+   hjørnet på brede/høye skjermer (samme tilnærming som galleriet).
+   Selve bredden/høyden/skriften styres av terminal.js (resize + lagring),
+   som også regner ut en større standardstørrelse på store skjermer. Her
+   hever vi bare vinduet så det klarerer den større knappen, og skalerer
+   forslags-popupen. */
+@media (min-width: 1400px) {
+    #terminal-vindu {
+        bottom: clamp(100px, 7vw, 130px);
+    }
+
+    #terminal-forslag {
+        font-size: clamp(13px, 0.95vw, 18px);
+        max-height: clamp(160px, 22vh, 280px);
+    }
 }

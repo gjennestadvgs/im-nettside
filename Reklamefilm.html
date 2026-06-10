@@ -30,7 +30,7 @@
 
         #bilde {
             width: 100%;
-            max-width: 900px;
+            max-width: min(1400px, 90vw);
             aspect-ratio: 16 / 9;
 
             display: flex;
@@ -53,10 +53,10 @@
 
         .main-content {
             width: 100%;
-            max-width: 1400px;
+            max-width: 1700px;
 
             display: flex;
-            gap: 40px;
+            gap: clamp(30px, 3vw, 60px);
 
             align-items: flex-start;
         }
@@ -72,7 +72,7 @@
         .inhold h1 {
             margin-top: 0;
 
-            font-size: 2.4rem;
+            font-size: clamp(1.8rem, 1rem + 2.5vw, 4.5rem);
 
             letter-spacing: 2px;
 
@@ -82,7 +82,7 @@
         .inhold p {
             line-height: 1.8;
 
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 0.8rem + 0.7vw, 2rem);
         }
 
         /* BILDER */
@@ -99,7 +99,7 @@
         .bilde-kolonne img {
             width: 100%;
 
-            max-width: 350px;
+            max-width: 480px;
 
             border-radius: 6px;
         }
@@ -108,7 +108,7 @@
 
         .video-seksjon {
             width: 100%;
-            max-width: 1400px;
+            max-width: 1700px;
         }
 
         .video-grid {
@@ -129,6 +129,11 @@
         /* TELEFON */
 
         @media (max-width: 768px) {
+
+            .flex-container .back-button--fixed {
+                position: static;
+                align-self: flex-start;
+            }
 
             body {
                 padding: 20px 15px 40px 15px;
@@ -175,12 +180,13 @@
 
     <div class="flex-container">
 
+        <button class="back-button back-button--fixed" aria-label="Tilbake"></button>
+
         <div class="bilde-wrapper">
             <div id="bilde"></div>
         </div>
 
         <div class="back-title-band">
-            <button class="back-button" aria-label="Tilbake"></button>
             <h1 id="prosjekt-tittel"></h1>
         </div>
 

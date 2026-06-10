@@ -232,18 +232,35 @@ const BASE_FONT = 14;
 
 // Skalerer teksten i terminalen ut fra hvor stort vinduet er. Større
 // vindu => større tekst. Teksten blir aldri mindre enn standard (1x),
-// så den er alltid lesbar, og maks 2x så den ikke blir for stor.
+// så den er alltid lesbar, og maks 2,5x så den ikke blir for stor.
 function settTekststorrelse(bredde, hoyde) {
     const skala = Math.min(bredde / BASE_BREDDE, hoyde / BASE_HOYDE);
-    const begrenset = Math.max(1, Math.min(skala, 2));
+    const begrenset = Math.max(1, Math.min(skala, 2.5));
     terminalVindu.style.fontSize = (BASE_FONT * begrenset) + 'px';
 }
 
-// Gjenoppretter lagret størrelse fra forrige besøk (faller tilbake til
-// standardstørrelsen) og setter tekststørrelsen deretter.
+// Regner ut en passende standardstørrelse ut fra skjermen, så terminalen
+// ikke blir liggende liten i hjørnet på store skjermer (samme tanke som
+// galleriet). Brukes kun når brukeren ikke har dratt til en egen størrelse.
+// Aldri mindre enn grunnstørrelsen, og aldri større enn skjermen tillater.
+function standardStorrelse() {
+    const maksBredde = window.innerWidth - 40;
+    const maksHoyde = window.innerHeight - 100;
+    let bredde = Math.min(Math.max(BASE_BREDDE, window.innerWidth * 0.55), 1300);
+    let hoyde = Math.min(Math.max(BASE_HOYDE, window.innerHeight * 0.74), 1050);
+    bredde = Math.min(bredde, maksBredde);
+    hoyde = Math.min(hoyde, maksHoyde);
+    return { bredde: bredde, hoyde: hoyde };
+}
+
+// Gjenoppretter lagret størrelse fra forrige besøk (faller tilbake til en
+// skjermtilpasset standardstørrelse) og setter tekststørrelsen deretter.
 function lastInnStorrelse() {
-    const bredde = parseInt(localStorage.getItem('terminal_bredde'), 10) || BASE_BREDDE;
-    const hoyde = parseInt(localStorage.getItem('terminal_hoyde'), 10) || BASE_HOYDE;
+    const lagretBredde = parseInt(localStorage.getItem('terminal_bredde'), 10);
+    const lagretHoyde = parseInt(localStorage.getItem('terminal_hoyde'), 10);
+    const standard = standardStorrelse();
+    const bredde = Number.isFinite(lagretBredde) ? lagretBredde : standard.bredde;
+    const hoyde = Number.isFinite(lagretHoyde) ? lagretHoyde : standard.hoyde;
     terminalVindu.style.width = bredde + 'px';
     terminalVindu.style.height = hoyde + 'px';
     settTekststorrelse(bredde, hoyde);
