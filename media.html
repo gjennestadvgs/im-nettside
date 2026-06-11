@@ -26,7 +26,8 @@
             justify-content: center;
         }
 
-        #player {
+        #player,
+        #player-bunn {
             width: 100%;
             max-width: min(1400px, 90vw);
             aspect-ratio: 16 / 9;
@@ -39,7 +40,8 @@
             border-radius: 20px;
         }
 
-        #player iframe {
+        #player iframe,
+        #player-bunn iframe {
             display: block;
             width: 101%;
             height: 101%;
@@ -163,7 +165,8 @@
                 gap: 30px;
             }
 
-            #player {
+            #player,
+            #player-bunn {
                 border-radius: 12px;
             }
 
@@ -225,6 +228,11 @@
 
         </div>
 
+        <!-- VIDEO NEDERST -->
+        <div class="player-wrapper">
+            <div id="player-bunn"></div>
+        </div>
+
     </div>
 
     <script>
@@ -243,6 +251,8 @@
                 ],
 
                 videoEmbed: `<iframe width="560" height="315" src="https://www.youtube.com/embed/PDOXalyZSPo?si=xivrMl3sCR7dsBGo&autoplay=1&mute=1&playsinline=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
+
+                videoEmbedBunn: `<iframe width="560" height="315" src="https://www.youtube.com/embed/irRcCGdyCKw?si=ZZWigCQSeCfPvgxg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
 
                 tekstfil: "Assets/tekst/medieproduksjon",
             },
@@ -314,6 +324,12 @@
             // VIDEO
 
             document.querySelector('#player').innerHTML = prosjekt.videoEmbed;
+
+            // VIDEO NEDERST (valgfri - vises bare hvis prosjektet har en)
+            const bunnPlayer = document.querySelector('#player-bunn');
+            bunnPlayer.innerHTML = prosjekt.videoEmbedBunn || '';
+            bunnPlayer.closest('.player-wrapper').style.display =
+                prosjekt.videoEmbedBunn ? '' : 'none';
         }
 
         document.addEventListener(
