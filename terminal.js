@@ -218,6 +218,97 @@ function lukkTerminal() {
     lagre();
 }
 
+// --- Endre størrelse ---
+
+// Minste og største mål vinduet kan dras til.
+const MIN_BREDDE = 320;
+const MIN_HOYDE = 240;
+
+// Standardstørrelse (samme som i CSS) - brukes som utgangspunkt for
+// hvor stor teksten skal være.
+const BASE_BREDDE = 750;
+const BASE_HOYDE = 600;
+const BASE_FONT = 14;
+
+// Skalerer teksten i terminalen ut fra hvor stort vinduet er. Større
+// vindu => større tekst. Teksten blir aldri mindre enn standard (1x),
+// så den er alltid lesbar, og maks 2,5x så den ikke blir for stor.
+function settTekststorrelse(bredde, hoyde) {
+    const skala = Math.min(bredde / BASE_BREDDE, hoyde / BASE_HOYDE);
+    const begrenset = Math.max(1, Math.min(skala, 2.5));
+    terminalVindu.style.fontSize = (BASE_FONT * begrenset) + 'px';
+}
+
+// Regner ut en passende standardstørrelse ut fra skjermen, så terminalen
+// ikke blir liggende liten i hjørnet på store skjermer (samme tanke som
+// galleriet). Brukes kun når brukeren ikke har dratt til en egen størrelse.
+// Aldri mindre enn grunnstørrelsen, og aldri større enn skjermen tillater.
+function standardStorrelse() {
+    const maksBredde = window.innerWidth - 40;
+    const maksHoyde = window.innerHeight - 100;
+    let bredde = Math.min(Math.max(BASE_BREDDE, window.innerWidth * 0.55), 1300);
+    let hoyde = Math.min(Math.max(BASE_HOYDE, window.innerHeight * 0.74), 1050);
+    bredde = Math.min(bredde, maksBredde);
+    hoyde = Math.min(hoyde, maksHoyde);
+    return { bredde: bredde, hoyde: hoyde };
+}
+
+// Gjenoppretter lagret størrelse fra forrige besøk (faller tilbake til en
+// skjermtilpasset standardstørrelse) og setter tekststørrelsen deretter.
+function lastInnStorrelse() {
+    const lagretBredde = parseInt(localStorage.getItem('terminal_bredde'), 10);
+    const lagretHoyde = parseInt(localStorage.getItem('terminal_hoyde'), 10);
+    const standard = standardStorrelse();
+    const bredde = Number.isFinite(lagretBredde) ? lagretBredde : standard.bredde;
+    const hoyde = Number.isFinite(lagretHoyde) ? lagretHoyde : standard.hoyde;
+    terminalVindu.style.width = bredde + 'px';
+    terminalVindu.style.height = hoyde + 'px';
+    settTekststorrelse(bredde, hoyde);
+}
+
+// Kobler opp resize-håndtaket. Vinduet er forankret nede til høyre, så
+// når vi drar håndtaket (øvre venstre hjørne) utover blir vinduet større.
+function settOppResize() {
+    const handtak = document.getElementById('terminal-resize');
+
+    handtak.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startBredde = terminalVindu.offsetWidth;
+        const startHoyde = terminalVindu.offsetHeight;
+
+        // Maks-mål så vinduet ikke dras utenfor skjermen.
+        const maksBredde = window.innerWidth - 40;
+        const maksHoyde = window.innerHeight - 100;
+
+        function flytt(ev) {
+            // Drar man mot venstre/opp (mindre clientX/Y) blir vinduet større.
+            let nyBredde = startBredde + (startX - ev.clientX);
+            let nyHoyde = startHoyde + (startY - ev.clientY);
+
+            nyBredde = Math.max(MIN_BREDDE, Math.min(nyBredde, maksBredde));
+            nyHoyde = Math.max(MIN_HOYDE, Math.min(nyHoyde, maksHoyde));
+
+            terminalVindu.style.width = nyBredde + 'px';
+            terminalVindu.style.height = nyHoyde + 'px';
+            settTekststorrelse(nyBredde, nyHoyde);
+        }
+
+        function slipp() {
+            document.removeEventListener('mousemove', flytt);
+            document.removeEventListener('mouseup', slipp);
+            // Lagre den nye størrelsen så den overlever sidebytte.
+            localStorage.setItem('terminal_bredde', terminalVindu.offsetWidth);
+            localStorage.setItem('terminal_hoyde', terminalVindu.offsetHeight);
+        }
+
+        document.addEventListener('mousemove', flytt);
+        document.addEventListener('mouseup', slipp);
+    });
+}
+
 // --- Autocomplete ---
 
 // Regner ut hvilke forslag som passer det brukeren har skrevet.
@@ -341,6 +432,7 @@ function startTerminal() {
             <img id="pc-bilde" src="Assets/elementer/pc-forside.png" alt="Gammel PC" draggable="false">
             <button id="terminal-knapp" title="Åpne terminal">&gt;_</button>
             <div id="terminal-vindu" class="skjult">
+                <div id="terminal-resize" title="Dra for å endre størrelse"></div>
                 <div id="terminal-topp">
                     <span>im-terminal</span>
                     <button id="terminal-lukk" title="Lukk">×</button>
@@ -364,6 +456,7 @@ function startTerminal() {
     forslagBoks = document.getElementById('terminal-forslag');
 
     // 3. Last inn lagret state og gjenopprett linjer
+    lastInnStorrelse();
     lastInnState();
     for (const linje of terminalLinjer) {
         leggTilLinje(linje);
@@ -384,6 +477,9 @@ function startTerminal() {
     });
 
     terminalLukk.addEventListener('click', lukkTerminal);
+
+    // La brukeren endre størrelse ved å dra i hjørnehåndtaket
+    settOppResize();
 
     // Klikk hvor som helst i vinduet -> sett fokus tilbake på input
     terminalVindu.addEventListener('click', function () {
