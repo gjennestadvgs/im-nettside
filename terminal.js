@@ -223,7 +223,8 @@ function tilpassTilTastatur() {
         return;
     }
 
-    terminalVindu.style.height = vv.height + 'px';
+    // 15px luft mot bunnen (samme som CSS på telefon)
+    terminalVindu.style.height = (vv.height - 15) + 'px';
     terminalVindu.style.top = vv.offsetTop + 'px';
     if (terminalOutput) terminalOutput.scrollTop = terminalOutput.scrollHeight;
 }
@@ -284,6 +285,11 @@ function standardStorrelse() {
 // Gjenoppretter lagret størrelse fra forrige besøk (faller tilbake til en
 // skjermtilpasset standardstørrelse) og setter tekststørrelsen deretter.
 function lastInnStorrelse() {
+    // På telefon styrer CSS hele størrelsen (fullskjerm med 15px luft mot
+    // bunnen), og terminal.js justerer høyden live i tilpassTilTastatur.
+    // Inline mål her ville overstyrt CSS-en, så vi hopper over dem.
+    if (window.innerWidth <= 680) return;
+
     const lagretBredde = parseInt(localStorage.getItem('terminal_bredde'), 10);
     const lagretHoyde = parseInt(localStorage.getItem('terminal_hoyde'), 10);
     const standard = standardStorrelse();

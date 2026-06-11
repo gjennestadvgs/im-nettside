@@ -175,7 +175,9 @@
       }
 
       .inhold h1 {
-        font-size: 2rem;
+        font-size: clamp(1.4rem, 6vw, 2rem);
+        overflow-wrap: break-word;
+        hyphens: auto;
       }
 
       .bilde-kolonne {
@@ -217,19 +219,23 @@
 
   <script>
 
-    document.getElementById('velkomst-popup').showModal();
+    // Vis velkomst-popupen bare første gang man besøker siden
+    if (!localStorage.getItem('velkomst-popup-vist')) {
+      document.getElementById('velkomst-popup').showModal();
+      localStorage.setItem('velkomst-popup-vist', 'true');
+    }
 
     // Project Data
     const prosjekter = [
       {
         id: "Informasjonsteknologi",
-        tittel: " Informasjonsteknologi",
+        tittel: "Informasjonsteknologi",
         bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
         videoEmbed: `
           <iframe 
             width="560" 
             height="315" 
-            src="https://www.youtube.com/embed/VhwFDFbLhZM?si=FCh6hTy-KyHo3wFE&autoplay=1&mute=1&playsinline=1" 
+            src="https://www.youtube.com/embed/AqWzwk2Pne4?si=LmGvY0vTMU6JpjdX&autoplay=1&mute=1&playsinline=1" 
             title="YouTube video player" 
             frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 

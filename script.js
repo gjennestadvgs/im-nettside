@@ -77,6 +77,27 @@ if (title) {
 }
 bgColour[0] = Number("a")
 
+// Felles gradient nederst på alle sider.
+// Skjuler seg når man har scrollet (nesten) helt til bunnen.
+;(function () {
+    const gradient = document.createElement("div");
+    gradient.className = "bottom-gradient";
+    document.body.appendChild(gradient);
+
+    function oppdaterGradient() {
+        const avstandTilBunn =
+            document.documentElement.scrollHeight -
+            (window.scrollY + window.innerHeight);
+        // Skjul gradienten når man er innenfor 4px fra bunnen (eller siden ikke kan scrolles)
+        gradient.classList.toggle("is-hidden", avstandTilBunn <= 4);
+    }
+
+    window.addEventListener("scroll", oppdaterGradient, { passive: true });
+    window.addEventListener("resize", oppdaterGradient);
+    window.addEventListener("load", oppdaterGradient);
+    oppdaterGradient();
+})();
+
 window.addEventListener("load", function () {
     const loader = document.querySelector(".loader-wrapper");
 
