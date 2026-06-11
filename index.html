@@ -159,11 +159,19 @@
     let maxZ = 5000;
     let mouseHasMoved = false;
     let imgLink = null;
+    let startX = 0;
+    let startY = 0;
+    // Hvor mange piksler fingeren/musen må flytte seg før det regnes som
+    // et dra (og ikke et klikk). På iPad gir en vanlig tapp alltid noen få
+    // pikslers bevegelse, så uten denne terskelen ville touch aldri navigere.
+    const DRAG_THRESHOLD = 8;
 
     function startDrag(img, clientX, clientY) {
         isDragging = true;
         mouseHasMoved = false;
         imgLink = img.dataset.link;
+        startX = clientX;
+        startY = clientY;
         maxZ += 1;
         currentImage = img;
         currentImage.style.zIndex = maxZ;
@@ -175,7 +183,9 @@
 
     function moveDrag(clientX, clientY) {
         if (isDragging && currentImage) {
-            mouseHasMoved = true;
+            if (Math.hypot(clientX - startX, clientY - startY) > DRAG_THRESHOLD) {
+                mouseHasMoved = true;
+            }
 
             let nyLeft = clientX - offsetX;
             let nyTop = clientY - offsetY;
@@ -195,11 +205,19 @@
     }
 
     function endDrag() {
+        // Bare reager hvis man faktisk startet et trykk på et bilde.
+        // Uten denne sjekken vil et klikk hvor som helst på siden (mouseup
+        // ligger på hele document) navigere til en gammel/hengende imgLink –
+        // f.eks. når forsiden gjenopprettes fra nettleserens bfcache.
+        if (!isDragging) {
+            return;
+        }
         if (!mouseHasMoved && imgLink) {
             console.log(imgLink);
             window.location.assign(imgLink);
         }
         isDragging = false;
+        imgLink = null;
         // reset cursors
         document.body.style.cursor = '';
         img.forEach(i => i.style.cursor = 'grab');
