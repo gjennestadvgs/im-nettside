@@ -217,7 +217,11 @@
 
   <script>
 
-    document.getElementById('velkomst-popup').showModal();
+    // Vis velkomst-popupen bare første gang man besøker siden
+    if (!localStorage.getItem('velkomst-popup-vist')) {
+      document.getElementById('velkomst-popup').showModal();
+      localStorage.setItem('velkomst-popup-vist', 'true');
+    }
 
     // Project Data
     const prosjekter = [
@@ -229,7 +233,7 @@
           <iframe 
             width="560" 
             height="315" 
-            src="https://www.youtube.com/embed/VhwFDFbLhZM?si=FCh6hTy-KyHo3wFE&autoplay=1&mute=1&playsinline=1" 
+            src="https://www.youtube.com/embed/AqWzwk2Pne4?si=LmGvY0vTMU6JpjdX&autoplay=1&mute=1&playsinline=1" 
             title="YouTube video player" 
             frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
