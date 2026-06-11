@@ -24,7 +24,7 @@
 /* Selve terminalvinduet */
 #terminal-vindu {
     position: fixed;
-    bottom: 80px;
+    bottom: 2px;
     right: 20px;
     width: 750px;
     max-width: calc(100vw - 40px);
@@ -38,7 +38,9 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     display: flex;
     flex-direction: column;
-    z-index: 9999;
+    /* Over den løftede PC-en (z-index: 10000 når terminalen er åpen),
+       så vinduet aldri havner bak skjermen/PC-en. */
+    z-index: 10001;
     overflow: hidden;
 }
 
@@ -202,8 +204,10 @@
     pointer-events: none;          /* klikk går gjennom alt unntatt skjermflaten */
 }
 
-/* Når terminalvinduet er åpent, løftes hele PC-en over bildene */
-#pc-forside:has(#terminal-vindu:not(.skjult)) {
+/* Når terminalvinduet er åpent, løftes hele PC-en over bildene.
+   Klassen settes av terminal.js (åpne/lukk), siden vinduet nå ligger
+   utenfor PC-en i DOM-en og et :has() derfor ikke ville truffet. */
+#pc-forside.terminal-aapen {
     z-index: 10000;
 }
 
@@ -241,18 +245,18 @@
     background: rgba(43, 255, 91, 0.07);
 }
 
-/* Terminalvinduet beholder sin opprinnelige flytende plassering.
-   Wrapperen har pointer-events: none, så vinduet må slå den på igjen. */
-#pc-forside #terminal-vindu {
-    pointer-events: auto;
-}
+/* Terminalvinduet ligger nå utenfor PC-en (flyttet til body av terminal.js),
+   så det er ikke lenger påvirket av PC-ens pointer-events: none. Det beholder
+   sin flytende plassering fast nederst på skjermen via base-stilen lenger opp. */
 
-/* Telefon: litt mindre PC, flyttet lenger opp og mot høyre kant */
+/* Telefon: litt mindre PC, mot høyre kant. Negativ bottom skjuler de ~14 %
+   gjennomsiktige under tastaturet i pc-forside.png, så TASTATURET når bunnen.
+   (-7.4vw ≈ 14 % av PC-ens høyde ved width: 75vw.) */
 @media (max-width: 600px) {
     #pc-forside {
         width: min(75vw, 475px);
         right: -6vw;
-        bottom: 3vh;
+        bottom: -7.4vw;
     }
 }
 
