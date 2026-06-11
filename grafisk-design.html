@@ -125,7 +125,7 @@
 
         .bilder.logoer {
             flex-direction: row;
-            flex-wrap: wrap;
+            flex-wrap: nowrap; /* alle logoene på én linje */
 
             justify-content: center;
 
@@ -133,10 +133,22 @@
         }
 
         .bilder.logoer img {
-            width: clamp(80px, 10vw, 140px);
-            height: clamp(80px, 10vw, 140px);
+            /* Del bredden likt og la dem krympe, så alle får plass på én linje
+               uansett antall. aspect-ratio holder hver logo kvadratisk. */
+            flex: 1 1 0;
+            min-width: 0;
+            width: auto;
+            height: auto;
+            max-width: 140px;
+            aspect-ratio: 1 / 1;
 
             object-fit: contain;
+
+            /* hvit firkant rundt hver logo */
+            background-color: #fff;
+            padding: 12px;
+            box-sizing: border-box;
+            border-radius: 8px;
         }
 
         /* flere filmplakater = rutenett med portrettbilder */
@@ -206,6 +218,15 @@
             .bilder {
                 align-items: center;
             }
+
+            /* Hold logo-raden innenfor skjermen: full bredde + tillat krymping,
+               ellers flyter de nowrap-logoene utenfor på telefon. */
+            .bilder.logoer {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                gap: 8px;
+            }
         }
     </style>
 </head>
@@ -241,7 +262,7 @@
 
                 tekstfil: "Assets/tekst/Grafisk-Design.txt",
 
-                forside: "Assets/bilder/1IM_2026_1.jpg",
+                forside: "Assets/bilder/GrafiskMontasje.jpg",
 
                 // bilder for hvert avsnitt (avsnitt deles med "--" i tekstfila)
                 // 3 eller flere bilder vises som små logoer
