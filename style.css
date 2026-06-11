@@ -12,9 +12,10 @@ body {
 :root {
     --main-color: #007bff;
     --secondary-color: #6c757d;
-    --background-color: #3b3b3f;
+    --background-color: #005063;
     --text-color: #ffffff;
     --secondary-text-color: #000000;
+    --heading-color: #e67e22;
     --line-height-body: 1.15;
     --line-height-headings: 1.05;
 }
@@ -23,6 +24,7 @@ body {
 h1, h2, h3, h4, h5, h6, .panel-label, .key-title {
     font-family: 'mundial', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     line-height: var(--line-height-headings);
+    color: var(--heading-color);
 }
 
 /* Body and paragraph line-height */
