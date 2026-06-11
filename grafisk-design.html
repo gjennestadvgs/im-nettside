@@ -56,9 +56,26 @@
             max-width: 1700px;
 
             display: flex;
+            flex-direction: column;
+
+            gap: clamp(50px, 6vw, 100px);
+        }
+
+        /* AVSNITT (rad med tekst + bilder) */
+
+        .avsnitt-rad {
+            width: 100%;
+
+            display: flex;
             gap: clamp(30px, 3vw, 60px);
 
-            align-items: flex-start;
+            align-items: center;
+        }
+
+        /* annenhver avsnitt bytter side */
+
+        .avsnitt-rad:nth-child(even) {
+            flex-direction: row-reverse;
         }
 
         /* TEKST */
@@ -87,8 +104,8 @@
 
         /* BILDER */
 
-        .bilde-kolonne {
-            flex: 1;
+        .bilder {
+            flex: 1.4;
 
             display: flex;
             flex-direction: column;
@@ -96,12 +113,50 @@
             gap: 20px;
         }
 
-        .bilde-kolonne img {
+        .bilder img {
             width: 100%;
 
-            max-width: 480px;
+            max-width: 600px;
 
             border-radius: 6px;
+        }
+
+        /* mange små bilder = logoer */
+
+        .bilder.logoer {
+            flex-direction: row;
+            flex-wrap: wrap;
+
+            justify-content: center;
+
+            gap: 14px;
+        }
+
+        .bilder.logoer img {
+            width: clamp(80px, 10vw, 140px);
+            height: clamp(80px, 10vw, 140px);
+
+            object-fit: contain;
+        }
+
+        /* flere filmplakater = rutenett med portrettbilder */
+
+        .bilder.plakater {
+            flex-direction: row;
+            flex-wrap: wrap;
+
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 16px;
+        }
+
+        .bilder.plakater img {
+            width: 100%;
+            max-width: none;
+
+            aspect-ratio: 2 / 3;
+            object-fit: cover;
         }
 
         /* MOBIL */
@@ -125,6 +180,13 @@
             }
 
             .main-content {
+                gap: 45px;
+            }
+
+            /* alltid tekst over bilder på mobil */
+
+            .avsnitt-rad,
+            .avsnitt-rad:nth-child(even) {
                 flex-direction: column;
                 gap: 25px;
             }
@@ -141,7 +203,7 @@
                 font-size: 1rem;
             }
 
-            .bilde-kolonne {
+            .bilder {
                 align-items: center;
             }
         }
@@ -162,14 +224,8 @@
             <h1 id="prosjekt-tittel"></h1>
         </div>
 
-        <!-- TEKST + BILDE -->
-        <div class="main-content">
-
-            <div class="inhold" id="inhold"></div>
-
-            <div class="bilde-kolonne" id="bilde-kolonne"></div>
-
-        </div>
+        <!-- AVSNITT (tekst + bilder, bytter side) -->
+        <div class="main-content" id="main-content"></div>
 
     </div>
 
@@ -185,7 +241,33 @@
 
                 tekstfil: "Assets/tekst/Grafisk-Design.txt",
 
-                forside: "Assets/bilder/1IM_2026_1.jpg"
+                forside: "Assets/bilder/1IM_2026_1.jpg",
+
+                // bilder for hvert avsnitt (avsnitt deles med "--" i tekstfila)
+                // 3 eller flere bilder vises som små logoer
+                avsnittBilder: [
+
+                    // avsnitt 1: små logoer
+                    [
+                        "Assets/bilder/logoer/northbyte-v2-23.png",
+                        "Assets/bilder/logoer/NorthByteLogoClean-1.png",
+                        "Assets/bilder/logoer/New_Northbyte_Games_V4_BlackNWhite-1.png",
+                        "Assets/bilder/logoer/PulseZone-1.png",
+                        "Assets/bilder/logoer/Logo_Kasper-1.png"
+                    ],
+
+                    // avsnitt 2
+                    [
+                        "Assets/bilder/Filmplakat_above-the-law.jpg",
+                        "Assets/bilder/filmplakater/Gresk Antikk-v4.jpg",
+                        "Assets/bilder/filmplakater/LanPoster.jpg",
+                        "Assets/bilder/filmplakater/Lan_poster_oppgave.jpg",
+                        "Assets/bilder/filmplakater/OperationUnknown.png",
+                        "Assets/bilder/filmplakater/viking-tiden.png"
+                    ],
+
+                    // avsnitt 3
+                ]
             },
         ];
 
@@ -211,25 +293,20 @@
 
                 document.getElementById('prosjekt-tittel').textContent = 'Prosjekt ikke funnet';
 
-                document.querySelector('.inhold').innerHTML =
-                    "";
+                document.getElementById('main-content').innerHTML = "";
 
                 return;
             }
 
             document.getElementById('prosjekt-tittel').textContent = prosjekt.tittel;
 
-            // BILDE
-
-            document.querySelector('.bilde-kolonne').innerHTML = `
-                <img src="${prosjekt.bilde}">
-            `;
+            // FORSIDEBILDE
 
             document.getElementById('bilde').innerHTML = `
                 <img src="${prosjekt.forside || prosjekt.bilde}" alt="${prosjekt.tittel}">
             `;
 
-            // TEKST
+            // TEKST + BILDER (avsnitt deles med "--")
 
             fetch(prosjekt.tekstfil)
 
@@ -239,15 +316,49 @@
 
                     const avsnitt = data
 
-                        .split(/\n\s*\n/)
+                        .split('--')
 
-                        .map(a => `<p>${a.trim()}</p>`)
+                        .map(a => a.trim())
+
+                        .filter(a => a.length > 0);
+
+                    const bildeGrupper = prosjekt.avsnittBilder || [];
+
+                    document.getElementById('main-content').innerHTML = avsnitt
+
+                        .map((tekst, i) => {
+
+                            // del avsnittet i mindre tekstbiter på blanke linjer
+                            const tekstHtml = tekst
+                                .split(/\n\s*\n/)
+                                .map(p => `<p>${p.trim()}</p>`)
+                                .join('');
+
+                            const bilder = bildeGrupper[i] || [];
+
+                            // bilder i /logoer/ = små logoer, ellers flere bilder = plakat-rutenett
+                            const erLogoer = bilder.length >= 3
+                                && bilder.every(src => src.includes('/logoer/'));
+
+                            const erPlakater = !erLogoer && bilder.length >= 2;
+
+                            const bilderHtml = bilder
+                                .map(src => `<img src="${src}" alt="">`)
+                                .join('');
+
+                            const bilderKlasse = erLogoer
+                                ? ' logoer'
+                                : (erPlakater ? ' plakater' : '');
+
+                            return `
+                                <div class="avsnitt-rad">
+                                    <div class="inhold">${tekstHtml}</div>
+                                    <div class="bilder${bilderKlasse}">${bilderHtml}</div>
+                                </div>
+                            `;
+                        })
 
                         .join('');
-
-                    document.querySelector('.inhold').innerHTML = `
-                        ${avsnitt}
-                    `;
                 });
 
         }
