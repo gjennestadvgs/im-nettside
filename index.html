@@ -20,7 +20,9 @@
         body {
             background-image: url('Assets/bilder/bakgrunner/forside-uten-pc.jpg');
             background-size: cover;
-            background-position: center;
+            /* Fest bildet til bunnen: når "cover" må beskjære, kuttes
+               alltid toppen - aldri bunnen. Så bordet er alltid synlig. */
+            background-position: center bottom;
             background-attachment: fixed;
         }
         @media (max-width: 768px) {
@@ -40,7 +42,8 @@
             z-index: 5000;
         }
         .main-assets:active {
-            transform: scale(1.2)
+            transform: scale(1.2);
+            cursor: grabbing;
         }
 
         /* ============================================================
@@ -83,7 +86,6 @@
         #postit-reklamer      { max-width: 12vw; max-height: 12vh; top: 40vh; left: 70vw; }
         #postit-lan           { max-width: 12vw; max-height: 12vh; top: 75vh; left: 5vw;  }
         #postit-praksis       { max-width: 12vw; max-height: 12vh; top: 75vh; left: 38vw; }
-        #postit-programmering { max-width: 12vw; max-height: 12vh; top: 75vh; left: 70vw; }
 
         /* --- Telefon (liten skjerm) --- */
         @media (max-width: 600px) {
@@ -114,7 +116,6 @@
             #postit-reklamer      { max-width: 18vw; max-height: 18vh; top: 52vh; left: 28vw; right: auto; }
             #postit-lan           { max-width: 18vw; max-height: 18vh; top: 74vh; left: 78vw; right: auto; }
             #postit-praksis       { max-width: 18vw; max-height: 18vh; top: 74vh; left: 28vw; right: auto; }
-            #postit-programmering { max-width: 18vw; max-height: 18vh; top: 96vh; left: 28vw; right: auto; }
         }
     </style>
 </head>
@@ -144,7 +145,6 @@
     <img id="postit-medie" src="Assets/elementer/postit notes/medie.png" class="main-assets" data-link="media.html?id=media" alt="Media">
     <img id="postit-reklamer" src="Assets/elementer/postit notes/reklamer.png" class="main-assets" data-link="Reklamefilm.html?id=Reklamefilm" alt="Reklamer">
     <img id="postit-praksis" src="Assets/elementer/postit notes/praksis.png" class="main-assets" data-link="film-rull.html?id=Praksis" alt="Praksis">
-    <img id="postit-programmering" src="Assets/elementer/postit notes/programmeringsOppgave.png" class="main-assets" data-link="#" alt="Programmeringsoppgave">
 </div>
 <script src="script.js"></script>
 <script src="prosjekter.js"></script>
@@ -170,6 +170,7 @@
         offsetX = clientX - img.getBoundingClientRect().left;
         offsetY = clientY - img.getBoundingClientRect().top;
         document.body.style.cursor = 'grabbing';
+        currentImage.style.cursor = 'grabbing';
     }
 
     function moveDrag(clientX, clientY) {

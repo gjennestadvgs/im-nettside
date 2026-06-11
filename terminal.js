@@ -230,6 +230,9 @@ function tilpassTilTastatur() {
 
 function åpneTerminal() {
     terminalVindu.classList.remove('skjult');
+    // Løft PC-en over bildene mens terminalen er åpen (se terminal index.css).
+    const pc = document.getElementById('pc-forside');
+    if (pc) pc.classList.add('terminal-aapen');
     terminalInput.focus();
     tilpassTilTastatur();
     lagre();
@@ -237,6 +240,8 @@ function åpneTerminal() {
 
 function lukkTerminal() {
     terminalVindu.classList.add('skjult');
+    const pc = document.getElementById('pc-forside');
+    if (pc) pc.classList.remove('terminal-aapen');
     tilpassTilTastatur(); // nullstiller de live-satte stilene
     lagre();
 }
@@ -330,6 +335,91 @@ function settOppResize() {
         document.addEventListener('mousemove', flytt);
         document.addEventListener('mouseup', slipp);
     });
+}
+
+// --- Forankre PC-en til bordet i bakgrunnsbildet ---
+
+// Bakgrunnsbildet bruker "cover", så det skaleres og beskjæres ulikt
+// avhengig av skjermens form - og dermed flytter bordet seg rundt.
+// Her regner vi ut hvor et valgt punkt PÅ bordet havner på skjermen
+// akkurat nå, og plasserer PC-en der, slik at den alltid står på bordet.
+
+// Hvor på bakgrunnsbildet bordet er (0-1). JUSTER DISSE for å flytte
+// PC-en bortover / innover på bordet.
+const BORD_ANKER_X = 0.85;  // 0 = venstre kant, 0.5 = midten, 1 = høyre kant
+const BORD_ANKER_Y = 1;  // 0 = topp av bildet, 1 = bunn av bildet
+
+// Hvilket punkt PÅ PC-en som skal treffe bordpunktet (0-1).
+// OBS: pc-forside.png har ca. 14 % gjennomsiktig tomrom under tastaturet,
+// så selve maskinen slutter ved 0.86. Vi anker på 0.86 slik at TASTATURETS
+// underkant (ikke den tomme bildekanten) lander på bordet/bunnen.
+const PC_ANKER_X = 0.5;
+const PC_ANKER_Y = 0.86;
+
+// Naturlig størrelse på bakgrunnsbildet. Måles opp første gang (og hvis
+// bildet byttes), så vi kjenner størrelsesforholdet.
+let bgUrl = '', bgBredde = 0, bgHoyde = 0;
+
+// Plukker ut url-en til bakgrunnsbildet som faktisk vises nå.
+function aktivBakgrunnUrl() {
+    const bg = getComputedStyle(document.body).backgroundImage;
+    const treff = bg && bg.match(/url\(["']?(.*?)["']?\)/);
+    return treff ? treff[1] : null;
+}
+
+function forankrePc() {
+    const pc = document.getElementById('pc-forside');
+    if (!pc) return;
+
+    const url = aktivBakgrunnUrl();
+    const erForside = url && url.indexOf('forside') !== -1;
+
+    // Bare på forsiden (der bord-bakgrunnen brukes) og på større skjermer.
+    // Ellers nullstiller vi de live-satte stilene, så CSS-en styrer PC-en
+    // som før (svart bakgrunn på undersider, egne media queries på telefon).
+    if (!erForside || window.innerWidth <= 768) {
+        pc.style.left = '';
+        pc.style.top = '';
+        pc.style.right = '';
+        pc.style.bottom = '';
+        return;
+    }
+
+    // Mål opp bildet første gang, eller hvis bakgrunnen er byttet.
+    if (url !== bgUrl) {
+        bgUrl = url;
+        const bilde = new Image();
+        bilde.onload = function () {
+            bgBredde = bilde.naturalWidth;
+            bgHoyde = bilde.naturalHeight;
+            forankrePc(); // regn på nytt når vi kjenner størrelsen
+        };
+        bilde.src = url;
+        return;
+    }
+    if (!bgBredde || !bgHoyde) return;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // "cover": skaler bildet så det dekker hele skjermen.
+    // Vannrett sentrert, men festet til BUNNEN loddrett (samme som
+    // background-position: center bottom), så bordet alltid er synlig.
+    const skala = Math.max(vw / bgBredde, vh / bgHoyde);
+    const synligB = bgBredde * skala;
+    const synligH = bgHoyde * skala;
+    const venstre = (vw - synligB) / 2; // kan bli negativ når bildet beskjæres
+    const topp = vh - synligH;          // bunnen av bildet ligger på skjermens bunn
+
+    // Bordpunktet, omregnet til skjermkoordinater (piksler).
+    const bordX = venstre + BORD_ANKER_X * synligB;
+    const bordY = topp + BORD_ANKER_Y * synligH;
+
+    // Plasser PC-en slik at valgt punkt på den treffer bordpunktet.
+    pc.style.right = 'auto';
+    pc.style.bottom = 'auto';
+    pc.style.left = (bordX - PC_ANKER_X * pc.offsetWidth) + 'px';
+    pc.style.top = (bordY - PC_ANKER_Y * pc.offsetHeight) + 'px';
 }
 
 // --- Autocomplete ---
@@ -478,6 +568,12 @@ function startTerminal() {
     terminalInput = document.getElementById('terminal-input');
     forslagBoks = document.getElementById('terminal-forslag');
 
+    // PC-en har container-type: inline-size (for å skalere skjerm-teksten).
+    // Det gjør at "position: fixed" inni PC-en regnes i forhold til PC-boksen
+    // i stedet for skjermen. Vi flytter derfor terminalvinduet ut til body, så
+    // det alltid ligger fast nederst på skjermen - uavhengig av hvor PC-en står.
+    document.body.appendChild(terminalVindu);
+
     // 3. Last inn lagret state og gjenopprett linjer
     lastInnStorrelse();
     lastInnState();
@@ -503,6 +599,13 @@ function startTerminal() {
 
     // La brukeren endre størrelse ved å dra i hjørnehåndtaket
     settOppResize();
+
+    // Hold PC-en plassert på bordet i bakgrunnsbildet (forsiden), og
+    // regn på nytt når skjermen endrer størrelse eller PC-bildet er lastet.
+    const pcBilde = document.getElementById('pc-bilde');
+    pcBilde.addEventListener('load', forankrePc);
+    window.addEventListener('resize', forankrePc);
+    forankrePc();
 
     // Klikk hvor som helst i vinduet -> sett fokus tilbake på input
     terminalVindu.addEventListener('click', function () {
