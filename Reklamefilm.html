@@ -222,8 +222,8 @@
 
                 // Fire YouTube-videoer. Bytt ut ID-ene (delen etter "embed/").
                 videoer: [
-                    "https://www.youtube.com/embed/MKrL_Y153B0",
-                    "https://www.youtube.com/embed/zAhAdWmfdtM",
+                    "https://www.youtube.com/embed/MKrL_Y153B0?si=MHNIkMAT8SbU4X_J",
+                    "https://www.youtube.com/embed/zAhAdWmfdtM?si=3Yy1NmIAbSU0m924"
                 ]
             },
         ];
@@ -259,10 +259,6 @@
             document.getElementById('prosjekt-tittel').textContent = prosjekt.tittel;
 
             // BILDE
-
-            document.querySelector('.bilde-kolonne').innerHTML = `
-                <img src="${prosjekt.bilde}">
-            `;
 
             document.getElementById('bilde').innerHTML = `
                 <img src="${prosjekt.forside || prosjekt.bilde}" alt="${prosjekt.tittel}">
@@ -315,6 +311,7 @@
     <script src="back-button.js"></script>
 <script src="terminal.js"></script>
 <script src="kommandoer.js"></script>
+<script src="lightbox.js"></script>
 
 </html>
 </body>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Modak&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bangers&family=Modak&display=swap"
+        rel="stylesheet">
+    <title>Minesweeper</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js"></script>
+</head>
+
+<body>
+    <button class="back-button back-button--fixed" type="button" aria-label="Tilbake"></button>
+    <div class="container">
+        <div class="stats">
+            <div>Flags left: <span id="flags-left"></span></div>
+            <div>Time: <span id="timer">0</span>s</div>
+            <div>Best: <span id="best-time">--</span>s</div>
+        </div>
+        <div class="grid"></div>
+        <div id="result"></div>
+        <button id="reset">Try Again</button>
+    </div>
+    <script src="../back-button.js"></script>
+</body>
+
+</html>
