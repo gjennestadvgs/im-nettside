@@ -175,7 +175,9 @@
       }
 
       .inhold h1 {
-        font-size: 2rem;
+        font-size: clamp(1.4rem, 6vw, 2rem);
+        overflow-wrap: break-word;
+        hyphens: auto;
       }
 
       .bilde-kolonne {
@@ -227,7 +229,7 @@
     const prosjekter = [
       {
         id: "Informasjonsteknologi",
-        tittel: " Informasjonsteknologi",
+        tittel: "Informasjonsteknologi",
         bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
         videoEmbed: `
           <iframe 

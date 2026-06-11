@@ -75,3 +75,22 @@ body, p, li, dd, dt, .info-content p {
     font-size: clamp(1.8rem, 1rem + 2.5vw, 4.5rem);
 }
 
+/* Felles gradient nederst på alle sider.
+   Vises når man ikke har scrollet helt til bunnen, og fader ut når man er nede. */
+.bottom-gradient {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: clamp(80px, 12vh, 160px);
+    background: linear-gradient(to top, black, transparent);
+    pointer-events: none;
+    z-index: 900;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.bottom-gradient.is-hidden {
+    opacity: 0;
+}
+
