@@ -110,10 +110,13 @@
 /* Området der tekst skrives ut */
 #terminal-output {
     flex: 1;
+    min-width: 0;
     padding: 12px;
+    overflow-x: hidden;
     overflow-y: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
+    overflow-wrap: anywhere; /* bryt lange ord/lenker så de aldri går utenfor skjermen */
 }
 
 .terminal-linje {

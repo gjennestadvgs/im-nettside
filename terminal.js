@@ -229,11 +229,28 @@ function tilpassTilTastatur() {
     if (terminalOutput) terminalOutput.scrollTop = terminalOutput.scrollHeight;
 }
 
+// Slår zoom av/på via viewport-metaen. Mens terminalen er åpen vil vi unngå at
+// telefonen (særlig iOS) zoomer inn når man trykker i input-feltet. Når den
+// lukkes setter vi metaen tilbake, så kniping-for-å-zoome virker som vanlig på
+// resten av siden.
+function settViewportZoom(tillatt) {
+    let meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('name', 'viewport');
+        document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', tillatt
+        ? 'width=device-width, initial-scale=1.0'
+        : 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+}
+
 function åpneTerminal() {
     terminalVindu.classList.remove('skjult');
     // Løft PC-en over bildene mens terminalen er åpen (se terminal index.css).
     const pc = document.getElementById('pc-forside');
     if (pc) pc.classList.add('terminal-aapen');
+    settViewportZoom(false); // hindre zoom-på-input mens terminalen er åpen
     terminalInput.focus();
     tilpassTilTastatur();
     lagre();
@@ -243,6 +260,7 @@ function lukkTerminal() {
     terminalVindu.classList.add('skjult');
     const pc = document.getElementById('pc-forside');
     if (pc) pc.classList.remove('terminal-aapen');
+    settViewportZoom(true); // tillat zoom igjen på resten av siden
     tilpassTilTastatur(); // nullstiller de live-satte stilene
     lagre();
 }
@@ -483,6 +501,11 @@ function visForslag() {
         const indeks = i;
         rad.addEventListener('mousedown', function (e) {
             e.preventDefault(); // unngå at input mister fokus
+            // Stopp boblingen til "lukk ved klikk utenfor"-håndtereren på
+            // document. velgForslag bygger ofte forslagslisten på nytt og
+            // fjerner denne raden fra DOM-en, og da ville contains(e.target)
+            // bli false slik at terminalen feilaktig lukket seg.
+            e.stopPropagation();
             velgForslag(indeks);
         });
         forslagBoks.appendChild(rad);

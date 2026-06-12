@@ -1,3 +1,11 @@
+/* Rutestørrelsen styrer hele brettet. Den er 40px på store skjermer, men
+   krymper med skjermbredden på telefon (8.5vw) så hele brettet alltid får
+   plass. Alt annet regnes ut fra --cell. */
+:root {
+    --cell: min(40px, 8.5vw);
+    --grid: calc(var(--cell) * 10);
+}
+
 body {
     display: flex;
     justify-content: center;
@@ -6,6 +14,8 @@ body {
     padding-top: 40px;
     box-sizing: border-box;
     background-color: #e1d7ca;
+    touch-action: manipulation;       /* hindrer dobbelttrykk-zoom på spillet */
+    -webkit-text-size-adjust: 100%;
 }
 
 /* Tilbake-knapp - samme stil som resten av siden (bildet ligger i rotmappa). */
@@ -35,21 +45,16 @@ body {
 
 #reset {
     z-index: 10;
-    top: 320px;
-    left: 210px;
-    position: absolute;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
     display: none;
     margin: 10px auto;
     font-family: 'Archivo Black', system-ui;
     background-color: #57da59;
     color: white;
     border-radius: 10px;
-    padding: 10px;
+    padding: 10px 16px;
     border: none;
     cursor: pointer;
+    font-size: clamp(14px, 4vw, 18px);
     transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
@@ -62,87 +67,110 @@ body {
     transform: scale(0.95);
 }
 
+.container {
+    width: min(500px, 96vw);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .stats {
     display: flex;
     justify-content: space-between;
-    width: 400px;
+    gap: 8px;
+    width: calc(var(--grid) + 20px);   /* like bredt som brettet (inkl. ramme) */
+    max-width: 100%;
     margin: 0 auto;
-    font-size: 20px;
 }
 
 .stats div {
     font-family: 'Archivo Black', system-ui;
-    font-size: 20px;
+    font-size: clamp(11px, 3.2vw, 20px);
 }
 
-.container {
-    width: 500px;
+/* Brett + resultat-overlegg ligger oppå hverandre */
+.board {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .grid {
-    width: 400px;
-    height: 400px;
+    width: var(--grid);
+    height: var(--grid);
+    box-sizing: content-box;           /* rammen kommer utenpå de 10 rutene */
     display: flex;
     flex-wrap: wrap;
     background-color: #83837fb7;
-    margin-left: 50px;
-    margin-top: 20px;
     border: 10px solid #83837fb7;
-    margin-bottom: 10px;
+    margin: 20px 0 10px;
+    touch-action: manipulation;
 }
 
 div {
-    font-size: 25px;
     text-align: center;
     font-family: 'Roboto', sans-serif;
-
 }
 
 .valid,
 .bomb {
-    width: 40px;
-    height: 40px;
     border: 5px solid;
     border-color: #d8d8d7 #5d5c5a #5d5c5a #f5f3eb;
-    box-sizing: border-box;
-    cursor: default;
 }
 
+.checked {
+    border: 2px solid #514d4c;
+}
+
+.valid,
+.bomb,
+.checked {
+    width: var(--cell);
+    height: var(--cell);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--cell) * 0.58);
+    line-height: 1;
+    cursor: default;
+    /* hindrer tekstmarkering / iOS-meny når man holder inne for å flagge */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Emoji-innholdet (flagg/bombe) ligger i en indre div - skaler den med ruten */
+.grid div {
+    font-size: calc(var(--cell) * 0.6);
+    line-height: 1;
+}
 
 #result {
     position: absolute;
-    top: 48px;
-    left: 50px;
-    width: 420px;
-    height: 420px;
+    inset: 0;
     background-color: rgba(255, 255, 255, 0.2);
     color: red;
-    font-size: 45px;
+    font-size: clamp(28px, 9vw, 45px);
     font-weight: bold;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    text-align: center;
     z-index: 10;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
 }
 
 #result:empty {
     display: none;
 }
 
-.checked {
-    width: 40px;
-    height: 40px;
-    border: 2px solid #514d4c;
-    box-sizing: border-box;
-}
-
-
 .number {
     font-family: "Bangers", system-ui;
-    padding-top: 5px;
 }
 
 .one {
@@ -175,4 +203,12 @@ div {
 
 .eight {
     color: #6d267c;
+}
+
+/* Telefon: gi litt ekstra luft på toppen så statene ikke havner under
+   tilbake-knappen. */
+@media (max-width: 560px) {
+    body {
+        padding-top: 72px;
+    }
 }

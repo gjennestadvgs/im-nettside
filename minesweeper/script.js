@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', function () {
     let squares = []
     let isGameOver = false
     let flags = 0
+    // Settes når et "hold inne" har plassert et flagg, så det påfølgende
+    // (simulerte) klikket ikke også avslører ruten.
+    let suppressNextClick = false
     //laget av Ai
     let firstClick = true
     let timeElapsed = 0
@@ -38,13 +41,43 @@ document.addEventListener('DOMContentLoaded', function () {
 
             //normal click
             square.addEventListener('click', function () {
+                // Etter et "hold inne"-flagg skal selve klikket ignoreres
+                if (suppressNextClick) {
+                    suppressNextClick = false
+                    return
+                }
                 click(square)
             })
 
-            //ctrl and left click
+            //ctrl and left click (PC: høyreklikk = flagg)
             square.addEventListener('contextmenu', function (e) {
                 e.preventDefault()
                 addFlag(square)
+            })
+
+            // Mobil: hold inne for å plassere/fjerne flagg (ingen mus = ingen høyreklikk)
+            let pressTimer = null
+            square.addEventListener('touchstart', function () {
+                suppressNextClick = false
+                pressTimer = setTimeout(function () {
+                    suppressNextClick = true   // hindre at touch-en også avslører ruten
+                    addFlag(square)
+                    if (navigator.vibrate) navigator.vibrate(40) // liten haptisk respons
+                }, 350)
+            }, { passive: true })
+
+            square.addEventListener('touchend', function (e) {
+                clearTimeout(pressTimer)
+                // Avbryt det simulerte klikket som ellers kommer etter et long-press
+                if (suppressNextClick) e.preventDefault()
+            })
+
+            // Dro fingeren eller avbrutt berøring = ikke et "hold inne"
+            square.addEventListener('touchmove', function () {
+                clearTimeout(pressTimer)
+            })
+            square.addEventListener('touchcancel', function () {
+                clearTimeout(pressTimer)
             })
         }
     }
