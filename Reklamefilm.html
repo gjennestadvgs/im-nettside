@@ -145,6 +145,15 @@
             display: block;
         }
 
+        /* LOGO (ved siden av teksten på PC, under teksten på telefon) */
+
+        .bilde-kolonne .reklame-logo {
+            width: 100%;
+            max-width: 320px;
+            align-self: center;   /* sentrer i bilde-kolonnen */
+            border-radius: 0;     /* logoen trenger ingen avrunding */
+        }
+
         /* TELEFON */
 
         @media (max-width: 768px) {
@@ -214,7 +223,10 @@
 
             <div class="inhold" id="inhold"></div>
 
-            <div class="bilde-kolonne" id="bilde-kolonne"></div>
+            <div class="bilde-kolonne" id="bilde-kolonne">
+                <!-- Logo ved siden av teksten på PC; stables under teksten på telefon. -->
+                <img class="reklame-logo" src="Assets/bilder/reklamefilm/pakke-logo.png" alt="Logo">
+            </div>
 
         </div>
 
