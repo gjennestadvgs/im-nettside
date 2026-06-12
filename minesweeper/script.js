@@ -49,18 +49,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 click(square)
             })
 
-            //ctrl and left click (PC: høyreklikk = flagg)
+            // Per-rute tilstand for berøring. Deklareres her så både
+            // contextmenu- og touch-håndtererne kan dele den.
+            let pressTimer = null
+            // True når "hold inne"-timeren allerede har plassert/fjernet et flagg
+            // i denne berøringen. Brukes for å nøytralisere contextmenu-hendelsen
+            // som Android sender i tillegg (se under).
+            let longPressFlagg = false
+
+            //ctrl and left click (PC: høyreklikk = flagg, eller contextmenu fra "hold inne" på Android)
             square.addEventListener('contextmenu', function (e) {
                 e.preventDefault()
+                // VIKTIG (Android): et langt trykk utløser BÅDE vår egen
+                // hold-inne-timer OG en contextmenu-hendelse. Kjørte vi addFlag
+                // for begge, ble flagget lagt til og straks fjernet igjen - så
+                // det "plasseres ikke". Har timeren allerede gjort jobben,
+                // hopper vi over her.
+                if (longPressFlagg) { longPressFlagg = false; return }
+                clearTimeout(pressTimer) // skulle contextmenu komme før timeren
                 addFlag(square)
             })
 
             // Mobil: hold inne for å plassere/fjerne flagg (ingen mus = ingen høyreklikk)
-            let pressTimer = null
             square.addEventListener('touchstart', function () {
                 suppressNextClick = false
+                longPressFlagg = false
                 pressTimer = setTimeout(function () {
                     suppressNextClick = true   // hindre at touch-en også avslører ruten
+                    longPressFlagg = true      // nøytraliser den påfølgende contextmenu-en
                     addFlag(square)
                     if (navigator.vibrate) navigator.vibrate(40) // liten haptisk respons
                 }, 350)
