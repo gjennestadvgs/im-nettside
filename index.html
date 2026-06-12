@@ -134,7 +134,7 @@
         #grid-flerkamera4 { top: 10%; left: 30%; } /* Flerkamera 4 */
 
         /* KLYNGE: Internat og Gjennestad (nede til venstre) */
-        #postit-internat  { top: 54%; left: 11%; }
+        #postit-internat  { top: 60%; left: 11%; }
         #grid-gjennestad  { top: 66%; left: 4%;  } /* Skolen!!! */
         #grid-internat1   { top: 66%; left: 20%; } /* Internat 1 */
         #grid-internat2   { top: 75%; left: 12%; } /* Internat 2 */
@@ -383,6 +383,11 @@
     // Husker om lappen akkurat nå "dunker" i PC-en, så vi bare vibrerer
     // én gang når den treffer veggen (ikke hver eneste piksel).
     let bleBlokkert = false;
+    // "Svai": lappen heller litt i den retningen du drar den, og retter seg
+    // opp igjen når du står stille. Gjør plukk/flytting mer levende.
+    let forrigeSvaiX = 0;
+    let svaiTimeout = null;
+    const SVAI_MAKS = 12; // største helning i grader
     // Hvor mange piksler fingeren/musen må flytte seg før det regnes som
     // et dra (og ikke et klikk). På iPad gir en vanlig tapp alltid noen få
     // pikslers bevegelse, så uten denne terskelen ville touch aldri navigere.
@@ -402,6 +407,9 @@
         document.body.style.cursor = 'grabbing';
         currentImage.style.cursor = 'grabbing';
         bleBlokkert = false;
+        // Løft lappen (samme som :active) og nullstill svai-referansen.
+        forrigeSvaiX = clientX;
+        currentImage.style.transform = 'scale(1.2)';
         vibrer(10); // lett napp når du plukker opp en lapp
     }
 
@@ -441,6 +449,17 @@
             currentImage.style.right = 'auto';
             currentImage.style.left = nyLeft + 'px';
             currentImage.style.top = nyTop + 'px';
+
+            // Svai: hell lappen i dra-retningen ut fra hvor fort den beveger
+            // seg vannrett, og rett den opp igjen når bevegelsen stopper.
+            const svaiDx = clientX - forrigeSvaiX;
+            forrigeSvaiX = clientX;
+            const vinkel = Math.max(-SVAI_MAKS, Math.min(SVAI_MAKS, svaiDx * 1.2));
+            currentImage.style.transform = `scale(1.2) rotate(${vinkel}deg)`;
+            clearTimeout(svaiTimeout);
+            svaiTimeout = setTimeout(() => {
+                if (currentImage) currentImage.style.transform = 'scale(1.2) rotate(0deg)';
+            }, 120);
         }
     }
 
@@ -464,6 +483,9 @@
         // reset cursors
         document.body.style.cursor = '';
         img.forEach(i => i.style.cursor = 'grab');
+        // Legg lappen pent ned igjen (transition-en i CSS gjør det mykt).
+        clearTimeout(svaiTimeout);
+        if (currentImage) currentImage.style.transform = '';
         currentImage = null;
     }
 

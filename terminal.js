@@ -563,6 +563,66 @@ function kjørKommando(linje) {
     }
 }
 
+// --- Skrivemaskin-animasjon på PC-skjermen ---
+
+// Den mørke CRT-skjermen (som også er åpne-knappen) "skriver" korte hint med
+// blinkende markør, sletter dem og veksler til neste. Gjør at PC-en ser levende
+// ut og inviterer til å klikke. Animasjonen påvirker ikke at man kan klikke -
+// den endrer bare teksten på knappen.
+function startSkjermAnimasjon() {
+    if (!terminalKnapp) return;
+    // Bare på startsiden (forsiden) – den eneste siden med korktavla
+    // (.prosjekt-grid). På undersider skal PC-skjermen være rolig og bare
+    // vise standardteksten ">_".
+    if (!document.querySelector('.prosjekt-grid')) return;
+
+    const hint = ['> klikk her', '> /help', '> hei :)'];
+    let linje = 0;        // hvilket hint vi viser nå
+    let lengde = 0;       // hvor mange tegn som er "skrevet"
+    let sletter = false;  // skriver vi, eller sletter vi nå?
+    let markorSynlig = true;
+
+    function tegnOpp() {
+        const tekst = hint[linje].slice(0, lengde);
+        // Hardt mellomrom som "av"-markør, så bredden ikke hopper når den blinker.
+        terminalKnapp.textContent = tekst + (markorSynlig ? '_' : ' ');
+    }
+
+    // Jevn markørblink, uavhengig av skrive-/slettetakten.
+    setInterval(function () {
+        markorSynlig = !markorSynlig;
+        tegnOpp();
+    }, 530);
+
+    // Ett "steg" om gangen: legg til eller fjern ett tegn, og planlegg neste
+    // steg med en passende pause (skrive, slette, eller hvile på en ferdig linje).
+    function steg() {
+        const full = hint[linje];
+        let pause;
+        if (!sletter) {
+            lengde++;
+            if (lengde >= full.length) {
+                sletter = true;
+                pause = 1600; // hold den ferdige linja litt før vi sletter
+            } else {
+                pause = 110;  // skrivefart
+            }
+        } else {
+            lengde--;
+            if (lengde <= 0) {
+                sletter = false;
+                linje = (linje + 1) % hint.length; // gå videre til neste hint
+                pause = 400;  // kort pause før neste linje
+            } else {
+                pause = 55;   // slettefart (litt raskere enn skriving)
+            }
+        }
+        tegnOpp();
+        setTimeout(steg, pause);
+    }
+    steg();
+}
+
 // --- Oppstart ---
 
 // Bygger terminalens HTML og setter alt i gang.
@@ -637,6 +697,9 @@ function startTerminal() {
     pcBilde.addEventListener('load', forankrePc);
     window.addEventListener('resize', forankrePc);
     forankrePc();
+
+    // Start skrivemaskin-animasjonen på PC-skjermen (vekslende hint-tekster).
+    startSkjermAnimasjon();
 
     // Klikk hvor som helst i vinduet -> sett fokus tilbake på input
     terminalVindu.addEventListener('click', function () {

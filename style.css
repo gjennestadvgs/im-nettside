@@ -53,6 +53,14 @@ body, p, li, dd, dt, .info-content p {
     border: none;                  /* Fjerner rammen rundt */
     padding: 10px;                    /* Fjerner standard innside-margin */
     outline: none;                 /* Fjerner den blå ringen ved klikk (kan beholdes for universell utforming) */
+
+    /* Glir mykt når den hovres (se :hover under). */
+    transition: transform 200ms ease;
+}
+
+/* Hover: knappen glir litt mot venstre, som om den "trekker seg tilbake". */
+.back-button:hover {
+    transform: translateX(-10px);
 }
 
 .back-button--fixed {
