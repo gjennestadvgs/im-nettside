@@ -223,22 +223,229 @@ function tilpassTilTastatur() {
         return;
     }
 
-    terminalVindu.style.height = vv.height + 'px';
+    // 15px luft mot bunnen (samme som CSS på telefon)
+    terminalVindu.style.height = (vv.height - 15) + 'px';
     terminalVindu.style.top = vv.offsetTop + 'px';
     if (terminalOutput) terminalOutput.scrollTop = terminalOutput.scrollHeight;
 }
 
+// Slår zoom av/på via viewport-metaen. Mens terminalen er åpen vil vi unngå at
+// telefonen (særlig iOS) zoomer inn når man trykker i input-feltet. Når den
+// lukkes setter vi metaen tilbake, så kniping-for-å-zoome virker som vanlig på
+// resten av siden.
+function settViewportZoom(tillatt) {
+    let meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('name', 'viewport');
+        document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', tillatt
+        ? 'width=device-width, initial-scale=1.0'
+        : 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+}
+
 function åpneTerminal() {
+    if (window.vibrer) vibrer(20); // napp når terminalen åpnes
     terminalVindu.classList.remove('skjult');
+    // Løft PC-en over bildene mens terminalen er åpen (se terminal index.css).
+    const pc = document.getElementById('pc-forside');
+    if (pc) pc.classList.add('terminal-aapen');
+    settViewportZoom(false); // hindre zoom-på-input mens terminalen er åpen
     terminalInput.focus();
     tilpassTilTastatur();
     lagre();
 }
 
 function lukkTerminal() {
+    if (window.vibrer) vibrer(12); // kort napp når terminalen lukkes
     terminalVindu.classList.add('skjult');
+    const pc = document.getElementById('pc-forside');
+    if (pc) pc.classList.remove('terminal-aapen');
+    settViewportZoom(true); // tillat zoom igjen på resten av siden
     tilpassTilTastatur(); // nullstiller de live-satte stilene
     lagre();
+}
+
+// --- Endre størrelse ---
+
+// Minste og største mål vinduet kan dras til.
+const MIN_BREDDE = 320;
+const MIN_HOYDE = 240;
+
+// Standardstørrelse (samme som i CSS) - brukes som utgangspunkt for
+// hvor stor teksten skal være.
+const BASE_BREDDE = 750;
+const BASE_HOYDE = 600;
+const BASE_FONT = 14;
+
+// Skalerer teksten i terminalen ut fra hvor stort vinduet er. Større
+// vindu => større tekst. Teksten blir aldri mindre enn standard (1x),
+// så den er alltid lesbar, og maks 2,5x så den ikke blir for stor.
+function settTekststorrelse(bredde, hoyde) {
+    const skala = Math.min(bredde / BASE_BREDDE, hoyde / BASE_HOYDE);
+    const begrenset = Math.max(1, Math.min(skala, 2.5));
+    terminalVindu.style.fontSize = (BASE_FONT * begrenset) + 'px';
+}
+
+// Regner ut en passende standardstørrelse ut fra skjermen, så terminalen
+// ikke blir liggende liten i hjørnet på store skjermer (samme tanke som
+// galleriet). Brukes kun når brukeren ikke har dratt til en egen størrelse.
+// Aldri mindre enn grunnstørrelsen, og aldri større enn skjermen tillater.
+function standardStorrelse() {
+    const maksBredde = window.innerWidth - 40;
+    const maksHoyde = window.innerHeight - 100;
+    let bredde = Math.min(Math.max(BASE_BREDDE, window.innerWidth * 0.55), 1300);
+    let hoyde = Math.min(Math.max(BASE_HOYDE, window.innerHeight * 0.74), 1050);
+    bredde = Math.min(bredde, maksBredde);
+    hoyde = Math.min(hoyde, maksHoyde);
+    return { bredde: bredde, hoyde: hoyde };
+}
+
+// Gjenoppretter lagret størrelse fra forrige besøk (faller tilbake til en
+// skjermtilpasset standardstørrelse) og setter tekststørrelsen deretter.
+function lastInnStorrelse() {
+    // På telefon styrer CSS hele størrelsen (fullskjerm med 15px luft mot
+    // bunnen), og terminal.js justerer høyden live i tilpassTilTastatur.
+    // Inline mål her ville overstyrt CSS-en, så vi hopper over dem.
+    if (window.innerWidth <= 680) return;
+
+    const lagretBredde = parseInt(localStorage.getItem('terminal_bredde'), 10);
+    const lagretHoyde = parseInt(localStorage.getItem('terminal_hoyde'), 10);
+    const standard = standardStorrelse();
+    const bredde = Number.isFinite(lagretBredde) ? lagretBredde : standard.bredde;
+    const hoyde = Number.isFinite(lagretHoyde) ? lagretHoyde : standard.hoyde;
+    terminalVindu.style.width = bredde + 'px';
+    terminalVindu.style.height = hoyde + 'px';
+    settTekststorrelse(bredde, hoyde);
+}
+
+// Kobler opp resize-håndtaket. Vinduet er forankret nede til høyre, så
+// når vi drar håndtaket (øvre venstre hjørne) utover blir vinduet større.
+function settOppResize() {
+    const handtak = document.getElementById('terminal-resize');
+
+    handtak.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startBredde = terminalVindu.offsetWidth;
+        const startHoyde = terminalVindu.offsetHeight;
+
+        // Maks-mål så vinduet ikke dras utenfor skjermen.
+        const maksBredde = window.innerWidth - 40;
+        const maksHoyde = window.innerHeight - 100;
+
+        function flytt(ev) {
+            // Drar man mot venstre/opp (mindre clientX/Y) blir vinduet større.
+            let nyBredde = startBredde + (startX - ev.clientX);
+            let nyHoyde = startHoyde + (startY - ev.clientY);
+
+            nyBredde = Math.max(MIN_BREDDE, Math.min(nyBredde, maksBredde));
+            nyHoyde = Math.max(MIN_HOYDE, Math.min(nyHoyde, maksHoyde));
+
+            terminalVindu.style.width = nyBredde + 'px';
+            terminalVindu.style.height = nyHoyde + 'px';
+            settTekststorrelse(nyBredde, nyHoyde);
+        }
+
+        function slipp() {
+            document.removeEventListener('mousemove', flytt);
+            document.removeEventListener('mouseup', slipp);
+            // Lagre den nye størrelsen så den overlever sidebytte.
+            localStorage.setItem('terminal_bredde', terminalVindu.offsetWidth);
+            localStorage.setItem('terminal_hoyde', terminalVindu.offsetHeight);
+        }
+
+        document.addEventListener('mousemove', flytt);
+        document.addEventListener('mouseup', slipp);
+    });
+}
+
+// --- Forankre PC-en til bordet i bakgrunnsbildet ---
+
+// Bakgrunnsbildet bruker "cover", så det skaleres og beskjæres ulikt
+// avhengig av skjermens form - og dermed flytter bordet seg rundt.
+// Her regner vi ut hvor et valgt punkt PÅ bordet havner på skjermen
+// akkurat nå, og plasserer PC-en der, slik at den alltid står på bordet.
+
+// Hvor på bakgrunnsbildet bordet er (0-1). JUSTER DISSE for å flytte
+// PC-en bortover / innover på bordet.
+const BORD_ANKER_X = 0.85;  // 0 = venstre kant, 0.5 = midten, 1 = høyre kant
+const BORD_ANKER_Y = 1;  // 0 = topp av bildet, 1 = bunn av bildet
+
+// Hvilket punkt PÅ PC-en som skal treffe bordpunktet (0-1).
+// OBS: pc-forside.png har ca. 14 % gjennomsiktig tomrom under tastaturet,
+// så selve maskinen slutter ved 0.86. Vi anker på 0.86 slik at TASTATURETS
+// underkant (ikke den tomme bildekanten) lander på bordet/bunnen.
+const PC_ANKER_X = 0.5;
+const PC_ANKER_Y = 0.86;
+
+// Naturlig størrelse på bakgrunnsbildet. Måles opp første gang (og hvis
+// bildet byttes), så vi kjenner størrelsesforholdet.
+let bgUrl = '', bgBredde = 0, bgHoyde = 0;
+
+// Plukker ut url-en til bakgrunnsbildet som faktisk vises nå.
+function aktivBakgrunnUrl() {
+    const bg = getComputedStyle(document.body).backgroundImage;
+    const treff = bg && bg.match(/url\(["']?(.*?)["']?\)/);
+    return treff ? treff[1] : null;
+}
+
+function forankrePc() {
+    const pc = document.getElementById('pc-forside');
+    if (!pc) return;
+
+    const url = aktivBakgrunnUrl();
+    const erForside = url && url.indexOf('forside') !== -1;
+
+    // Bare på forsiden (der bord-bakgrunnen brukes) og på større skjermer.
+    // Ellers nullstiller vi de live-satte stilene, så CSS-en styrer PC-en
+    // som før (svart bakgrunn på undersider, egne media queries på telefon).
+    if (!erForside || window.innerWidth <= 768) {
+        pc.style.left = '';
+        pc.style.top = '';
+        pc.style.right = '';
+        pc.style.bottom = '';
+        return;
+    }
+
+    // Mål opp bildet første gang, eller hvis bakgrunnen er byttet.
+    if (url !== bgUrl) {
+        bgUrl = url;
+        const bilde = new Image();
+        bilde.onload = function () {
+            bgBredde = bilde.naturalWidth;
+            bgHoyde = bilde.naturalHeight;
+            forankrePc(); // regn på nytt når vi kjenner størrelsen
+        };
+        bilde.src = url;
+        return;
+    }
+    if (!bgBredde || !bgHoyde) return;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // "cover": skaler bildet så det dekker hele skjermen.
+    // Vannrett sentrert, men festet til BUNNEN loddrett (samme som
+    // background-position: center bottom), så bordet alltid er synlig.
+    const skala = Math.max(vw / bgBredde, vh / bgHoyde);
+    const synligB = bgBredde * skala;
+    const synligH = bgHoyde * skala;
+    const venstre = (vw - synligB) / 2; // kan bli negativ når bildet beskjæres
+    const topp = vh - synligH;          // bunnen av bildet ligger på skjermens bunn
+
+    // Bordpunktet, omregnet til skjermkoordinater (piksler).
+    const bordX = venstre + BORD_ANKER_X * synligB;
+    const bordY = topp + BORD_ANKER_Y * synligH;
+
+    // Plasser PC-en slik at valgt punkt på den treffer bordpunktet.
+    pc.style.right = 'auto';
+    pc.style.bottom = 'auto';
+    pc.style.left = (bordX - PC_ANKER_X * pc.offsetWidth) + 'px';
+    pc.style.top = (bordY - PC_ANKER_Y * pc.offsetHeight) + 'px';
 }
 
 // --- Autocomplete ---
@@ -296,6 +503,11 @@ function visForslag() {
         const indeks = i;
         rad.addEventListener('mousedown', function (e) {
             e.preventDefault(); // unngå at input mister fokus
+            // Stopp boblingen til "lukk ved klikk utenfor"-håndtereren på
+            // document. velgForslag bygger ofte forslagslisten på nytt og
+            // fjerner denne raden fra DOM-en, og da ville contains(e.target)
+            // bli false slik at terminalen feilaktig lukket seg.
+            e.stopPropagation();
             velgForslag(indeks);
         });
         forslagBoks.appendChild(rad);
@@ -351,6 +563,66 @@ function kjørKommando(linje) {
     }
 }
 
+// --- Skrivemaskin-animasjon på PC-skjermen ---
+
+// Den mørke CRT-skjermen (som også er åpne-knappen) "skriver" korte hint med
+// blinkende markør, sletter dem og veksler til neste. Gjør at PC-en ser levende
+// ut og inviterer til å klikke. Animasjonen påvirker ikke at man kan klikke -
+// den endrer bare teksten på knappen.
+function startSkjermAnimasjon() {
+    if (!terminalKnapp) return;
+    // Bare på startsiden (forsiden) – den eneste siden med korktavla
+    // (.prosjekt-grid). På undersider skal PC-skjermen være rolig og bare
+    // vise standardteksten ">_".
+    if (!document.querySelector('.prosjekt-grid')) return;
+
+    const hint = ['> klikk her', '> /help', '> hei :)'];
+    let linje = 0;        // hvilket hint vi viser nå
+    let lengde = 0;       // hvor mange tegn som er "skrevet"
+    let sletter = false;  // skriver vi, eller sletter vi nå?
+    let markorSynlig = true;
+
+    function tegnOpp() {
+        const tekst = hint[linje].slice(0, lengde);
+        // Hardt mellomrom som "av"-markør, så bredden ikke hopper når den blinker.
+        terminalKnapp.textContent = tekst + (markorSynlig ? '_' : ' ');
+    }
+
+    // Jevn markørblink, uavhengig av skrive-/slettetakten.
+    setInterval(function () {
+        markorSynlig = !markorSynlig;
+        tegnOpp();
+    }, 530);
+
+    // Ett "steg" om gangen: legg til eller fjern ett tegn, og planlegg neste
+    // steg med en passende pause (skrive, slette, eller hvile på en ferdig linje).
+    function steg() {
+        const full = hint[linje];
+        let pause;
+        if (!sletter) {
+            lengde++;
+            if (lengde >= full.length) {
+                sletter = true;
+                pause = 1600; // hold den ferdige linja litt før vi sletter
+            } else {
+                pause = 110;  // skrivefart
+            }
+        } else {
+            lengde--;
+            if (lengde <= 0) {
+                sletter = false;
+                linje = (linje + 1) % hint.length; // gå videre til neste hint
+                pause = 400;  // kort pause før neste linje
+            } else {
+                pause = 55;   // slettefart (litt raskere enn skriving)
+            }
+        }
+        tegnOpp();
+        setTimeout(steg, pause);
+    }
+    steg();
+}
+
 // --- Oppstart ---
 
 // Bygger terminalens HTML og setter alt i gang.
@@ -360,17 +632,21 @@ function startTerminal() {
 
     // 1. Sett HTML inn i body
     document.body.insertAdjacentHTML('beforeend', `
-        <button id="terminal-knapp" title="Åpne terminal">&gt;_</button>
-        <div id="terminal-vindu" class="skjult">
-            <div id="terminal-topp">
-                <span>im-terminal</span>
-                <button id="terminal-lukk" title="Lukk">×</button>
-            </div>
-            <div id="terminal-output"></div>
-            <div id="terminal-input-rad">
-                <div id="terminal-forslag" class="skjult"></div>
-                <span class="prompt">&gt;</span>
-                <input id="terminal-input" type="text" autocomplete="off" spellcheck="false" />
+        <div id="pc-forside">
+            <img id="pc-bilde" src="Assets/elementer/pc-forside.png" alt="Gammel PC" draggable="false">
+            <button id="terminal-knapp" title="Åpne terminal">&gt;_</button>
+            <div id="terminal-vindu" class="skjult">
+                <div id="terminal-resize" title="Dra for å endre størrelse"></div>
+                <div id="terminal-topp">
+                    <span>im-terminal</span>
+                    <button id="terminal-lukk" title="Lukk">×</button>
+                </div>
+                <div id="terminal-output"></div>
+                <div id="terminal-input-rad">
+                    <div id="terminal-forslag" class="skjult"></div>
+                    <span class="prompt">&gt;</span>
+                    <input id="terminal-input" type="text" autocomplete="off" spellcheck="false" />
+                </div>
             </div>
         </div>
     `);
@@ -383,7 +659,14 @@ function startTerminal() {
     terminalInput = document.getElementById('terminal-input');
     forslagBoks = document.getElementById('terminal-forslag');
 
+    // PC-en har container-type: inline-size (for å skalere skjerm-teksten).
+    // Det gjør at "position: fixed" inni PC-en regnes i forhold til PC-boksen
+    // i stedet for skjermen. Vi flytter derfor terminalvinduet ut til body, så
+    // det alltid ligger fast nederst på skjermen - uavhengig av hvor PC-en står.
+    document.body.appendChild(terminalVindu);
+
     // 3. Last inn lagret state og gjenopprett linjer
+    lastInnStorrelse();
     lastInnState();
     for (const linje of terminalLinjer) {
         leggTilLinje(linje);
@@ -404,6 +687,19 @@ function startTerminal() {
     });
 
     terminalLukk.addEventListener('click', lukkTerminal);
+
+    // La brukeren endre størrelse ved å dra i hjørnehåndtaket
+    settOppResize();
+
+    // Hold PC-en plassert på bordet i bakgrunnsbildet (forsiden), og
+    // regn på nytt når skjermen endrer størrelse eller PC-bildet er lastet.
+    const pcBilde = document.getElementById('pc-bilde');
+    pcBilde.addEventListener('load', forankrePc);
+    window.addEventListener('resize', forankrePc);
+    forankrePc();
+
+    // Start skrivemaskin-animasjonen på PC-skjermen (vekslende hint-tekster).
+    startSkjermAnimasjon();
 
     // Klikk hvor som helst i vinduet -> sett fokus tilbake på input
     terminalVindu.addEventListener('click', function () {
@@ -440,6 +736,7 @@ function startTerminal() {
             skrivLinje('> ' + linje);
             historikk.push(linje);
             historikkIndeks = historikk.length;
+            if (window.vibrer) vibrer(15); // napp når en kommando kjøres
             kjørKommando(linje);
             terminalInput.value = '';
             lagre();

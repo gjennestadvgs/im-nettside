@@ -3,10 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
         body {
-            font-family: Arial, sans-serif;
             margin: 0;
             padding: 10px 30px 30px 30px;
         }
@@ -28,7 +28,7 @@
 
         #player {
             width: 100%;
-            max-width: 800px;
+            max-width: min(1400px, 90vw);
             aspect-ratio: 16 / 9;
 
             display: flex;
@@ -54,26 +54,57 @@
 
         .main-content {
             width: 100%;
-            max-width: 1400px;
+            max-width: 1700px;
 
             display: flex;
-            gap: 40px;
+            gap: clamp(30px, 3vw, 60px);
 
             align-items: flex-start;
         }
 
         /* TEKST */
 
-        .inhold {
+        .tekst-kolonne {
             flex: 2;
 
+            display: flex;
+            flex-direction: column;
+
+            gap: 30px;
+        }
+
+        .inhold {
+            flex: 0 1 auto;
+
             padding: 30px;
+        }
+
+        /* STORT BILDE UNDER TEKSTEN */
+
+        .stor-bilde {
+            padding: 0 30px;
+        }
+
+        .stor-bilde img {
+            width: 100%;
+
+            border-radius: 6px;
+
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+
+            transform: rotate(-1.5deg);
+
+            transition: transform 200ms ease;
+        }
+
+        .stor-bilde img:hover {
+            transform: rotate(0deg) scale(1.02);
         }
 
         .inhold h1 {
             margin-top: 0;
 
-            font-size: 2.4rem;
+            font-size: clamp(1.8rem, 1rem + 2.5vw, 4.5rem);
 
             letter-spacing: 2px;
 
@@ -82,10 +113,7 @@
 
         .inhold p {
             line-height: 1.8;
-
-            color: #ddd;
-
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 0.8rem + 0.7vw, 2rem);
         }
 
         /* BILDER */
@@ -102,11 +130,70 @@
         .bilde-kolonne img {
             width: 100%;
 
-            max-width: 350px;
+            max-width: 480px;
 
             border-radius: 6px;
+
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+
+            transition: transform 200ms ease;
         }
-    </style>
+
+        /* SPREDT COLLAGE: ulike størrelser og plasseringer per bilde */
+        .bilde-kolonne { gap: 30px; }
+        .bilde-kolonne img:nth-child(4n+1) { width: 100%; align-self: flex-start; transform: rotate(-3deg); }
+        .bilde-kolonne img:nth-child(4n+2) { width: 64%;  align-self: flex-end;   transform: rotate(2.5deg); margin-top: -6px; }
+        .bilde-kolonne img:nth-child(4n+3) { width: 82%;  align-self: center;     transform: rotate(-1.5deg); }
+        .bilde-kolonne img:nth-child(4n+4) { width: 54%;  align-self: flex-start; transform: rotate(3.5deg); margin-left: 14%; }
+        .bilde-kolonne img:hover { transform: rotate(0deg) scale(1.04); z-index: 2; }
+
+        /* MOBIL */
+
+        @media (max-width: 768px) {
+            .flex-container .back-button--fixed {
+                position: static;
+                align-self: flex-start;
+            }
+
+            body {
+                padding: 10px 15px 30px 15px;
+            }
+
+            .flex-container {
+                gap: 30px;
+            }
+
+            #player {
+                border-radius: 12px;
+            }
+
+            .main-content {
+                flex-direction: column;
+                gap: 25px;
+            }
+
+            .inhold {
+                padding: 0;
+            }
+
+            .stor-bilde {
+                padding: 0;
+            }
+
+            .inhold h1 {
+                font-size: 1.8rem;
+            }
+
+            .inhold p {
+                font-size: 1rem;
+            }
+
+            .bilde-kolonne {
+                align-items: center;
+            }
+        }
+        </style>
+        <link rel="stylesheet" href="https://use.typekit.net/nar4tne.css">
         <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="terminal.css">
 </head>
@@ -115,15 +202,24 @@
 
     <div class="flex-container">
 
+        <button class="back-button back-button--fixed" aria-label="Tilbake"></button>
+
         <!-- VIDEO -->
         <div class="player-wrapper">
             <div id="player"></div>
         </div>
 
+        <div class="back-title-band">
+            <h1 id="prosjekt-tittel"></h1>
+        </div>
+
         <!-- TEKST + BILDE -->
         <div class="main-content">
 
-            <div class="inhold" id="inhold"></div>
+            <div class="tekst-kolonne">
+                <div class="inhold" id="inhold"></div>
+                <div class="stor-bilde" id="stor-bilde"></div>
+            </div>
 
             <div class="bilde-kolonne" id="bilde-kolonne"></div>
 
@@ -135,15 +231,33 @@
 
         const prosjekter = [
             {
-                id: "test-id",
+                id: "Internat og Gjennestad",
 
-                tittel: "Above The Law",
+                tittel: "Internat og Gjennestad",
 
-                bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
+                bilder: [
+                    "Assets/bilder/internatet/Volleyball-1.jpg",
+                    "Assets/bilder/internatet/Skjermbilde%202026-06-11%20122324.png"
+                ],
 
-                videoEmbed: `<iframe width="560" height="315" src="https://www.youtube.com/embed/yv3bVFX2lXA?si=D0rhYQHylAjppMyq&autoplay=1&mute=1&playsinline=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
+                videoEmbed: `<iframe width="560" height="315" src="https://www.youtube.com/embed/8RZQ7RyLs4c?si=U3eLsfqoiTdGKaZS&autoplay=1&mute=1&playsinline=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
 
-                tekstfil: "Assets/tekst/test.txt",
+                tekstfil: "Assets/tekst/Internat og Gjennestad",
+            },
+            {
+                id: "Praksis",
+
+                tittel: "Yrkespraksis",
+
+                bilder: [
+                    "Assets/bilder/praksis bilder/IMG_0825.JPG",
+                    "Assets/bilder/praksis%20bilder/IMG_1542.JPG",
+                    "Assets/bilder/praksis%20bilder/06185D90-F61F-41BB-A8D9-F1FFA9898ABB.JPG"
+                ],
+
+                videoEmbed: `<iframe width="560" height="315" src="https://www.youtube.com/embed/I2030ndwiDA?si=3Yy1NmIAbSU0m924&autoplay=1&mute=1&playsinline=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
+
+                tekstfil: "Assets/tekst/Yrkespraksis",
             }
         ];
 
@@ -167,17 +281,27 @@
 
             if (!prosjekt) {
 
+                document.getElementById('prosjekt-tittel').textContent = 'Prosjekt ikke funnet';
+
                 document.querySelector('.inhold').innerHTML =
-                    "<h1>Prosjekt ikke funnet</h1>";
+                    "";
 
                 return;
             }
 
+            document.getElementById('prosjekt-tittel').textContent = prosjekt.tittel;
+
             // BILDE
 
-            document.querySelector('.bilde-kolonne').innerHTML = `
-                <img src="${prosjekt.bilde}">
-            `;
+            // Første bilde stort under teksten, resten i side-kolonnen
+            document.querySelector('#stor-bilde').innerHTML = prosjekt.bilder.length
+                ? `<img src="${prosjekt.bilder[0]}">`
+                : '';
+
+            document.querySelector('.bilde-kolonne').innerHTML = prosjekt.bilder
+                .slice(1)
+                .map(src => `<img src="${src}">`)
+                .join('');
 
             // TEKST
 
@@ -196,7 +320,6 @@
                         .join('');
 
                     document.querySelector('.inhold').innerHTML = `
-                        <h1>${prosjekt.tittel}</h1>
                         ${avsnitt}
                     `;
                 });
@@ -213,8 +336,10 @@
 
     </script>
 <script src="script.js"></script>
+    <script src="back-button.js"></script>
 <script src="terminal.js"></script>
 <script src="kommandoer.js"></script>
+<script src="lightbox.js"></script>
 
 </html>
 </body>

@@ -50,11 +50,6 @@ const FONTER = {
     "times":    "'Times New Roman', serif"
 };
 
-const SPILL = {
-    "minesweeper": "spill/minesweeper.html",
-    "snake":       "spill/snake.html"
-};
-
 // --- Kommandoer ---
 
 kommandoer["help"] = {
@@ -75,12 +70,6 @@ kommandoer["clear"] = {
     }
 };
 
-kommandoer["echo"] = {
-    beskrivelse: "Skriver ut det du sender med (f.eks. /echo hei på deg)",
-    kjør: function (args) {
-        skrivLinje(args.join(' '));
-    }
-};
 
 kommandoer["joke"] = {
     beskrivelse: "Forteller en tilfeldig vits",
@@ -197,44 +186,11 @@ kommandoer["theme"] = {
     }
 };
 
-kommandoer["project"] = {
-    beskrivelse: "Åpner et prosjekt. /project [id]",
-    valg: prosjekter.map(function (p) { return p.id; }),
-    kjør: function (args) {
-        if (args.length === 0) {
-            skrivLinje("Tilgjengelige prosjekter:");
-            for (const p of prosjekter) {
-                skrivLinje("  /project " + p.id + " - " + p.tittel);
-            }
-            return;
-        }
-        const valg = args[0].toLowerCase();
-        const funnet = prosjekter.find(function (p) { return p.id.toLowerCase() === valg; });
-        if (funnet) {
-            skrivLinje("Åpner " + funnet.tittel + "...");
-            window.location.href = "prosjekt.html?id=" + encodeURIComponent(funnet.id);
-        } else {
-            skrivLinje("Ukjent prosjekt: " + valg + ". Skriv /project for å se alternativer.");
-        }
-    }
-};
-
 kommandoer["game"] = {
-    beskrivelse: "Åpner et spill. /game [navn]",
-    valg: Object.keys(SPILL),
+    beskrivelse: "Åpner Minesweeper",
     kjør: function (args) {
-        if (args.length === 0) {
-            skrivLinje("Bruk: /game [navn]");
-            skrivLinje("Tilgjengelige spill: " + Object.keys(SPILL).join(', '));
-            return;
-        }
-        const valg = args[0].toLowerCase();
-        if (SPILL[valg]) {
-            skrivLinje("Åpner " + valg + "...");
-            window.location.href = SPILL[valg];
-        } else {
-            skrivLinje("Ukjent spill: " + valg + ". Skriv /game for å se alternativer.");
-        }
+        skrivLinje("Åpner Minesweeper...");
+        window.location.href = "minesweeper/minesweeper.html";
     }
 };
 

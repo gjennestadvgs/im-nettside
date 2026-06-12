@@ -3,14 +3,15 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 50px;
-    height: 50px;
+    /* Vokser flytende med skjermbredden, akkurat som på galleriet */
+    width: clamp(50px, 4.5vw, 96px);
+    height: clamp(50px, 4.5vw, 96px);
     border-radius: 50%;
     background-color: #1a1a1a;
     color: #ffffff;
     border: none;
     font-family: 'Courier New', monospace;
-    font-size: 18px;
+    font-size: clamp(18px, 1.6vw, 34px);
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -46,6 +47,34 @@
     display: none;
 }
 
+/* Håndtak for å endre størrelse. Ligger i øvre venstre hjørne siden
+   vinduet er forankret nede til høyre - dra utover for å gjøre større. */
+#terminal-resize {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    z-index: 1;
+}
+
+/* Liten visuell indikator (diagonale streker) på håndtaket */
+#terminal-resize::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 7px;
+    height: 7px;
+    border-top: 2px solid #555555;
+    border-left: 2px solid #555555;
+}
+
+#terminal-resize:hover::before {
+    border-color: #888888;
+}
+
 /* Topplinje med tittel og lukkeknapp */
 #terminal-topp {
     background-color: #1a1a1a;
@@ -54,7 +83,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 12px;
+    /* Relativt til vinduets font-size (settes av terminal.js ut fra
+       terminalstørrelsen), så tittelen skalerer likt med teksten inni. */
+    font-size: 1.2em;
     border-bottom: 1px solid #2a2a2a;
 }
 
@@ -62,11 +93,13 @@
     background: none;
     border: none;
     color: #aaaaaa;
-    font-size: 18px;
+    /* Relativt til topplinjen, så kryssknappen følger samme skalering
+       som terminalen ellers. */
+    font-size: 1.6em;
     cursor: pointer;
     padding: 0;
-    width: 20px;
-    height: 20px;
+    width: 1.5em;
+    height: 1.5em;
     line-height: 1;
 }
 
@@ -77,10 +110,13 @@
 /* Området der tekst skrives ut */
 #terminal-output {
     flex: 1;
+    min-width: 0;
     padding: 12px;
+    overflow-x: hidden;
     overflow-y: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
+    overflow-wrap: anywhere; /* bryt lange ord/lenker så de aldri går utenfor skjermen */
 }
 
 .terminal-linje {
@@ -114,7 +150,7 @@
     max-height: 160px;
     overflow-y: auto;
     font-family: 'Courier New', monospace;
-    font-size: 13px;
+    font-size: inherit;
 }
 
 #terminal-forslag.skjult {
@@ -147,8 +183,35 @@
     border: none;
     color: #ffffff;
     font-family: 'Courier New', monospace;
-    font-size: 14px;
+    font-size: inherit;
     outline: none;
+}
+
+/* På innholdssidene brukes ikke PC-bildet: gjør wrapperen "usynlig" for
+   layouten slik at knappen og terminalvinduet beholder sin egen
+   fixed-plassering, og skjul selve PC-bildet. */
+#pc-forside {
+    display: contents;
+}
+
+#pc-bilde {
+    display: none;
+}
+
+/* STORE SKJERMER: skaler opp terminalen så den ikke blir liggende liten i
+   hjørnet på brede/høye skjermer (samme tilnærming som galleriet).
+   Selve bredden/høyden/skriften styres av terminal.js (resize + lagring),
+   som også regner ut en større standardstørrelse på store skjermer. Her
+   hever vi bare vinduet så det klarerer den større knappen, og skalerer
+   forslags-popupen. */
+@media (min-width: 1400px) {
+    #terminal-vindu {
+        bottom: clamp(100px, 7vw, 130px);
+    }
+
+    #terminal-forslag {
+        max-height: clamp(160px, 22vh, 280px);
+    }
 }
 
 /* MOBIL: la terminalen fylle skjermen i stedet for å være et lite, kappet vindu.
@@ -159,9 +222,9 @@
         top: 0;
         left: 0;
         right: 0;
-        bottom: 0;
+        bottom: 15px; /* liten luft mot bunnen på telefon */
         width: 100%;
-        height: 100dvh; /* dynamisk høyde – tar høyde for nettleserlinja */
+        height: calc(100dvh - 15px); /* dynamisk høyde – tar høyde for nettleserlinja */
         max-width: none;
         max-height: none;
         border-radius: 0;

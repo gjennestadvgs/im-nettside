@@ -1,0 +1,298 @@
+/* Flytende knapp som åpner terminalen */
+#terminal-knapp {
+    position: fixed;
+    bottom: 98px;
+    right: 130px;
+    width: 145px;
+    height: 108px;
+    border-radius: 2px;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    border: none;
+    font-family: 'Courier New', monospace;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 9998;
+}
+
+#terminal-knapp:hover {
+    background-color: #333333;
+}
+
+/* Selve terminalvinduet */
+#terminal-vindu {
+    position: fixed;
+    bottom: 2px;
+    right: 20px;
+    width: 750px;
+    max-width: calc(100vw - 40px);
+    height: 600px;
+    max-height: calc(100vh - 100px);
+    background-color: #0d0d0d;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    /* Over den løftede PC-en (z-index: 10000 når terminalen er åpen),
+       så vinduet aldri havner bak skjermen/PC-en. */
+    z-index: 10001;
+    overflow: hidden;
+}
+
+#terminal-vindu.skjult {
+    display: none;
+}
+
+/* Håndtak for å endre størrelse. Ligger i øvre venstre hjørne siden
+   vinduet er forankret nede til høyre - dra utover for å gjøre større. */
+#terminal-resize {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    z-index: 1;
+}
+
+/* Liten visuell indikator (diagonale streker) på håndtaket */
+#terminal-resize::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 7px;
+    height: 7px;
+    border-top: 2px solid #555555;
+    border-left: 2px solid #555555;
+}
+
+#terminal-resize:hover::before {
+    border-color: #888888;
+}
+
+/* Topplinje med tittel og lukkeknapp */
+#terminal-topp {
+    background-color: #1a1a1a;
+    color: #aaaaaa;
+    padding: 6px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* Relativt til vinduets font-size (settes av terminal.js ut fra
+       terminalstørrelsen), så tittelen skalerer likt med teksten inni. */
+    font-size: 1.2em;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+#terminal-lukk {
+    background: none;
+    border: none;
+    color: #aaaaaa;
+    /* Relativt til topplinjen, så kryssknappen følger samme skalering
+       som terminalen ellers. */
+    font-size: 1.6em;
+    cursor: pointer;
+    padding: 0;
+    width: 1.5em;
+    height: 1.5em;
+    line-height: 1;
+}
+
+#terminal-lukk:hover {
+    color: #ffffff;
+}
+
+/* Området der tekst skrives ut */
+#terminal-output {
+    flex: 1;
+    min-width: 0;
+    padding: 12px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: anywhere; /* bryt lange ord/lenker så de aldri går utenfor skjermen */
+}
+
+.terminal-linje {
+    margin: 0 0 4px 0;
+}
+
+.terminal-linje img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin: 4px 0;
+}
+
+/* Input-raden nederst */
+#terminal-input-rad {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-top: 1px solid #2a2a2a;
+}
+
+/* Popup med autocomplete-forslag, ligger rett over input-raden */
+#terminal-forslag {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    background-color: #1a1a1a;
+    border-top: 1px solid #2a2a2a;
+    max-height: 160px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: inherit;
+}
+
+#terminal-forslag.skjult {
+    display: none;
+}
+
+.terminal-forslag-rad {
+    padding: 4px 12px;
+    color: #cccccc;
+    cursor: pointer;
+}
+
+.terminal-forslag-rad:hover {
+    background-color: #2a2a2a;
+}
+
+.terminal-forslag-rad.aktiv {
+    background-color: #2a4a6a;
+    color: #ffffff;
+}
+
+#terminal-input-rad .prompt {
+    color: #ffffff;
+    margin-right: 8px;
+}
+
+#terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-family: 'Courier New', monospace;
+    font-size: inherit;
+    outline: none;
+}
+
+/* ============================================================
+   FORSIDE: gammel PC i hjørnet. Den mørke CRT-skjermen fungerer
+   som åpne-knapp for terminalen. PC-en skaleres med skjermen
+   (vw / media queries) slik at den også fungerer på telefon.
+   Selve terminalvinduet åpnes som det store, flytende vinduet
+   det alltid har vært (base-stilen lenger opp).
+   ============================================================ */
+
+/* PC-en festes nederst i høyre hjørne og skaleres med skjermen */
+#pc-forside {
+    position: fixed;
+    right: 0;
+    bottom: -6vh;
+    width: clamp(380px, 36vw, 680px);
+    z-index: 100;                  /* under bildene (z-index 5000) som standard */
+    container-type: inline-size;   /* gjør cqw-enhetene relative til PC-bredden */
+    pointer-events: none;          /* klikk går gjennom alt unntatt skjermflaten */
+}
+
+/* Når terminalvinduet er åpent, løftes hele PC-en over bildene.
+   Klassen settes av terminal.js (åpne/lukk), siden vinduet nå ligger
+   utenfor PC-en i DOM-en og et :has() derfor ikke ville truffet. */
+#pc-forside.terminal-aapen {
+    z-index: 10000;
+}
+
+#pc-bilde {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Den mørke skjermflaten på CRT-monitoren (prosent av PC-bildet).
+   Når terminalen er lukket fungerer den som åpne-knapp. */
+#pc-forside #terminal-knapp {
+    position: absolute;
+    left: 27%;
+    top: 16.5%;
+    width: 42.5%;
+    height: 41%;
+    right: auto;
+    bottom: auto;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #2bff5b;
+    font-size: clamp(10px, 4cqw, 26px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+#pc-forside #terminal-knapp:hover {
+    background: rgba(43, 255, 91, 0.07);
+}
+
+/* Terminalvinduet ligger nå utenfor PC-en (flyttet til body av terminal.js),
+   så det er ikke lenger påvirket av PC-ens pointer-events: none. Det beholder
+   sin flytende plassering fast nederst på skjermen via base-stilen lenger opp. */
+
+/* Telefon: litt mindre PC, mot høyre kant. Negativ bottom skjuler de ~14 %
+   gjennomsiktige under tastaturet i pc-forside.png, så TASTATURET når bunnen.
+   (-7.4vw ≈ 14 % av PC-ens høyde ved width: 75vw.) */
+@media (max-width: 600px) {
+    #pc-forside {
+        width: min(75vw, 475px);
+        right: -6vw;
+        bottom: -7.4vw;
+    }
+}
+
+/* MOBIL: la terminalen fylle skjermen i stedet for å være et lite, kappet vindu.
+   terminal.js justerer i tillegg høyden live så input-feltet holder seg over
+   tastaturet (se tilpassTilTastatur). 15px luft mot bunnen. */
+@media (max-width: 680px) {
+    #terminal-vindu {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 15px; /* liten luft mot bunnen på telefon */
+        width: 100%;
+        height: calc(100dvh - 15px); /* dynamisk høyde – tar høyde for nettleserlinja */
+        max-width: none;
+        max-height: none;
+        border-radius: 0;
+    }
+
+    /* iOS zoomer inn på input med font under 16px – 16px hindrer det */
+    #terminal-input {
+        font-size: 16px;
+    }
+}
+
+/* Lave/liggende skjermer: ikke la PC-en bli høyere enn skjermen */
+@media (max-height: 520px) {
+    #pc-forside {
+        width: auto;
+        height: 96vh;
+    }
+    #pc-bilde {
+        width: auto;
+        height: 100%;
+    }
+}

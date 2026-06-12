@@ -3,27 +3,265 @@
 
 <head>
     <title>IM nettside</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="terminal.css">
+    <link rel="stylesheet" href="terminal index.css">
+    <link rel="stylesheet" href="https://use.typekit.net/nar4tne.css">
     <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            /* Klipp alt som havner utenfor skjermen, så siden ikke
+               blir bredere/høyere og zoomer ut på telefon. */
+            overflow: hidden;
+        }
         body {
-            background-image: url('Assets/bilder/Uten navn.png');
+            background-image: url('Assets/bilder/bakgrunner/forside-uten-pc.jpg');
             background-size: cover;
-            background-position: center;
-            background-attachment: fixed; 
+            /* Fest bildet til bunnen: når "cover" må beskjære, kuttes
+               alltid toppen - aldri bunnen. Så bordet er alltid synlig. */
+            background-position: center bottom;
+            background-attachment: fixed;
+        }
+        @media (max-width: 768px) {
+            body {
+                background-image: url('Assets/bilder/bakgrunner/forside-tlf-fixed.jpg');
+            }
+        }
+        /* Korktavla: denne usynlige boksen legges av JavaScript (oppdaterTavle)
+           nøyaktig oppå korkflaten i bakgrunnsbildet, og fungerer som "rammen"
+           alle lappene plasseres og dras innenfor. Verdiene her er bare et
+           utgangspunkt før JS kjører. */
+        .prosjekt-grid {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            /* Selve boksen skal ikke fange museklikk - bare lappene inni. */
+            pointer-events: none;
+            /* Lappene ligger over PC-en (z 100) som standard. Når terminalen
+               åpnes, løftes PC-en over alt (se terminal index.css). */
+            z-index: 5000;
+        }
+        .main-assets {
+            position: absolute;
+            cursor: grab;
+            user-select: none;
+            display: block;
+            /* Høyden følger bredden automatisk, så bildeforholdet beholdes. */
+            height: auto;
+            transition: transform 0.1s ease;
+            transform-origin: center;
+            /* Lappene er klikkbare selv om tavla er pointer-events: none. */
+            pointer-events: auto;
+            z-index: 5000;
+        }
+        .main-assets:active {
+            transform: scale(1.2);
+            cursor: grabbing;
+        }
+
+        /* ============================================================
+           PLASSERING AV LAPPENE PÅ KORKTAVLA
+
+           Alt under er nå i PROSENT AV KORKTAVLA (.prosjekt-grid), ikke av
+           skjermen. 0% = venstre/topp-kant av korkflaten, 100% = høyre/bunn-
+           kant. Derfor holder lappene seg alltid innenfor rammen, uansett
+           skjermstørrelse.
+
+             top / left  = hvor lappen sitter (i % av tavla)
+             width       = hvor stor lappen er (i % av tavlas bredde);
+                           høyden regnes ut av seg selv.
+
+           Telefon-delen nederst (media query) overstyrer på liten skjerm.
+           ============================================================ */
+
+        /* --- Polaroids + post-it (PC / stor skjerm) ---
+
+           Hver KLYNGE har post-it-lappen ØVERST, og polaroidene som hører til
+           faget stables i et tett lite rutenett rett under. Slik vises alle
+           bildene, men hver klynge tar lite plass på tavla.
+
+           Vil du flytte en hel klynge: endre "top"/"left" på post-iten og de
+           samme tallene på bildene under (de er bare forskjøvet litt ned/bort). */
+
+        /* Polaroidene er små så klyngene tar lite plass; endre for å skalere alle. */
+        #grid-film, #grid-film2, #grid-bedrift1, #grid-bedrift2,
+        #grid-flerkamera2, #grid-flerkamera1, #grid-gjennestad, #grid-imlan1,
+        #grid-imlan2, #grid-itkode1, #grid-filmplakat, #grid-media1,
+        #grid-media2, #grid-media3, #grid-egetspill, #grid-itkode2,
+        #grid-bedriftsbesok1, #grid-bedriftsbesok2, #grid-flerkamera3,
+        #grid-flerkamera4, #grid-internat1, #grid-internat2, #grid-media4,
+        #grid-media5, #grid-media6 { width: 8%; }
+
+        /* Post-it-lappene er litt større og ligger ALLTID over bildene i klyngen
+           (høyere z-index), så de "henger oppå" haugen med polaroids. */
+        #postit-it, #postit-galleri, #postit-grafisk, #postit-internat,
+        #postit-medie, #postit-reklamer, #postit-praksis { width: 9%; z-index: 6000; }
+
+        /* Hver KLYNGE: post-iten sitter omtrent i midten/toppen, og bildene
+           ligger i en løs, litt tilfeldig sirkel/haug rundt og under den.
+           Post-iten ligger oppå (z-index over) - som en lapp festet over bunken.
+           Vil du flytte en hel klynge: endre tallene på alle linjene i blokka. */
+
+        /* KLYNGE: IT (oppe til venstre) */
+        #postit-it        { top: 17%;  left: 11%; }
+        #grid-itkode1     { top: 15%; left: 3%;  } /* Gooby code */
+        #grid-imlan1      { top: 15%; left: 21%; } /* Lanet er i full sving */
+        #grid-imlan2      { top: 5%; left: 10%;  } /* Lan vinner */
+        #grid-itkode2     { top: 26%; left: 19%; } /* IT kode 3 */
+        #grid-egetspill   { top: 33%; left: 12%; } /* Gravespill */
+
+        /* KLYNGE: Reklamer (oppe, venstre for midten) */
+        #postit-reklamer  { top: 20%;  left: 84%; }
+        #grid-film        { top: 10%; left: 90%; } /* Reklame 1 */
+        #grid-film2       { top: 28%; left: 80%; } /* Reklame 2 */
+
+        /* KLYNGE: Grafisk design (oppe, høyre for midten) */
+        #postit-grafisk   { top: 5%;  left: 59%; }
+        #grid-bedrift1    { top: 1%; left: 52%; } /* Northbyte */
+        #grid-bedrift2    { top: 6%; left: 68%; } /* Logo oppgave */
+        #grid-filmplakat  { top: 18%; left: 58%; } /* Riffriders */
+
+        /* KLYNGE: Praksis (oppe til høyre) */
+        #postit-praksis   { top: 12%;  left: 36%; }
+        #grid-bedriftsbesok1 { top: 20%; left: 45%; } /* Bedriftsbesøk 1 */
+        #grid-bedriftsbesok2 { top: 23%; left: 36%; } /* Bedriftsbesøk 2 */
+        #grid-flerkamera3 { top: 2%; left: 43%; } /* Flerkamera 3 */
+        #grid-flerkamera4 { top: 10%; left: 30%; } /* Flerkamera 4 */
+
+        /* KLYNGE: Internat og Gjennestad (nede til venstre) */
+        #postit-internat  { top: 60%; left: 11%; }
+        #grid-gjennestad  { top: 66%; left: 4%;  } /* Skolen!!! */
+        #grid-internat1   { top: 66%; left: 20%; } /* Internat 1 */
+        #grid-internat2   { top: 75%; left: 12%; } /* Internat 2 */
+
+        /* KLYNGE: Media (nede i midten - størst klynge) */
+        #postit-medie     { top: 65%; left: 43%; }
+        #grid-flerkamera1 { top: 50%; left: 40%; } /* Flerkamera-produksjon */
+        #grid-flerkamera2 { top: 65%; left: 53%; } /* Han flytter seg */
+        #grid-media3      { top: 68%; left: 35%; } /* Filip Nyhamn */
+        #grid-media4      { top: 48%; left: 49%; } /* Mediaproduksjon 4 */
+        #grid-media6      { top: 80%; left: 44%; } /* Mediaproduksjon 6 */
+
+        /* KLYNGE: Galleri (nede til høyre) */
+        #postit-galleri   { top: 45%; left: 65%; }
+        #grid-media5      { top: 55%; left: 70%; } /* Mediaproduksjon 5 */
+        #grid-media1      { top: 36%; left: 68%; } /* Jeg liker kyling */
+        #grid-media2      { top: 53%; left: 60%; } /* The Decever */
+
+        /* --- Telefon (liten skjerm) --- */
+        /* Samme brytepunkt som bakgrunnsbildet og korktavla (oppdaterTavle i
+           JS-en nederst), så bilde, ramme og lapper bytter samtidig. */
+        @media (max-width: 768px) {
+            /* Litt mindre lapper på den smale telefon-tavla, så klyngene
+               (løse hauger med post-it oppå) får plass ved siden av hverandre
+               likt som på PC. */
+            #grid-film, #grid-film2, #grid-bedrift1, #grid-bedrift2,
+            #grid-flerkamera2, #grid-flerkamera1, #grid-gjennestad, #grid-imlan1,
+            #grid-imlan2, #grid-itkode1, #grid-filmplakat, #grid-media1,
+            #grid-media2, #grid-media3, #grid-egetspill, #grid-itkode2,
+            #grid-bedriftsbesok1, #grid-bedriftsbesok2, #grid-flerkamera3,
+            #grid-flerkamera4, #grid-internat1, #grid-internat2, #grid-media4,
+            #grid-media5, #grid-media6 { width: 15%; }
+
+            #postit-it, #postit-galleri, #postit-grafisk, #postit-internat,
+            #postit-medie, #postit-reklamer, #postit-praksis { width: 19%; }
+
+            /* Samme klynger og samme relative plassering som PC-visningen, men
+               tilpasset den høye, smale tavla: IT oppe til venstre, Reklamer
+               oppe til høyre, Media nederst i midten osv. Hver klynge er en løs
+               haug med post-iten oppå (z-index). Alt er skjøvet litt ned så
+               toppen ikke blir kuttet av nettleserlinja på telefon. */
+
+            /* IT (oppe til venstre) */
+            #postit-it        { top: 15%; left: 12%; right: auto; }
+            #grid-itkode1     { top: 14%; left: 3%;  right: auto; } /* Gooby code */
+            #grid-imlan1      { top: 14%; left: 27%; right: auto; } /* Lanet er i full sving */
+            #grid-imlan2      { top: 22%; left: 7%;  right: auto; } /* Lan vinner */
+            #grid-itkode2     { top: 23%; left: 23%; right: auto; } /* IT kode 3 */
+            #grid-egetspill   { top: 27%; left: 15%; right: auto; } /* Gravespill */
+
+            /* Reklamer (oppe til høyre) */
+            #postit-reklamer  { top: 40%; left: 16%; right: auto; }
+            #grid-film        { top: 35%; left: 30%; right: auto; } /* Reklame 1 */
+            #grid-film2       { top: 42%; left: 5%; right: auto; } /* Reklame 2 */
+
+            /* Praksis (øvre midt, venstre) */
+            #postit-praksis   { top: 19%; left: 69%; right: auto; }
+            #grid-flerkamera3 { top: 16%; left: 59%;  right: auto; } /* Flerkamera 3 */
+            #grid-flerkamera4 { top: 12%; left: 78%; right: auto; } /* Flerkamera 4 */
+            #grid-bedriftsbesok1 { top: 26%; left: 64%; right: auto; } /* Bedriftsbesøk 1 */
+            #grid-bedriftsbesok2 { top: 27%; left: 80%; right: auto; } /* Bedriftsbesøk 2 */
+
+            /* Grafisk design (øvre midt, høyre) */
+            #postit-grafisk   { top: 80%; left: 70%; right: auto; }
+            #grid-bedrift1    { top: 72%; left: 72%; right: auto; } /* Northbyte */
+            #grid-bedrift2    { top: 79%; left: 85%; right: auto; } /* Logo oppgave */
+            #grid-filmplakat  { top: 84%; left: 64%; right: auto; } /* Riffriders */
+
+            /* Internat og Gjennestad (midt til venstre) */
+            #postit-internat  { top: 55%; left: 14%; right: auto; }
+            #grid-gjennestad  { top: 53%; left: 4%;  right: auto; } /* Skolen!!! */
+            #grid-internat1   { top: 54%; left: 30%; right: auto; } /* Internat 1 */
+            #grid-internat2   { top: 63%; left: 10%; right: auto; } /* Internat 2 */
+
+            /* Galleri (midt til høyre) */
+            #postit-galleri   { top: 50%; left: 64%; right: auto; }
+            #grid-media5      { top: 60%; left: 65%; right: auto; } /* Mediaproduksjon 5 */
+            #grid-media1      { top: 49%; left: 79%; right: auto; } /* Jeg liker kyling */
+            #grid-media2      { top: 48%; left: 54%; right: auto; } /* The Decever */
+
+            /* Media (nederst i midten - størst klynge) */
+            #postit-medie     { top: 72%; left: 30%; right: auto; }
+            #grid-flerkamera1 { top: 67%; left: 30%; right: auto; } /* Flerkamera-produksjon */
+            #grid-flerkamera2 { top: 68%; left: 47%; right: auto; } /* Han flytter seg */
+            #grid-media4      { top: 76%; left: 20%; right: auto; } /* Mediaproduksjon 4 */
+            #grid-media3      { top: 77%; left: 41%; right: auto; } /* Filip Nyhamn */
+            #grid-media6      { top: 81%; left: 33%; right: auto; } /* Mediaproduksjon 6 */
         }
     </style>
 </head>
 <body>
 <div class="prosjekt-grid">
-    <img src="Assets\bilder\test-bilde.jpg" class="main-assets" data-link="film-rull.html?id=test-id"
-            style="max-width:30vw;max-height:30vh; top: 60vh; left: 80vw" alt="test">
-    <img src="Assets\bilder\Filmplakat_above-the-law.jpg" class="main-assets" data-link="polaroid.html?id=test-id"
-            style="max-width:25vw;max-height:25vh; top: 10vh; left: 5vw" alt="test">
-    <img src="Assets\bilder\sticky-note.png" class="main-assets"
-            style="max-width:20vw;max-height:20vh; top: 10vh; left: 5vw" alt="test">
+    <img id="grid-film" src="Assets/elementer/polaroids/reklame1.png" class="main-assets" alt="Filmrull">
+    <img id="grid-film2" src="Assets/elementer/polaroids/reklame2.png" class="main-assets" alt="Filmrull">
+    <img id="grid-bedrift1" src="Assets/elementer/polaroids/bedriftLogo1V2.png" class="main-assets" alt="test">
+    <img id="grid-bedrift2" src="Assets/elementer/polaroids/bedriftLogo2V3.png" class="main-assets" alt="test">
+    <img id="grid-flerkamera2" src="Assets/elementer/polaroids/flerkameraproduksjon2V2.png" class="main-assets" alt="test">
+    <img id="grid-flerkamera1" src="Assets/elementer/polaroids/flerkameraproduksjon1V2.png" class="main-assets" alt="test">
+    <img id="grid-gjennestad" src="Assets/elementer/polaroids/GjennestadV2.png" class="main-assets" alt="test">
+    <img id="grid-imlan1" src="Assets/elementer/polaroids/IMLan1V2.png" class="main-assets" alt="IM LAN">
+    <img id="grid-imlan2" src="Assets/elementer/polaroids/IMLan2V3.png" class="main-assets" alt="IM LAN">
+    <img id="grid-itkode1" src="Assets/elementer/polaroids/ITkode1.png" class="main-assets" alt="IT kode">
+    <img id="grid-filmplakat" src="Assets/elementer/polaroids/filmplakat1V2.png" class="main-assets" alt="Filmplakat">
+    <img id="grid-media1" src="Assets/elementer/polaroids/mediaproduksjon1V2.png" class="main-assets" alt="Mediaproduksjon">
+    <img id="grid-media2" src="Assets/elementer/polaroids/mediaproduksjon2.png" class="main-assets" alt="Mediaproduksjon">
+    <img id="grid-media3" src="Assets/elementer/polaroids/mediaproduksjon3.png" class="main-assets" alt="Mediaproduksjon">
+    <img id="grid-egetspill" src="Assets/elementer/polaroids/polaroidEgetSpill1V2.png" class="main-assets" alt="Eget spill">
+    <img id="grid-itkode2" src="Assets/elementer/polaroids/ITkode3.png" class="main-assets" alt="IT kode">
+    <img id="grid-bedriftsbesok1" src="Assets/elementer/polaroids/bedriftsbesok1.png" class="main-assets" alt="Bedriftsbesøk">
+    <img id="grid-bedriftsbesok2" src="Assets/elementer/polaroids/bedriftsbesok2.png" class="main-assets" alt="Bedriftsbesøk">
+    <img id="grid-flerkamera3" src="Assets/elementer/polaroids/flerkameraproduksjon3.png" class="main-assets" alt="Flerkameraproduksjon">
+    <img id="grid-flerkamera4" src="Assets/elementer/polaroids/flerkameraproduksjon4.png" class="main-assets" alt="Flerkameraproduksjon">
+    <img id="grid-internat1" src="Assets/elementer/polaroids/internat1.png" class="main-assets" alt="Internat">
+    <img id="grid-internat2" src="Assets/elementer/polaroids/internat2.png" class="main-assets" alt="Internat">
+    <img id="grid-media4" src="Assets/elementer/polaroids/mediaproduksjon4.png" class="main-assets" alt="Mediaproduksjon">
+    <img id="grid-media5" src="Assets/elementer/polaroids/mediaproduksjon5.png" class="main-assets" alt="Mediaproduksjon">
+    <img id="grid-media6" src="Assets/elementer/polaroids/mediaproduksjon6.png" class="main-assets" alt="Mediaproduksjon">
+
+    <!-- Postit-lapper. data-link styrer hvilken side lappen leder til. -->
+    <img id="postit-it" src="Assets/elementer/postit notes/ITV3.png" class="main-assets" data-link="it-side.html?id=Informasjonsteknologi" alt="IT">
+    <img id="postit-galleri" src="Assets/elementer/postit notes/galleriV3.png" class="main-assets" data-link="galleri.html" alt="Galleri">
+    <img id="postit-grafisk" src="Assets/elementer/postit notes/grafiskDesignV3.png" class="main-assets" data-link="grafisk-design.html?id=Grafisk-Design" alt="Grafisk design">
+    <img id="postit-internat" src="Assets/elementer/postit notes/internatGjennestadV3.png" class="main-assets" data-link="film-rull.html?id=Internat og Gjennestad" alt="Internat og Gjennestad">
+    <img id="postit-medie" src="Assets/elementer/postit notes/medieV3.png" class="main-assets" data-link="media.html?id=media" alt="Media">
+    <img id="postit-reklamer" src="Assets/elementer/postit notes/reklamerV3.png" class="main-assets" data-link="Reklamefilm.html?id=Reklamefilm" alt="Reklamer">
+    <img id="postit-praksis" src="Assets/elementer/postit notes/praksisV3.png" class="main-assets" data-link="film-rull.html?id=Praksis" alt="Praksis">
 </div>
-</body>
 <script src="script.js"></script>
 <script src="prosjekter.js"></script>
 <script src="terminal.js"></script>
@@ -31,43 +269,276 @@
 
 <script>
     const img = document.querySelectorAll('.main-assets')
+    const tavle = document.querySelector('.prosjekt-grid')
+
+    // ============================================================
+    // KORKTAVLA: legg den usynlige .prosjekt-grid-boksen nøyaktig
+    // oppå korkflaten i bakgrunnsbildet. Bakgrunnen bruker
+    // "background-size: cover" + "center bottom", så vi regner ut
+    // samme beskjæring her og plasserer boksen deretter. Da følger
+    // alle lappene rammen på alle skjermstørrelser.
+    //
+    // venstre/hoyre/topp/bunn er hvor korkflaten (innsiden av
+    // trerammen) ligger, som andel 0-1 av bakgrunnsbildet. Juster
+    // disse litt hvis rammen ikke treffer helt.
+    // ============================================================
+    const TAVLE_PC  = { w: 1920, h: 1080, venstre: 0.12, hoyre: 0.89, topp: 0.11, bunn: 0.86 };
+    const TAVLE_TLF = { w: 1440, h: 3200, venstre: 0.11, hoyre: 0.90, topp: 0.13, bunn: 0.75 };
+
+    function oppdaterTavle() {
+        // Samme brytepunkt (768px) som bakgrunnsbildet bytter på i CSS-en.
+        const b = window.innerWidth <= 768 ? TAVLE_TLF : TAVLE_PC;
+        const vW = window.innerWidth, vH = window.innerHeight;
+        const skala = Math.max(vW / b.w, vH / b.h);   // "cover": dekk hele skjermen
+        const rW = b.w * skala, rH = b.h * skala;       // bildets faktiske størrelse
+        const forskyvX = (vW - rW) / 2;                 // sentrert vannrett
+        const forskyvY = vH - rH;                       // forankret i bunn
+        tavle.style.left   = (forskyvX + b.venstre * rW) + 'px';
+        tavle.style.top    = (forskyvY + b.topp    * rH) + 'px';
+        tavle.style.width  = ((b.hoyre - b.venstre) * rW) + 'px';
+        tavle.style.height = ((b.bunn  - b.topp)    * rH) + 'px';
+    }
+    // Selve resize-/rotasjons-lytteren settes opp lenger ned (vedFormendring),
+    // sammen med kastUtFraPC, så vi kan ignorere rene høyde-endringer (tastatur).
+    oppdaterTavle();
+
+    // ============================================================
+    // HOLD LAPPENE UNNA PC-EN / TERMINALEN
+    // PC-en (og terminalvinduet når det er åpent) ligger nede i høyre
+    // hjørne. Vi vil ikke at lappene skal kunne dras oppå eller bak den.
+    // Funksjonen tar en ønsket skjerm-posisjon (vpLeft/vpTop) for lappen
+    // og dytter den ut av hindringen - oppover eller mot venstre, det som
+    // krever minst flytting (PC-en sitter jo i hjørnet).
+    //
+    // pc-forside.png har gjennomsiktig kant rundt selve PC-en. Vi trekker
+    // sonen innover med disse andelene (0-1 av bildets bredde/høyde) så man
+    // bare blokkeres der det faktisk ER noe. Juster om kanten er feil.
+    // ============================================================
+    const PC_KANT = { venstre: 0.22, hoyre: 0.15, topp: 0.10, bunn: 0.10 };
+
+    function holdUnnaPC(vpLeft, vpTop, w, h, inkluderTerminal = true) {
+        const hindringer = [];
+        const pc = document.getElementById('pc-forside');
+        if (pc) {
+            const b = pc.getBoundingClientRect();
+            // Stram inn til selve PC-en (fjern den gjennomsiktige kanten).
+            hindringer.push({
+                left:   b.left  + b.width  * PC_KANT.venstre,
+                right:  b.right - b.width  * PC_KANT.hoyre,
+                top:    b.top   + b.height * PC_KANT.topp,
+                bottom: b.bottom - b.height * PC_KANT.bunn,
+            });
+        }
+        // Terminalvinduet teller bare som hindring mens man DRAR en lapp (så man
+        // ikke slipper den bak terminalen). Ved masseplassering på oppstart
+        // (kastUtFraPC) skal det IKKE telle: på telefon dekker det åpne vinduet
+        // hele skjermen, og da ville alle lappene blitt dyttet inn i hjørnet.
+        if (inkluderTerminal) {
+            const term = document.getElementById('terminal-vindu');
+            if (term && !term.classList.contains('skjult')) {
+                // Terminalvinduet er en heldekkende boks - ingen kant å trekke fra.
+                hindringer.push(term.getBoundingClientRect());
+            }
+        }
+        for (const r of hindringer) {
+            const overlapper = vpLeft < r.right && vpLeft + w > r.left &&
+                               vpTop < r.bottom && vpTop + h > r.top;
+            if (!overlapper) continue;
+            const penOpp     = (vpTop + h) - r.top;   // hvor langt ned i hindringen lappen stikker
+            const penVenstre = (vpLeft + w) - r.left; // hvor langt inn fra venstre den stikker
+            if (penOpp <= penVenstre) {
+                vpTop = r.top - h;     // skyv opp, over PC-en
+            } else {
+                vpLeft = r.left - w;   // skyv til venstre, forbi PC-en
+            }
+        }
+        return { vpLeft, vpTop };
+    }
+
+    // Kast ut lapper som ALLEREDE ligger oppå PC-en/terminalen (fra start-
+    // plasseringen eller etter at vinduet endret størrelse), så de aldri
+    // havner bak/oppå PC-en.
+    function kastUtFraPC() {
+        const tavleRekt = tavle.getBoundingClientRect();
+        img.forEach(el => {
+            const er = el.getBoundingClientRect();
+            const w = el.offsetWidth, h = el.offsetHeight;
+            // Ignorer terminalvinduet her – ellers ville et åpent (heldekkende)
+            // vindu på telefon dyttet alle lappene inn i hjørnet ved oppstart.
+            const res = holdUnnaPC(er.left, er.top, w, h, false);
+            if (res.vpLeft === er.left && res.vpTop === er.top) return; // lå ikke oppå
+            const nyLeft = Math.max(0, Math.min(res.vpLeft - tavleRekt.left, tavleRekt.width - w));
+            const nyTop  = Math.max(0, Math.min(res.vpTop  - tavleRekt.top,  tavleRekt.height - h));
+            el.style.right = 'auto';
+            el.style.left = nyLeft + 'px';
+            el.style.top = nyTop + 'px';
+        });
+    }
+    // Regn om tavla og kast ut lapper når skjermen faktisk endrer FORM.
+    //
+    // VIKTIG (Android): når terminalen åpnes spretter tastaturet opp og krymper
+    // bare HØYDEN på vinduet. Det utløser en resize - men korktavla er forankret
+    // i bunnen, så hvis vi regner den om da, hopper alle lappene. Vi reagerer
+    // derfor bare når BREDDEN endrer seg (rotasjon / vindusendring på PC), ikke
+    // på rene høyde-endringer fra tastaturet eller nettleserlinja. (På telefon er
+    // tavla uansett skjult bak den heldekkende terminalen mens den er åpen.)
+    let forrigeBredde = window.innerWidth;
+    function vedFormendring() {
+        const bredde = window.innerWidth;
+        // Hopp over når vi er på telefon og bredden er uendret (ren høyde-endring).
+        if (bredde === forrigeBredde && bredde <= 768) return;
+        forrigeBredde = bredde;
+        oppdaterTavle();
+        kastUtFraPC();
+    }
+    // Kjør når alt er lastet (PC-en finnes, bildene har fått størrelse).
+    window.addEventListener('load', kastUtFraPC);
+    window.addEventListener('resize', vedFormendring);
+    window.addEventListener('orientationchange', vedFormendring);
+
     let isDragging = false;
     let currentImage = null;
     let offsetX, offsetY;
-    let maxZ = 1;
+    let maxZ = 5000;
     let mouseHasMoved = false;
     let imgLink = null;
+    let startX = 0;
+    let startY = 0;
+    // Husker om lappen akkurat nå "dunker" i PC-en, så vi bare vibrerer
+    // én gang når den treffer veggen (ikke hver eneste piksel).
+    let bleBlokkert = false;
+    // "Svai": lappen heller litt i den retningen du drar den, og retter seg
+    // opp igjen når du står stille. Gjør plukk/flytting mer levende.
+    let forrigeSvaiX = 0;
+    let svaiTimeout = null;
+    const SVAI_MAKS = 12; // største helning i grader
+    // Hvor mange piksler fingeren/musen må flytte seg før det regnes som
+    // et dra (og ikke et klikk). På iPad gir en vanlig tapp alltid noen få
+    // pikslers bevegelse, så uten denne terskelen ville touch aldri navigere.
+    const DRAG_THRESHOLD = 8;
+
+    function startDrag(img, clientX, clientY) {
+        isDragging = true;
+        mouseHasMoved = false;
+        imgLink = img.dataset.link;
+        startX = clientX;
+        startY = clientY;
+        maxZ += 1;
+        currentImage = img;
+        currentImage.style.zIndex = maxZ;
+        offsetX = clientX - img.getBoundingClientRect().left;
+        offsetY = clientY - img.getBoundingClientRect().top;
+        document.body.style.cursor = 'grabbing';
+        currentImage.style.cursor = 'grabbing';
+        bleBlokkert = false;
+        // Løft lappen (samme som :active) og nullstill svai-referansen.
+        forrigeSvaiX = clientX;
+        currentImage.style.transform = 'scale(1.2)';
+        vibrer(10); // lett napp når du plukker opp en lapp
+    }
+
+    function moveDrag(clientX, clientY) {
+        if (isDragging && currentImage) {
+            if (Math.hypot(clientX - startX, clientY - startY) > DRAG_THRESHOLD) {
+                mouseHasMoved = true;
+            }
+
+            // Regn ut posisjonen RELATIVT TIL KORKTAVLA (ikke skjermen), siden
+            // lappene nå ligger inni .prosjekt-grid-boksen.
+            const tavleRekt = tavle.getBoundingClientRect();
+            let nyLeft = clientX - offsetX - tavleRekt.left;
+            let nyTop = clientY - offsetY - tavleRekt.top;
+
+            // Hold lappen innenfor korktavla, så den aldri havner utenfor rammen.
+            const w = currentImage.offsetWidth;
+            const h = currentImage.offsetHeight;
+            const maxLeft = tavleRekt.width - w;
+            const maxTop = tavleRekt.height - h;
+            nyLeft = Math.max(0, Math.min(nyLeft, maxLeft));
+            nyTop = Math.max(0, Math.min(nyTop, maxTop));
+
+            // Hold lappen unna PC-en/terminalen (regnes i skjerm-koordinater).
+            const onskLeft = tavleRekt.left + nyLeft;
+            const onskTop = tavleRekt.top + nyTop;
+            const ut = holdUnnaPC(onskLeft, onskTop, w, h);
+            // "Dunk": vibrer én gang når lappen nettopp ble blokkert av PC-en.
+            const blokkertNa = (ut.vpLeft !== onskLeft || ut.vpTop !== onskTop);
+            if (blokkertNa && !bleBlokkert) vibrer(25);
+            bleBlokkert = blokkertNa;
+            // tilbake til tavle-koordinater, og hold innenfor rammen igjen
+            nyLeft = Math.max(0, Math.min(ut.vpLeft - tavleRekt.left, maxLeft));
+            nyTop = Math.max(0, Math.min(ut.vpTop - tavleRekt.top, maxTop));
+
+            // Bytt fra eventuell right/%-plassering til ren px-styring
+            currentImage.style.right = 'auto';
+            currentImage.style.left = nyLeft + 'px';
+            currentImage.style.top = nyTop + 'px';
+
+            // Svai: hell lappen i dra-retningen ut fra hvor fort den beveger
+            // seg vannrett, og rett den opp igjen når bevegelsen stopper.
+            const svaiDx = clientX - forrigeSvaiX;
+            forrigeSvaiX = clientX;
+            const vinkel = Math.max(-SVAI_MAKS, Math.min(SVAI_MAKS, svaiDx * 1.2));
+            currentImage.style.transform = `scale(1.2) rotate(${vinkel}deg)`;
+            clearTimeout(svaiTimeout);
+            svaiTimeout = setTimeout(() => {
+                if (currentImage) currentImage.style.transform = 'scale(1.2) rotate(0deg)';
+            }, 120);
+        }
+    }
+
+    function endDrag() {
+        // Bare reager hvis man faktisk startet et trykk på et bilde.
+        // Uten denne sjekken vil et klikk hvor som helst på siden (mouseup
+        // ligger på hele document) navigere til en gammel/hengende imgLink –
+        // f.eks. når forsiden gjenopprettes fra nettleserens bfcache.
+        if (!isDragging) {
+            return;
+        }
+        if (!mouseHasMoved && imgLink) {
+            console.log(imgLink);
+            vibrer([15, 30, 15]); // tydelig dobbelt-napp når du åpner en side
+            window.location.assign(imgLink);
+        } else if (mouseHasMoved) {
+            vibrer(12); // lite napp når du slipper en lapp du har flyttet
+        }
+        isDragging = false;
+        imgLink = null;
+        // reset cursors
+        document.body.style.cursor = '';
+        img.forEach(i => i.style.cursor = 'grab');
+        // Legg lappen pent ned igjen (transition-en i CSS gjør det mykt).
+        clearTimeout(svaiTimeout);
+        if (currentImage) currentImage.style.transform = '';
+        currentImage = null;
+    }
 
     img.forEach(img => {
         img.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            mouseHasMoved = false;
-            imgLink = img.dataset.link;
-            maxZ += 1;
-            currentImage = img;
-            currentImage.style.zIndex = maxZ;
-            offsetX = e.clientX - img.getBoundingClientRect().left;
-            offsetY = e.clientY - img.getBoundingClientRect().top;
+            startDrag(img, e.clientX, e.clientY);
             e.preventDefault();
         });
+        img.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            startDrag(img, touch.clientX, touch.clientY);
+            e.preventDefault();
+        }, { passive: false });
     });
 
     document.addEventListener('mousemove', (e) => {
-        if (isDragging && currentImage) {
-            mouseHasMoved = true;
-            currentImage.style.left = (e.clientX - offsetX) + 'px';
-            currentImage.style.top = (e.clientY - offsetY) + 'px';
-        }
+        moveDrag(e.clientX, e.clientY);
     });
 
-    document.addEventListener('mouseup', () => {
-        if (!mouseHasMoved && imgLink) {
-            console.log(imgLink);
-            window.location.assign(imgLink);
+    document.addEventListener('touchmove', (e) => {
+        if (isDragging && currentImage) {
+            const touch = e.touches[0];
+            moveDrag(touch.clientX, touch.clientY);
+            e.preventDefault();
         }
-        isDragging = false;
-        currentImage = null;
-    })
+    }, { passive: false });
+
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchend', endDrag);
 </script>
 </body>
 

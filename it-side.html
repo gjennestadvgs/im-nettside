@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prosjekt</title>
+  <style>
+    /* RESET & BASE */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      position: relative;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      /* Make body take full viewport height */
+      min-height: 100vh;
+      /* Center content vertically and horizontally */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden; /* Prevent horizontal scroll from the border */
+    }
+
+    /* BACKGROUND BORDER */
+    .border {
+      position: absolute;
+      left: 0;
+      width: 150%;
+      /* Center the 150% width element */
+      transform: translateX(-25%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .border-top {
+      top: 0;
+      bottom: auto;
+    }
+
+    .border-bottom {
+      bottom: 0;
+      top: auto;
+    }
+
+    /* MAIN CONTAINER */
+    .flex-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 50px;
+      width: 100%;
+      max-width: 1700px;
+      padding: 80px 20px; /* Increased top/bottom space from borders */
+      position: relative;
+      z-index: 1;
+      /* Ensure the container doesn't exceed screen width */
+      margin: 0 auto;
+    }
+
+    /* VIDEO SECTION */
+    .player-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    #player {
+      width: 100%;
+      max-width: min(1400px, 90vw);
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 20px;
+      background: #000;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    #player iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      outline: none;
+    }
+
+    /* CONTENT SECTION (TEXT + IMAGES) */
+    .main-content {
+      width: 100%;
+      display: flex;
+      gap: clamp(30px, 3vw, 60px);
+      align-items: flex-start;
+      flex-wrap: wrap; /* Allow stacking on small screens */
+    }
+
+    /* TEXT COLUMN (tekst + stort bilde under) */
+    .tekst-kolonne {
+      flex: 2;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .inhold {
+      flex: 0 1 auto;
+      min-width: 300px;
+      padding: 30px;
+    }
+
+    /* STORT BILDE UNDER TEKSTEN */
+    .stor-bilde {
+      padding: 0 30px;
+    }
+
+    .stor-bilde img {
+      width: 100%;
+      border-radius: 6px;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+      transform: rotate(-1.5deg);
+      transition: transform 200ms ease;
+    }
+
+    .stor-bilde img:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+
+    .inhold h1 {
+      margin-top: 0;
+      font-size: clamp(1.8rem, 1rem + 2.5vw, 4.5rem);
+      letter-spacing: 2px;
+      padding-bottom: 15px;
+    }
+
+    .inhold p {
+      line-height: 1.8;
+      font-size: clamp(1rem, 0.8rem + 0.7vw, 2rem);
+      margin-bottom: 1.5rem;
+    }
+
+    /* IMAGE COLUMN */
+    .bilde-kolonne {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+      min-width: 250px;
+    }
+
+    .bilde-kolonne img {
+      width: 100%;
+      max-width: 480px;
+      border-radius: 6px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      object-fit: cover;
+      transition: transform 200ms ease;
+    }
+
+    /* SPREDT COLLAGE: ulike størrelser og plasseringer per bilde */
+    .bilde-kolonne { gap: 30px; }
+    .bilde-kolonne img:nth-child(4n+1) { width: 100%; align-self: flex-start; transform: rotate(-3deg); }
+    .bilde-kolonne img:nth-child(4n+2) { width: 64%;  align-self: flex-end;   transform: rotate(2.5deg); margin-top: -6px; }
+    .bilde-kolonne img:nth-child(4n+3) { width: 82%;  align-self: center;     transform: rotate(-1.5deg); }
+    .bilde-kolonne img:nth-child(4n+4) { width: 54%;  align-self: flex-start; transform: rotate(3.5deg); margin-left: 14%; }
+    .bilde-kolonne img:hover { transform: rotate(0deg) scale(1.04); z-index: 2; }
+
+    /* TERMINAL BUTTON GLOW */
+    #terminal-knapp {
+      border: none;
+      border-radius: 5px;
+      animation: pulse-glow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 0px #ff0000; }
+      50% { box-shadow: 0 0 100px #ff0000, 0 0 35px #ff0000; }
+      100% { box-shadow: 0 0 0px #ff0000; }
+    }
+
+    .no-animation {
+      animation: none !important;
+      box-shadow: 0 0 0px #ffffff00; 
+    }
+
+    /* RESPONSIVE TWEAKS */
+    @media (max-width: 768px) {
+      .flex-container .back-button--fixed {
+        position: static;
+        align-self: flex-start;
+      }
+
+      .main-content {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+      }
+
+      .inhold {
+        width: 100%;
+        text-align: center;
+      }
+
+      .inhold h1 {
+        font-size: clamp(1.4rem, 6vw, 2rem);
+        overflow-wrap: break-word;
+        hyphens: auto;
+      }
+
+      .bilde-kolonne {
+        width: 100%;
+        max-width: 400px;
+      }
+    }
+  </style>
+  
+  <!-- External stylesheets (keep if you have them, otherwise remove) -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="terminal.css">
+</head>
+<body>
+
+  <div class="flex-container">
+
+    <button class="back-button back-button--fixed" type="button" aria-label="Tilbake"></button>
+
+    <!-- VIDEO SECTION -->
+    <div class="player-wrapper">
+      <div id="player"></div>
+    </div>
+
+
+    <!-- TEXT + IMAGE SECTION -->
+    <div class="main-content">
+      <div class="tekst-kolonne">
+        <div class="inhold" id="inhold"></div>
+        <div class="stor-bilde" id="stor-bilde"></div>
+      </div>
+      <div class="bilde-kolonne" id="bilde-kolonne"></div>
+    </div>
+
+  </div>
+
+    <dialog id="velkomst-popup">
+      <h1>Velkommen til Informasjonsteknologi</h1>
+    <p>Vi minner om at terminalen er tilgjengelig for bruk i hjørnet av siden.</p>
+    <button onclick="document.getElementById('velkomst-popup').close()">Lukk</button>
+  </dialog>
+
+  <script>
+
+    // Vis velkomst-popupen bare første gang man besøker siden
+    if (!localStorage.getItem('velkomst-popup-vist')) {
+      document.getElementById('velkomst-popup').showModal();
+      localStorage.setItem('velkomst-popup-vist', 'true');
+    }
+
+    // Project Data
+    const prosjekter = [
+      {
+        id: "Informasjonsteknologi",
+        tittel: "Informasjonsteknologi",
+        bilder: [
+          "Assets/bilder/IT%20bilder/1IM_2026_4.JPG",
+          "Assets/bilder/IT%20bilder/1IM_2026_12.JPG",
+          "Assets/bilder/IT%20bilder/Skru_pc_v1.jpg",
+          "Assets/bilder/IT%20bilder/_MG_0158.JPG"
+        ],
+        videoEmbed: `
+          <iframe 
+            width="560" 
+            height="315" 
+            src="https://www.youtube.com/embed/AqWzwk2Pne4?si=LmGvY0vTMU6JpjdX&autoplay=1&mute=1&playsinline=1" 
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin" 
+            allowfullscreen>
+          </iframe>
+        `,
+        tekstfil: "Assets/tekst/Informasjonsteknologi",
+      }
+    ];
+
+    // Helper: Get URL Parameter
+    function getQueryParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    // Main Function: Load Project
+    function visProsjekt() {
+      const id = getQueryParam('id');
+      const prosjekt = prosjekter.find(p => p.id === id);
+
+      if (!prosjekt) {
+        document.querySelector('.inhold').innerHTML = "<h1>Prosjekt ikke funnet</h1>";
+        document.querySelector('.bilde-kolonne').innerHTML = "";
+        return;
+      }
+
+      // 1. Load Images — første bilde stort under teksten, resten i side-kolonnen
+      const storBilde = document.querySelector('#stor-bilde');
+      if (storBilde) {
+        storBilde.innerHTML = prosjekt.bilder.length
+          ? `<img src="${prosjekt.bilder[0]}" alt="${prosjekt.tittel}">`
+          : '';
+      }
+      const bildeContainer = document.querySelector('.bilde-kolonne');
+      if (bildeContainer) {
+        bildeContainer.innerHTML = prosjekt.bilder
+          .slice(1)
+          .map((src, i) => `<img src="${src}" alt="${prosjekt.tittel} ${i + 2}">`)
+          .join('');
+      }
+
+      // 2. Load Text
+      const tekstContainer = document.querySelector('.inhold');
+      if (tekstContainer) {
+        // Set title immediately
+        tekstContainer.innerHTML = `<h1>${prosjekt.tittel}</h1> Loading...`;
+        
+        fetch(prosjekt.tekstfil)
+          .then(response => {
+            if (!response.ok) throw new Error('Filen kunne ikke lastes');
+            return response.text();
+          })
+          .then(data => {
+            // Split text into paragraphs (handling empty lines)
+            const avsnitt = data
+              .split(/\n\s*\n/)
+              .filter(paragraph => paragraph.trim().length > 0) // Avoid empty paragraphs
+              .map(a => `<p>${a.trim()}</p>`)
+              .join('');
+            
+            // Replace content
+            tekstContainer.innerHTML = `<h1>${prosjekt.tittel}</h1>${avsnitt}`;
+          })
+          .catch(error => {
+            console.error('Feil ved lasting:', error);
+            tekstContainer.innerHTML = `<h1>${prosjekt.tittel}</h1><p>Kunne ikke laste teksten.</p>`;
+          });
+      }
+
+      // 3. Load Video
+      const playerContainer = document.querySelector('#player');
+      if (playerContainer) {
+        playerContainer.innerHTML = prosjekt.videoEmbed;
+      }
+    }
+
+    // Initialize on DOM Load
+    document.addEventListener('DOMContentLoaded', visProsjekt);
+  </script>
+
+  <!-- External scripts (keep if you have them, otherwise remove) -->
+  <script src="script.js"></script>
+  <script src="back-button.js"></script>
+  <script src="terminal.js"></script>
+  <script src="kommandoer.js"></script>
+  <script src="lightbox.js"></script>
+
+  <script>
+    // Stop terminal button glow after first click
+    function setupTerminalGlowStop() {
+        const btn = document.getElementById('terminal-knapp');
+        if (!btn) {
+            setTimeout(setupTerminalGlowStop, 100);
+            return;
+        }
+        
+        btn.addEventListener('click', function () {
+            btn.classList.add('no-animation');
+        }, { once: true });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupTerminalGlowStop);
+    } else {
+        setupTerminalGlowStop();
+    }
+  </script>
+</body>
+</html>
