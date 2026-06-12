@@ -246,6 +246,7 @@ function settViewportZoom(tillatt) {
 }
 
 function åpneTerminal() {
+    if (window.vibrer) vibrer(20); // napp når terminalen åpnes
     terminalVindu.classList.remove('skjult');
     // Løft PC-en over bildene mens terminalen er åpen (se terminal index.css).
     const pc = document.getElementById('pc-forside');
@@ -257,6 +258,7 @@ function åpneTerminal() {
 }
 
 function lukkTerminal() {
+    if (window.vibrer) vibrer(12); // kort napp når terminalen lukkes
     terminalVindu.classList.add('skjult');
     const pc = document.getElementById('pc-forside');
     if (pc) pc.classList.remove('terminal-aapen');
@@ -671,6 +673,7 @@ function startTerminal() {
             skrivLinje('> ' + linje);
             historikk.push(linje);
             historikkIndeks = historikk.length;
+            if (window.vibrer) vibrer(15); // napp når en kommando kjøres
             kjørKommando(linje);
             terminalInput.value = '';
             lagre();

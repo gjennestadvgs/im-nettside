@@ -380,6 +380,9 @@
     let imgLink = null;
     let startX = 0;
     let startY = 0;
+    // Husker om lappen akkurat nå "dunker" i PC-en, så vi bare vibrerer
+    // én gang når den treffer veggen (ikke hver eneste piksel).
+    let bleBlokkert = false;
     // Hvor mange piksler fingeren/musen må flytte seg før det regnes som
     // et dra (og ikke et klikk). På iPad gir en vanlig tapp alltid noen få
     // pikslers bevegelse, så uten denne terskelen ville touch aldri navigere.
@@ -398,6 +401,8 @@
         offsetY = clientY - img.getBoundingClientRect().top;
         document.body.style.cursor = 'grabbing';
         currentImage.style.cursor = 'grabbing';
+        bleBlokkert = false;
+        vibrer(10); // lett napp når du plukker opp en lapp
     }
 
     function moveDrag(clientX, clientY) {
@@ -421,12 +426,16 @@
             nyTop = Math.max(0, Math.min(nyTop, maxTop));
 
             // Hold lappen unna PC-en/terminalen (regnes i skjerm-koordinater).
-            let vpLeft = tavleRekt.left + nyLeft;
-            let vpTop = tavleRekt.top + nyTop;
-            ({ vpLeft, vpTop } = holdUnnaPC(vpLeft, vpTop, w, h));
+            const onskLeft = tavleRekt.left + nyLeft;
+            const onskTop = tavleRekt.top + nyTop;
+            const ut = holdUnnaPC(onskLeft, onskTop, w, h);
+            // "Dunk": vibrer én gang når lappen nettopp ble blokkert av PC-en.
+            const blokkertNa = (ut.vpLeft !== onskLeft || ut.vpTop !== onskTop);
+            if (blokkertNa && !bleBlokkert) vibrer(25);
+            bleBlokkert = blokkertNa;
             // tilbake til tavle-koordinater, og hold innenfor rammen igjen
-            nyLeft = Math.max(0, Math.min(vpLeft - tavleRekt.left, maxLeft));
-            nyTop = Math.max(0, Math.min(vpTop - tavleRekt.top, maxTop));
+            nyLeft = Math.max(0, Math.min(ut.vpLeft - tavleRekt.left, maxLeft));
+            nyTop = Math.max(0, Math.min(ut.vpTop - tavleRekt.top, maxTop));
 
             // Bytt fra eventuell right/%-plassering til ren px-styring
             currentImage.style.right = 'auto';
@@ -445,7 +454,10 @@
         }
         if (!mouseHasMoved && imgLink) {
             console.log(imgLink);
+            vibrer([15, 30, 15]); // tydelig dobbelt-napp når du åpner en side
             window.location.assign(imgLink);
+        } else if (mouseHasMoved) {
+            vibrer(12); // lite napp når du slipper en lapp du har flyttet
         }
         isDragging = false;
         imgLink = null;

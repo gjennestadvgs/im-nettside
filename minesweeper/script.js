@@ -137,6 +137,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!square.classList.contains('flag') && (flags < bombAmount)) {
                 square.classList.add('flag')
                 flags++
+                // Haptisk feedback: kort napp når du plasserer et flagg.
+                // (Virker på Android; iPhone/Safari støtter det ikke for web.)
+                if (navigator.vibrate) navigator.vibrate(20)
                 square.innerHTML = '<div>🚩</div>'
                 let flaggElement = square.querySelector('div')
                 flaggElement.animate(

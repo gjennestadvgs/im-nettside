@@ -1,3 +1,13 @@
+// Haptisk feedback: kort vibrasjon når man gjør ting på siden.
+// navigator.vibrate virker på Android (Chrome m.fl.). iPhone/Safari støtter
+// det IKKE for nettsider, så der skjer ingenting (helt trygt - vi sjekker).
+// Bruk: vibrer(15) for ett kort napp, eller vibrer([10, 40, 10]) for mønster.
+window.vibrer = function (mønster) {
+    try {
+        if (navigator.vibrate) navigator.vibrate(mønster);
+    } catch (e) { /* ignorer hvis nettleseren ikke tillater det */ }
+};
+
 let bgColour = [120, 0, 120]
 //document.body.style.backgroundColor = "rgb(" + bgColour[0] + "," + bgColour[1] + "," + bgColour[2] + ")"
 
