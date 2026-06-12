@@ -48,6 +48,14 @@
             display: block;
         }
 
+        /* Når hero-plassen viser en video i stedet for et bilde. */
+        #bilde iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
 
         /* INNHOLD */
 
@@ -124,6 +132,17 @@
 
             border: none;
             border-radius: 12px;
+        }
+
+        /* Bildet som er flyttet ned i rutenettet (byttet plass med videoen). */
+        .video-grid img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            height: auto;
+
+            object-fit: cover;
+            border-radius: 12px;
+            display: block;
         }
 
         /* TELEFON */
@@ -219,9 +238,10 @@
                 forside: "Assets/bilder/reklamefilm/Skjermbilde 2026-06-11 135029.png",
 
                 // Fire YouTube-videoer. Bytt ut ID-ene (delen etter "embed/").
+                // Den FØRSTE i lista vises øverst (hero). Video 2 ligger derfor først.
                 videoer: [
-                    "https://www.youtube.com/embed/MKrL_Y153B0?si=MHNIkMAT8SbU4X_J",
-                    "https://www.youtube.com/embed/zAhAdWmfdtM?si=3Yy1NmIAbSU0m924"
+                    "https://www.youtube.com/embed/zAhAdWmfdtM?si=3Yy1NmIAbSU0m924",
+                    "https://www.youtube.com/embed/MKrL_Y153B0?si=MHNIkMAT8SbU4X_J"
                 ]
             },
         ];
@@ -256,25 +276,36 @@
 
             document.getElementById('prosjekt-tittel').textContent = prosjekt.tittel;
 
-            // BILDE
+            // BILDE OG VIDEOER (byttet plass):
+            // Den FØRSTE videoen vises øverst (hero - det første man ser), og
+            // forside-bildet er flyttet ned i rutenettet der videoen lå. Resten
+            // av videoene vises også i rutenettet.
 
-            document.getElementById('bilde').innerHTML = `
-                <img src="${prosjekt.forside || prosjekt.bilde}" alt="${prosjekt.tittel}">
+            const videoer = prosjekt.videoer || [];
+            const heroVideo = videoer[0];
+            const bildeUrl = prosjekt.forside || prosjekt.bilde;
+
+            const lagIframe = (url) => `
+                <iframe
+                    src="${url}"
+                    title="${prosjekt.tittel}"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
             `;
 
-            // VIDEOER
+            // ØVERST: første video. (Faller tilbake til bildet hvis ingen video.)
+            document.getElementById('bilde').innerHTML = heroVideo
+                ? lagIframe(heroVideo)
+                : `<img src="${bildeUrl}" alt="${prosjekt.tittel}">`;
 
-            document.getElementById('video-grid').innerHTML =
-                (prosjekt.videoer || [])
-                    .map(url => `
-                        <iframe
-                            src="${url}"
-                            title="${prosjekt.tittel}"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen>
-                        </iframe>
-                    `)
-                    .join('');
+            // RUTENETT: bildet først (der videoen lå), så resten av videoene.
+            const rutenett = [];
+            if (heroVideo && bildeUrl) {
+                rutenett.push(`<img src="${bildeUrl}" alt="${prosjekt.tittel}">`);
+            }
+            videoer.slice(heroVideo ? 1 : 0).forEach(url => rutenett.push(lagIframe(url)));
+            document.getElementById('video-grid').innerHTML = rutenett.join('');
 
             // TEKST
 
