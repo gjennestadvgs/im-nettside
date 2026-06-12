@@ -316,7 +316,7 @@
     // ============================================================
     const PC_KANT = { venstre: 0.22, hoyre: 0.15, topp: 0.10, bunn: 0.10 };
 
-    function holdUnnaPC(vpLeft, vpTop, w, h) {
+    function holdUnnaPC(vpLeft, vpTop, w, h, inkluderTerminal = true) {
         const hindringer = [];
         const pc = document.getElementById('pc-forside');
         if (pc) {
@@ -329,10 +329,16 @@
                 bottom: b.bottom - b.height * PC_KANT.bunn,
             });
         }
-        const term = document.getElementById('terminal-vindu');
-        if (term && !term.classList.contains('skjult')) {
-            // Terminalvinduet er en heldekkende boks - ingen kant å trekke fra.
-            hindringer.push(term.getBoundingClientRect());
+        // Terminalvinduet teller bare som hindring mens man DRAR en lapp (så man
+        // ikke slipper den bak terminalen). Ved masseplassering på oppstart
+        // (kastUtFraPC) skal det IKKE telle: på telefon dekker det åpne vinduet
+        // hele skjermen, og da ville alle lappene blitt dyttet inn i hjørnet.
+        if (inkluderTerminal) {
+            const term = document.getElementById('terminal-vindu');
+            if (term && !term.classList.contains('skjult')) {
+                // Terminalvinduet er en heldekkende boks - ingen kant å trekke fra.
+                hindringer.push(term.getBoundingClientRect());
+            }
         }
         for (const r of hindringer) {
             const overlapper = vpLeft < r.right && vpLeft + w > r.left &&
@@ -357,7 +363,9 @@
         img.forEach(el => {
             const er = el.getBoundingClientRect();
             const w = el.offsetWidth, h = el.offsetHeight;
-            const res = holdUnnaPC(er.left, er.top, w, h);
+            // Ignorer terminalvinduet her – ellers ville et åpent (heldekkende)
+            // vindu på telefon dyttet alle lappene inn i hjørnet ved oppstart.
+            const res = holdUnnaPC(er.left, er.top, w, h, false);
             if (res.vpLeft === er.left && res.vpTop === er.top) return; // lå ikke oppå
             const nyLeft = Math.max(0, Math.min(res.vpLeft - tavleRekt.left, tavleRekt.width - w));
             const nyTop  = Math.max(0, Math.min(res.vpTop  - tavleRekt.top,  tavleRekt.height - h));
