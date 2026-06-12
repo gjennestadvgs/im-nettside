@@ -100,11 +100,36 @@
       flex-wrap: wrap; /* Allow stacking on small screens */
     }
 
-    /* TEXT COLUMN */
-    .inhold {
+    /* TEXT COLUMN (tekst + stort bilde under) */
+    .tekst-kolonne {
       flex: 2;
       min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .inhold {
+      flex: 0 1 auto;
+      min-width: 300px;
       padding: 30px;
+    }
+
+    /* STORT BILDE UNDER TEKSTEN */
+    .stor-bilde {
+      padding: 0 30px;
+    }
+
+    .stor-bilde img {
+      width: 100%;
+      border-radius: 6px;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+      transform: rotate(-1.5deg);
+      transition: transform 200ms ease;
+    }
+
+    .stor-bilde img:hover {
+      transform: rotate(0deg) scale(1.02);
     }
 
     .inhold h1 {
@@ -136,7 +161,16 @@
       border-radius: 6px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.3);
       object-fit: cover;
+      transition: transform 200ms ease;
     }
+
+    /* SPREDT COLLAGE: ulike størrelser og plasseringer per bilde */
+    .bilde-kolonne { gap: 30px; }
+    .bilde-kolonne img:nth-child(4n+1) { width: 100%; align-self: flex-start; transform: rotate(-3deg); }
+    .bilde-kolonne img:nth-child(4n+2) { width: 64%;  align-self: flex-end;   transform: rotate(2.5deg); margin-top: -6px; }
+    .bilde-kolonne img:nth-child(4n+3) { width: 82%;  align-self: center;     transform: rotate(-1.5deg); }
+    .bilde-kolonne img:nth-child(4n+4) { width: 54%;  align-self: flex-start; transform: rotate(3.5deg); margin-left: 14%; }
+    .bilde-kolonne img:hover { transform: rotate(0deg) scale(1.04); z-index: 2; }
 
     /* TERMINAL BUTTON GLOW */
     #terminal-knapp {
@@ -205,7 +239,10 @@
 
     <!-- TEXT + IMAGE SECTION -->
     <div class="main-content">
-      <div class="inhold" id="inhold"></div>
+      <div class="tekst-kolonne">
+        <div class="inhold" id="inhold"></div>
+        <div class="stor-bilde" id="stor-bilde"></div>
+      </div>
       <div class="bilde-kolonne" id="bilde-kolonne"></div>
     </div>
 
@@ -230,7 +267,12 @@
       {
         id: "Informasjonsteknologi",
         tittel: "Informasjonsteknologi",
-        bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
+        bilder: [
+          "Assets/bilder/IT%20bilder/1IM_2026_4.JPG",
+          "Assets/bilder/IT%20bilder/1IM_2026_12.JPG",
+          "Assets/bilder/IT%20bilder/Skru_pc_v1.jpg",
+          "Assets/bilder/IT%20bilder/_MG_0158.JPG"
+        ],
         videoEmbed: `
           <iframe 
             width="560" 
@@ -264,10 +306,19 @@
         return;
       }
 
-      // 1. Load Image
+      // 1. Load Images — første bilde stort under teksten, resten i side-kolonnen
+      const storBilde = document.querySelector('#stor-bilde');
+      if (storBilde) {
+        storBilde.innerHTML = prosjekt.bilder.length
+          ? `<img src="${prosjekt.bilder[0]}" alt="${prosjekt.tittel}">`
+          : '';
+      }
       const bildeContainer = document.querySelector('.bilde-kolonne');
       if (bildeContainer) {
-        bildeContainer.innerHTML = `<img src="${prosjekt.bilde}" alt="${prosjekt.tittel}">`;
+        bildeContainer.innerHTML = prosjekt.bilder
+          .slice(1)
+          .map((src, i) => `<img src="${src}" alt="${prosjekt.tittel} ${i + 2}">`)
+          .join('');
       }
 
       // 2. Load Text
@@ -314,6 +365,7 @@
   <script src="back-button.js"></script>
   <script src="terminal.js"></script>
   <script src="kommandoer.js"></script>
+  <script src="lightbox.js"></script>
 
   <script>
     // Stop terminal button glow after first click

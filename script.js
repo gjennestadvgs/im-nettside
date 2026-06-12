@@ -1,3 +1,13 @@
+// Haptisk feedback: kort vibrasjon når man gjør ting på siden.
+// navigator.vibrate virker på Android (Chrome m.fl.). iPhone/Safari støtter
+// det IKKE for nettsider, så der skjer ingenting (helt trygt - vi sjekker).
+// Bruk: vibrer(15) for ett kort napp, eller vibrer([10, 40, 10]) for mønster.
+window.vibrer = function (mønster) {
+    try {
+        if (navigator.vibrate) navigator.vibrate(mønster);
+    } catch (e) { /* ignorer hvis nettleseren ikke tillater det */ }
+};
+
 let bgColour = [120, 0, 120]
 //document.body.style.backgroundColor = "rgb(" + bgColour[0] + "," + bgColour[1] + "," + bgColour[2] + ")"
 
@@ -77,19 +87,25 @@ if (title) {
 }
 bgColour[0] = Number("a")
 
-// Felles gradient nederst på alle sider.
-// Skjuler seg når man har scrollet (nesten) helt til bunnen.
+// Felles gradient nederst på sider som kan scrolles.
+// Forsiden har overflow:hidden og skal ikke ha gradient.
+// Skjuler seg også når man har scrollet (nesten) helt til bunnen.
 ;(function () {
     const gradient = document.createElement("div");
     gradient.className = "bottom-gradient";
     document.body.appendChild(gradient);
 
+    // Siden kan bare scrolles hvis overflow ikke er låst (forsiden låser den).
+    function kanScrolle() {
+        return getComputedStyle(document.body).overflowY !== "hidden";
+    }
+
     function oppdaterGradient() {
         const avstandTilBunn =
             document.documentElement.scrollHeight -
             (window.scrollY + window.innerHeight);
-        // Skjul gradienten når man er innenfor 4px fra bunnen (eller siden ikke kan scrolles)
-        gradient.classList.toggle("is-hidden", avstandTilBunn <= 4);
+        // Skjul gradienten på sider uten scroll, eller når man er innenfor 4px fra bunnen.
+        gradient.classList.toggle("is-hidden", !kanScrolle() || avstandTilBunn <= 4);
     }
 
     window.addEventListener("scroll", oppdaterGradient, { passive: true });

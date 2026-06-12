@@ -26,7 +26,13 @@
             justify-content: center;
         }
 
-        #player {
+        /* Desktop: nederste video plasseres sist i kolonnen (etter teksten) */
+        .player-wrapper--bunn {
+            order: 1;
+        }
+
+        #player,
+        #player-bunn {
             width: 100%;
             max-width: min(1400px, 90vw);
             aspect-ratio: 16 / 9;
@@ -39,7 +45,8 @@
             border-radius: 20px;
         }
 
-        #player iframe {
+        #player iframe,
+        #player-bunn iframe {
             display: block;
             width: 101%;
             height: 101%;
@@ -64,10 +71,41 @@
 
         /* TEKST */
 
-        .inhold {
+        .tekst-kolonne {
             flex: 2;
 
+            display: flex;
+            flex-direction: column;
+
+            gap: 30px;
+        }
+
+        .inhold {
+            flex: 0 1 auto;
+
             padding: 30px;
+        }
+
+        /* STORT BILDE UNDER TEKSTEN */
+
+        .stor-bilde {
+            padding: 0 30px;
+        }
+
+        .stor-bilde img {
+            width: 100%;
+
+            border-radius: 6px;
+
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+
+            transform: rotate(-1.5deg);
+
+            transition: transform 200ms ease;
+        }
+
+        .stor-bilde img:hover {
+            transform: rotate(0deg) scale(1.02);
         }
 
         .inhold h1 {
@@ -102,7 +140,19 @@
             max-width: 480px;
 
             border-radius: 6px;
+
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+
+            transition: transform 200ms ease;
         }
+
+        /* SPREDT COLLAGE: ulike størrelser og plasseringer per bilde */
+        .bilde-kolonne { gap: 30px; }
+        .bilde-kolonne img:nth-child(4n+1) { width: 100%; align-self: flex-start; transform: rotate(-3deg); }
+        .bilde-kolonne img:nth-child(4n+2) { width: 64%;  align-self: flex-end;   transform: rotate(2.5deg); margin-top: -6px; }
+        .bilde-kolonne img:nth-child(4n+3) { width: 82%;  align-self: center;     transform: rotate(-1.5deg); }
+        .bilde-kolonne img:nth-child(4n+4) { width: 54%;  align-self: flex-start; transform: rotate(3.5deg); margin-left: 14%; }
+        .bilde-kolonne img:hover { transform: rotate(0deg) scale(1.04); z-index: 2; }
 
         /* MOBIL */
 
@@ -120,7 +170,8 @@
                 gap: 30px;
             }
 
-            #player {
+            #player,
+            #player-bunn {
                 border-radius: 12px;
             }
 
@@ -130,6 +181,10 @@
             }
 
             .inhold {
+                padding: 0;
+            }
+
+            .stor-bilde {
                 padding: 0;
             }
 
@@ -143,6 +198,11 @@
 
             .bilde-kolonne {
                 align-items: center;
+            }
+
+            /* Telefon: nederste video mellom overskrift og brødtekst */
+            .player-wrapper--bunn {
+                order: 0;
             }
         }
         </style>
@@ -166,10 +226,18 @@
             <h1 id="prosjekt-tittel"></h1>
         </div>
 
+        <!-- VIDEO NEDERST (desktop: nederst etter teksten | telefon: mellom overskrift og brødtekst) -->
+        <div class="player-wrapper player-wrapper--bunn">
+            <div id="player-bunn"></div>
+        </div>
+
         <!-- TEKST + BILDE -->
         <div class="main-content">
 
-            <div class="inhold" id="inhold"></div>
+            <div class="tekst-kolonne">
+                <div class="inhold" id="inhold"></div>
+                <div class="stor-bilde" id="stor-bilde"></div>
+            </div>
 
             <div class="bilde-kolonne" id="bilde-kolonne"></div>
 
@@ -183,11 +251,18 @@
             {
                 id: "media",
 
-                tittel: "Media",
+                tittel: "Medieproduksjon",
 
-                bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
+                bilder: [
+                    "Assets/bilder/medie%20bilder/foto_med_model_v1.jpg",
+                    "Assets/bilder/medie%20bilder/1IM_2026_34.JPG",
+                    "Assets/bilder/medie%20bilder/1017B021-51CD-4FF3-A720-6ECE20779975.JPG",
+                    "Assets/bilder/medie%20bilder/3438987D-A19D-4913-ABE5-44FA9D4BD554.JPG"
+                ],
 
                 videoEmbed: `<iframe width="560" height="315" src="https://www.youtube.com/embed/PDOXalyZSPo?si=xivrMl3sCR7dsBGo&autoplay=1&mute=1&playsinline=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
+
+                videoEmbedBunn: `<iframe width="560" height="315" src="https://www.youtube.com/embed/irRcCGdyCKw?si=ZZWigCQSeCfPvgxg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
 
                 tekstfil: "Assets/tekst/medieproduksjon",
             },
@@ -225,9 +300,15 @@
 
             // BILDE
 
-            document.querySelector('.bilde-kolonne').innerHTML = `
-                <img src="${prosjekt.bilde}">
-            `;
+            // Første bilde stort under teksten, resten i side-kolonnen
+            document.querySelector('#stor-bilde').innerHTML = prosjekt.bilder.length
+                ? `<img src="${prosjekt.bilder[0]}">`
+                : '';
+
+            document.querySelector('.bilde-kolonne').innerHTML = prosjekt.bilder
+                .slice(1)
+                .map(src => `<img src="${src}">`)
+                .join('');
 
             // TEKST
 
@@ -253,6 +334,12 @@
             // VIDEO
 
             document.querySelector('#player').innerHTML = prosjekt.videoEmbed;
+
+            // VIDEO NEDERST (valgfri - vises bare hvis prosjektet har en)
+            const bunnPlayer = document.querySelector('#player-bunn');
+            bunnPlayer.innerHTML = prosjekt.videoEmbedBunn || '';
+            bunnPlayer.closest('.player-wrapper').style.display =
+                prosjekt.videoEmbedBunn ? '' : 'none';
         }
 
         document.addEventListener(
@@ -265,6 +352,7 @@
     <script src="back-button.js"></script>
 <script src="terminal.js"></script>
 <script src="kommandoer.js"></script>
+<script src="lightbox.js"></script>
 
 </html>
 </body>

@@ -229,20 +229,40 @@ function tilpassTilTastatur() {
     if (terminalOutput) terminalOutput.scrollTop = terminalOutput.scrollHeight;
 }
 
+// Slår zoom av/på via viewport-metaen. Mens terminalen er åpen vil vi unngå at
+// telefonen (særlig iOS) zoomer inn når man trykker i input-feltet. Når den
+// lukkes setter vi metaen tilbake, så kniping-for-å-zoome virker som vanlig på
+// resten av siden.
+function settViewportZoom(tillatt) {
+    let meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('name', 'viewport');
+        document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', tillatt
+        ? 'width=device-width, initial-scale=1.0'
+        : 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+}
+
 function åpneTerminal() {
+    if (window.vibrer) vibrer(20); // napp når terminalen åpnes
     terminalVindu.classList.remove('skjult');
     // Løft PC-en over bildene mens terminalen er åpen (se terminal index.css).
     const pc = document.getElementById('pc-forside');
     if (pc) pc.classList.add('terminal-aapen');
+    settViewportZoom(false); // hindre zoom-på-input mens terminalen er åpen
     terminalInput.focus();
     tilpassTilTastatur();
     lagre();
 }
 
 function lukkTerminal() {
+    if (window.vibrer) vibrer(12); // kort napp når terminalen lukkes
     terminalVindu.classList.add('skjult');
     const pc = document.getElementById('pc-forside');
     if (pc) pc.classList.remove('terminal-aapen');
+    settViewportZoom(true); // tillat zoom igjen på resten av siden
     tilpassTilTastatur(); // nullstiller de live-satte stilene
     lagre();
 }
@@ -483,6 +503,11 @@ function visForslag() {
         const indeks = i;
         rad.addEventListener('mousedown', function (e) {
             e.preventDefault(); // unngå at input mister fokus
+            // Stopp boblingen til "lukk ved klikk utenfor"-håndtereren på
+            // document. velgForslag bygger ofte forslagslisten på nytt og
+            // fjerner denne raden fra DOM-en, og da ville contains(e.target)
+            // bli false slik at terminalen feilaktig lukket seg.
+            e.stopPropagation();
             velgForslag(indeks);
         });
         forslagBoks.appendChild(rad);
@@ -536,6 +561,66 @@ function kjørKommando(linje) {
     } else {
         skrivLinje('Ukjent kommando: ' + navn + '. Skriv /help for å se alle kommandoer.');
     }
+}
+
+// --- Skrivemaskin-animasjon på PC-skjermen ---
+
+// Den mørke CRT-skjermen (som også er åpne-knappen) "skriver" korte hint med
+// blinkende markør, sletter dem og veksler til neste. Gjør at PC-en ser levende
+// ut og inviterer til å klikke. Animasjonen påvirker ikke at man kan klikke -
+// den endrer bare teksten på knappen.
+function startSkjermAnimasjon() {
+    if (!terminalKnapp) return;
+    // Bare på startsiden (forsiden) – den eneste siden med korktavla
+    // (.prosjekt-grid). På undersider skal PC-skjermen være rolig og bare
+    // vise standardteksten ">_".
+    if (!document.querySelector('.prosjekt-grid')) return;
+
+    const hint = ['> klikk her', '> /help', '> hei :)'];
+    let linje = 0;        // hvilket hint vi viser nå
+    let lengde = 0;       // hvor mange tegn som er "skrevet"
+    let sletter = false;  // skriver vi, eller sletter vi nå?
+    let markorSynlig = true;
+
+    function tegnOpp() {
+        const tekst = hint[linje].slice(0, lengde);
+        // Hardt mellomrom som "av"-markør, så bredden ikke hopper når den blinker.
+        terminalKnapp.textContent = tekst + (markorSynlig ? '_' : ' ');
+    }
+
+    // Jevn markørblink, uavhengig av skrive-/slettetakten.
+    setInterval(function () {
+        markorSynlig = !markorSynlig;
+        tegnOpp();
+    }, 530);
+
+    // Ett "steg" om gangen: legg til eller fjern ett tegn, og planlegg neste
+    // steg med en passende pause (skrive, slette, eller hvile på en ferdig linje).
+    function steg() {
+        const full = hint[linje];
+        let pause;
+        if (!sletter) {
+            lengde++;
+            if (lengde >= full.length) {
+                sletter = true;
+                pause = 1600; // hold den ferdige linja litt før vi sletter
+            } else {
+                pause = 110;  // skrivefart
+            }
+        } else {
+            lengde--;
+            if (lengde <= 0) {
+                sletter = false;
+                linje = (linje + 1) % hint.length; // gå videre til neste hint
+                pause = 400;  // kort pause før neste linje
+            } else {
+                pause = 55;   // slettefart (litt raskere enn skriving)
+            }
+        }
+        tegnOpp();
+        setTimeout(steg, pause);
+    }
+    steg();
 }
 
 // --- Oppstart ---
@@ -613,6 +698,9 @@ function startTerminal() {
     window.addEventListener('resize', forankrePc);
     forankrePc();
 
+    // Start skrivemaskin-animasjonen på PC-skjermen (vekslende hint-tekster).
+    startSkjermAnimasjon();
+
     // Klikk hvor som helst i vinduet -> sett fokus tilbake på input
     terminalVindu.addEventListener('click', function () {
         terminalInput.focus();
@@ -648,6 +736,7 @@ function startTerminal() {
             skrivLinje('> ' + linje);
             historikk.push(linje);
             historikkIndeks = historikk.length;
+            if (window.vibrer) vibrer(15); // napp når en kommando kjøres
             kjørKommando(linje);
             terminalInput.value = '';
             lagre();

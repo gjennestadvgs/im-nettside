@@ -48,6 +48,14 @@
             display: block;
         }
 
+        /* Når hero-plassen viser en video i stedet for et bilde. */
+        #bilde iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
 
         /* INNHOLD */
 
@@ -126,6 +134,26 @@
             border-radius: 12px;
         }
 
+        /* Bildet som er flyttet ned i rutenettet (byttet plass med videoen). */
+        .video-grid img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            height: auto;
+
+            object-fit: cover;
+            border-radius: 12px;
+            display: block;
+        }
+
+        /* LOGO (ved siden av teksten på PC, under teksten på telefon) */
+
+        .bilde-kolonne .reklame-logo {
+            width: 100%;
+            max-width: 320px;
+            align-self: center;   /* sentrer i bilde-kolonnen */
+            border-radius: 0;     /* logoen trenger ingen avrunding */
+        }
+
         /* TELEFON */
 
         @media (max-width: 768px) {
@@ -195,7 +223,10 @@
 
             <div class="inhold" id="inhold"></div>
 
-            <div class="bilde-kolonne" id="bilde-kolonne"></div>
+            <div class="bilde-kolonne" id="bilde-kolonne">
+                <!-- Logo ved siden av teksten på PC; stables under teksten på telefon. -->
+                <img class="reklame-logo" src="Assets/bilder/reklamefilm/pakke-logo.png" alt="Logo">
+            </div>
 
         </div>
 
@@ -214,16 +245,15 @@
 
                 tittel: "Reklamefilm",
 
-                bilde: "Assets/bilder/filmplakat_above-the-law.jpg",
-
                 tekstfil: "Assets/tekst/Reklamefilm",
 
-                forside: "Assets/bilder/1IM_2026_1.jpg",
+                forside: "Assets/bilder/reklamefilm/Skjermbilde 2026-06-11 135029.png",
 
                 // Fire YouTube-videoer. Bytt ut ID-ene (delen etter "embed/").
+                // Den FØRSTE i lista vises øverst (hero). Video 2 ligger derfor først.
                 videoer: [
-                    "https://www.youtube.com/embed/MKrL_Y153B0",
-                    "https://www.youtube.com/embed/zAhAdWmfdtM",
+                    "https://www.youtube.com/embed/zAhAdWmfdtM?si=3Yy1NmIAbSU0m924",
+                    "https://www.youtube.com/embed/MKrL_Y153B0?si=MHNIkMAT8SbU4X_J"
                 ]
             },
         ];
@@ -258,29 +288,43 @@
 
             document.getElementById('prosjekt-tittel').textContent = prosjekt.tittel;
 
-            // BILDE
+            // BILDE OG VIDEOER (byttet plass):
+            // Den FØRSTE videoen vises øverst (hero - det første man ser), og
+            // forside-bildet er flyttet ned i rutenettet der videoen lå. Resten
+            // av videoene vises også i rutenettet.
 
-            document.querySelector('.bilde-kolonne').innerHTML = `
-                <img src="${prosjekt.bilde}">
+            const videoer = prosjekt.videoer || [];
+            const heroVideo = videoer[0];
+            const bildeUrl = prosjekt.forside || prosjekt.bilde;
+
+            const lagIframe = (url) => `
+                <iframe
+                    src="${url}"
+                    title="${prosjekt.tittel}"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
             `;
 
-            document.getElementById('bilde').innerHTML = `
-                <img src="${prosjekt.forside || prosjekt.bilde}" alt="${prosjekt.tittel}">
-            `;
+            // Legg til autoplay-parametere på en video-URL. mute=1 er påkrevd -
+            // nettlesere blokkerer autoplay med lyd. playsinline=1 hindrer at
+            // mobilen tar over hele skjermen.
+            const medAutoplay = (url) =>
+                url + (url.includes('?') ? '&' : '?') + 'autoplay=1&mute=1&playsinline=1';
 
-            // VIDEOER
+            // ØVERST: første video, starter automatisk. (Faller tilbake til bildet
+            // hvis prosjektet ikke har noen video.)
+            document.getElementById('bilde').innerHTML = heroVideo
+                ? lagIframe(medAutoplay(heroVideo))
+                : `<img src="${bildeUrl}" alt="${prosjekt.tittel}">`;
 
-            document.getElementById('video-grid').innerHTML =
-                (prosjekt.videoer || [])
-                    .map(url => `
-                        <iframe
-                            src="${url}"
-                            title="${prosjekt.tittel}"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen>
-                        </iframe>
-                    `)
-                    .join('');
+            // RUTENETT: bildet først (der videoen lå), så resten av videoene.
+            const rutenett = [];
+            if (heroVideo && bildeUrl) {
+                rutenett.push(`<img src="${bildeUrl}" alt="${prosjekt.tittel}">`);
+            }
+            videoer.slice(heroVideo ? 1 : 0).forEach(url => rutenett.push(lagIframe(url)));
+            document.getElementById('video-grid').innerHTML = rutenett.join('');
 
             // TEKST
 
@@ -315,6 +359,7 @@
     <script src="back-button.js"></script>
 <script src="terminal.js"></script>
 <script src="kommandoer.js"></script>
+<script src="lightbox.js"></script>
 
 </html>
 </body>
