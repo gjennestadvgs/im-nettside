@@ -294,9 +294,16 @@
                 </iframe>
             `;
 
-            // ØVERST: første video. (Faller tilbake til bildet hvis ingen video.)
+            // Legg til autoplay-parametere på en video-URL. mute=1 er påkrevd -
+            // nettlesere blokkerer autoplay med lyd. playsinline=1 hindrer at
+            // mobilen tar over hele skjermen.
+            const medAutoplay = (url) =>
+                url + (url.includes('?') ? '&' : '?') + 'autoplay=1&mute=1&playsinline=1';
+
+            // ØVERST: første video, starter automatisk. (Faller tilbake til bildet
+            // hvis prosjektet ikke har noen video.)
             document.getElementById('bilde').innerHTML = heroVideo
-                ? lagIframe(heroVideo)
+                ? lagIframe(medAutoplay(heroVideo))
                 : `<img src="${bildeUrl}" alt="${prosjekt.tittel}">`;
 
             // RUTENETT: bildet først (der videoen lå), så resten av videoene.
