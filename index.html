@@ -298,8 +298,8 @@
         tavle.style.width  = ((b.hoyre - b.venstre) * rW) + 'px';
         tavle.style.height = ((b.bunn  - b.topp)    * rH) + 'px';
     }
-    window.addEventListener('resize', oppdaterTavle);
-    window.addEventListener('orientationchange', oppdaterTavle);
+    // Selve resize-/rotasjons-lytteren settes opp lenger ned (vedFormendring),
+    // sammen med kastUtFraPC, så vi kan ignorere rene høyde-endringer (tastatur).
     oppdaterTavle();
 
     // ============================================================
@@ -374,11 +374,27 @@
             el.style.top = nyTop + 'px';
         });
     }
-    // Kjør når alt er lastet (PC-en finnes, bildene har fått størrelse) og
-    // hver gang tavla regnes om.
+    // Regn om tavla og kast ut lapper når skjermen faktisk endrer FORM.
+    //
+    // VIKTIG (Android): når terminalen åpnes spretter tastaturet opp og krymper
+    // bare HØYDEN på vinduet. Det utløser en resize - men korktavla er forankret
+    // i bunnen, så hvis vi regner den om da, hopper alle lappene. Vi reagerer
+    // derfor bare når BREDDEN endrer seg (rotasjon / vindusendring på PC), ikke
+    // på rene høyde-endringer fra tastaturet eller nettleserlinja. (På telefon er
+    // tavla uansett skjult bak den heldekkende terminalen mens den er åpen.)
+    let forrigeBredde = window.innerWidth;
+    function vedFormendring() {
+        const bredde = window.innerWidth;
+        // Hopp over når vi er på telefon og bredden er uendret (ren høyde-endring).
+        if (bredde === forrigeBredde && bredde <= 768) return;
+        forrigeBredde = bredde;
+        oppdaterTavle();
+        kastUtFraPC();
+    }
+    // Kjør når alt er lastet (PC-en finnes, bildene har fått størrelse).
     window.addEventListener('load', kastUtFraPC);
-    window.addEventListener('resize', kastUtFraPC);
-    window.addEventListener('orientationchange', kastUtFraPC);
+    window.addEventListener('resize', vedFormendring);
+    window.addEventListener('orientationchange', vedFormendring);
 
     let isDragging = false;
     let currentImage = null;
