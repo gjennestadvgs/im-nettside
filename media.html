@@ -26,6 +26,11 @@
             justify-content: center;
         }
 
+        /* Desktop: nederste video plasseres sist i kolonnen (etter teksten) */
+        .player-wrapper--bunn {
+            order: 1;
+        }
+
         #player,
         #player-bunn {
             width: 100%;
@@ -194,6 +199,11 @@
             .bilde-kolonne {
                 align-items: center;
             }
+
+            /* Telefon: nederste video mellom overskrift og brødtekst */
+            .player-wrapper--bunn {
+                order: 0;
+            }
         }
         </style>
         <link rel="stylesheet" href="https://use.typekit.net/nar4tne.css">
@@ -216,6 +226,11 @@
             <h1 id="prosjekt-tittel"></h1>
         </div>
 
+        <!-- VIDEO NEDERST (desktop: nederst etter teksten | telefon: mellom overskrift og brødtekst) -->
+        <div class="player-wrapper player-wrapper--bunn">
+            <div id="player-bunn"></div>
+        </div>
+
         <!-- TEKST + BILDE -->
         <div class="main-content">
 
@@ -226,11 +241,6 @@
 
             <div class="bilde-kolonne" id="bilde-kolonne"></div>
 
-        </div>
-
-        <!-- VIDEO NEDERST -->
-        <div class="player-wrapper">
-            <div id="player-bunn"></div>
         </div>
 
     </div>
