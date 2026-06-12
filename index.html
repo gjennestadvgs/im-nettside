@@ -30,15 +30,33 @@
                 background-image: url('Assets/bilder/bakgrunner/forside-tlf-fixed.jpg');
             }
         }
+        /* Korktavla: denne usynlige boksen legges av JavaScript (oppdaterTavle)
+           nøyaktig oppå korkflaten i bakgrunnsbildet, og fungerer som "rammen"
+           alle lappene plasseres og dras innenfor. Verdiene her er bare et
+           utgangspunkt før JS kjører. */
+        .prosjekt-grid {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            /* Selve boksen skal ikke fange museklikk - bare lappene inni. */
+            pointer-events: none;
+            /* Lappene ligger over PC-en (z 100) som standard. Når terminalen
+               åpnes, løftes PC-en over alt (se terminal index.css). */
+            z-index: 5000;
+        }
         .main-assets {
             position: absolute;
             cursor: grab;
             user-select: none;
             display: block;
+            /* Høyden følger bredden automatisk, så bildeforholdet beholdes. */
+            height: auto;
             transition: transform 0.1s ease;
             transform-origin: center;
-            /* Bildene ligger over PC-en som standard. Når terminalen
-               åpnes, løftes PC-en over alt (se terminal index.css). */
+            /* Lappene er klikkbare selv om tavla er pointer-events: none. */
+            pointer-events: auto;
             z-index: 5000;
         }
         .main-assets:active {
@@ -47,92 +65,163 @@
         }
 
         /* ============================================================
-           PLASSERING AV BILDENE I prosjekt-grid
+           PLASSERING AV LAPPENE PÅ KORKTAVLA
 
-           Hvert bilde har en egen id (#grid-...). Standard-delen under
-           gjelder PC/stor skjerm. Telefon-delen nederst (i media query)
-           overstyrer plasseringen på liten skjerm.
+           Alt under er nå i PROSENT AV KORKTAVLA (.prosjekt-grid), ikke av
+           skjermen. 0% = venstre/topp-kant av korkflaten, 100% = høyre/bunn-
+           kant. Derfor holder lappene seg alltid innenfor rammen, uansett
+           skjermstørrelse.
 
-           Endre top/left/right og max-width/max-height for å flytte og
-           skalere et enkelt bilde. vw = prosent av skjermbredden,
-           vh = prosent av skjermhøyden.
+             top / left  = hvor lappen sitter (i % av tavla)
+             width       = hvor stor lappen er (i % av tavlas bredde);
+                           høyden regnes ut av seg selv.
+
+           Telefon-delen nederst (media query) overstyrer på liten skjerm.
            ============================================================ */
 
-        /* --- Standard (PC / stor skjerm) --- */
+        /* --- Polaroids + post-it (PC / stor skjerm) ---
 
-        #grid-film        { max-width: 18vw; max-height: 18vh; top: 26vh; left: 80vw; } /* Reklame 1 */
-        #grid-film2       { max-width: 18vw; max-height: 18vh; top: 54vh; left: 80vw; } /* Reklame 2 */
-        #grid-bedrift1    { max-width: 18vw; max-height: 18vh; top: 67vh; left: 43vw; } /* Northbyte */
-        #grid-bedrift2    { max-width: 18vw; max-height: 18vh; top: 71vh; left: 33vw; } /* Logo oppgave */
-        #grid-flerkamera2 { max-width: 18vw; max-height: 18vh; top: 72vh; left: 54vw; } /* Han flytter seg */
-        #grid-flerkamera1 { max-width: 18vw; max-height: 18vh; top: 54vh; left: 59vw; } /* Flerkamera-produksjon */
-        #grid-gjennestad  { max-width: 18vw; max-height: 18vh; top: 38vh; left: 45vw; } /* Skolen!!! */
-        #grid-imlan1      { max-width: 18vw; max-height: 18vh; top: 17vh; left: 39vw; } /* Lanet er i full sving */
-        #grid-imlan2      { max-width: 18vw; max-height: 18vh; top: 71vh; left: 65vw; } /* Lan vinner */
-        #grid-itkode1     { max-width: 18vw; max-height: 18vh; top: 11vh; left: 20vw; } /* Gooby code */
-        #grid-filmplakat  { max-width: 18vw; max-height: 18vh; top: 44vh; left: 69vw; } /* Riffriders */
-        #grid-media1      { max-width: 18vw; max-height: 18vh; top: 17vh; left: 67vw; } /* Jeg liker kyling */
-        #grid-media2      { max-width: 18vw; max-height: 18vh; top: 14vh; left: 61vw; } /* The Decever */
-        #grid-media3      { max-width: 18vw; max-height: 18vh; top: 2vh; left: 68vw; } /* Filip Nyhamn */
-        #grid-egetspill   { max-width: 18vw; max-height: 18vh; top: 8vh; left: 14vw; } /* Gravespill */
-        #grid-itkode2        { max-width: 18vw; max-height: 18vh; top: 7vh;  left: 33vw; } /* IT kode 3 */
-        #grid-bedriftsbesok1 { max-width: 18vw; max-height: 18vh; top: 60vh; left: 25vw; } /* Bedriftsbesøk 1 */
-        #grid-bedriftsbesok2 { max-width: 18vw; max-height: 18vh; top: 82vh; left: 22vw; } /* Bedriftsbesøk 2 */
-        #grid-flerkamera3    { max-width: 18vw; max-height: 18vh; top: 60vh; left: 50vw; } /* Flerkamera 3 */
-        #grid-flerkamera4    { max-width: 18vw; max-height: 18vh; top: 82vh; left: 48vw; } /* Flerkamera 4 */
-        #grid-internat1      { max-width: 18vw; max-height: 18vh; top: 25vh; left: 6vw;  } /* Internat 1 */
-        #grid-internat2      { max-width: 18vw; max-height: 18vh; top: 48vh; left: 8vw;  } /* Internat 2 */
-        #grid-media4         { max-width: 18vw; max-height: 18vh; top: 30vh; left: 76vw; } /* Mediaproduksjon 4 */
-        #grid-media5         { max-width: 18vw; max-height: 18vh; top: 2vh;  left: 54vw; } /* Mediaproduksjon 5 */
-        #grid-media6         { max-width: 18vw; max-height: 18vh; top: 86vh; left: 78vw; } /* Mediaproduksjon 6 */
+           Hver KLYNGE har post-it-lappen ØVERST, og polaroidene som hører til
+           faget stables i et tett lite rutenett rett under. Slik vises alle
+           bildene, men hver klynge tar lite plass på tavla.
 
-        /* --- Postit-lapper (PC / stor skjerm) --- */
-        #postit-it            { max-width: 12vw; max-height: 12vh; top: 5vh;  left: 25vw;  }
-        #postit-galleri       { max-width: 12vw; max-height: 12vh; top: 12vh;  left: 67vw; }
-        #postit-grafisk       { max-width: 12vw; max-height: 12vh; top: 74vh;  left: 39vw; }
-        #postit-internat      { max-width: 12vw; max-height: 12vh; top: 36vh; left: 16vw;  }
-        #postit-medie         { max-width: 12vw; max-height: 12vh; top: 67vh; left: 21vw; }
-        #postit-reklamer      { max-width: 12vw; max-height: 12vh; top: 40vh; left: 74vw; }
-        #postit-lan           { max-width: 12vw; max-height: 12vh; top: 75vh; left: 5vw;  }
-        #postit-praksis       { max-width: 12vw; max-height: 12vh; top: 70vh; left: 60vw; }
+           Vil du flytte en hel klynge: endre "top"/"left" på post-iten og de
+           samme tallene på bildene under (de er bare forskjøvet litt ned/bort). */
+
+        /* Polaroidene er små så klyngene tar lite plass; endre for å skalere alle. */
+        #grid-film, #grid-film2, #grid-bedrift1, #grid-bedrift2,
+        #grid-flerkamera2, #grid-flerkamera1, #grid-gjennestad, #grid-imlan1,
+        #grid-imlan2, #grid-itkode1, #grid-filmplakat, #grid-media1,
+        #grid-media2, #grid-media3, #grid-egetspill, #grid-itkode2,
+        #grid-bedriftsbesok1, #grid-bedriftsbesok2, #grid-flerkamera3,
+        #grid-flerkamera4, #grid-internat1, #grid-internat2, #grid-media4,
+        #grid-media5, #grid-media6 { width: 8%; }
+
+        /* Post-it-lappene er litt større og ligger ALLTID over bildene i klyngen
+           (høyere z-index), så de "henger oppå" haugen med polaroids. */
+        #postit-it, #postit-galleri, #postit-grafisk, #postit-internat,
+        #postit-medie, #postit-reklamer, #postit-praksis { width: 9%; z-index: 6000; }
+
+        /* Hver KLYNGE: post-iten sitter omtrent i midten/toppen, og bildene
+           ligger i en løs, litt tilfeldig sirkel/haug rundt og under den.
+           Post-iten ligger oppå (z-index over) - som en lapp festet over bunken.
+           Vil du flytte en hel klynge: endre tallene på alle linjene i blokka. */
+
+        /* KLYNGE: IT (oppe til venstre) */
+        #postit-it        { top: 17%;  left: 11%; }
+        #grid-itkode1     { top: 15%; left: 3%;  } /* Gooby code */
+        #grid-imlan1      { top: 15%; left: 21%; } /* Lanet er i full sving */
+        #grid-imlan2      { top: 5%; left: 10%;  } /* Lan vinner */
+        #grid-itkode2     { top: 26%; left: 19%; } /* IT kode 3 */
+        #grid-egetspill   { top: 33%; left: 12%; } /* Gravespill */
+
+        /* KLYNGE: Reklamer (oppe, venstre for midten) */
+        #postit-reklamer  { top: 20%;  left: 84%; }
+        #grid-film        { top: 10%; left: 90%; } /* Reklame 1 */
+        #grid-film2       { top: 28%; left: 80%; } /* Reklame 2 */
+
+        /* KLYNGE: Grafisk design (oppe, høyre for midten) */
+        #postit-grafisk   { top: 5%;  left: 59%; }
+        #grid-bedrift1    { top: 1%; left: 52%; } /* Northbyte */
+        #grid-bedrift2    { top: 6%; left: 68%; } /* Logo oppgave */
+        #grid-filmplakat  { top: 18%; left: 58%; } /* Riffriders */
+
+        /* KLYNGE: Praksis (oppe til høyre) */
+        #postit-praksis   { top: 12%;  left: 36%; }
+        #grid-bedriftsbesok1 { top: 20%; left: 45%; } /* Bedriftsbesøk 1 */
+        #grid-bedriftsbesok2 { top: 23%; left: 36%; } /* Bedriftsbesøk 2 */
+        #grid-flerkamera3 { top: 2%; left: 43%; } /* Flerkamera 3 */
+        #grid-flerkamera4 { top: 10%; left: 30%; } /* Flerkamera 4 */
+
+        /* KLYNGE: Internat og Gjennestad (nede til venstre) */
+        #postit-internat  { top: 54%; left: 11%; }
+        #grid-gjennestad  { top: 66%; left: 4%;  } /* Skolen!!! */
+        #grid-internat1   { top: 66%; left: 20%; } /* Internat 1 */
+        #grid-internat2   { top: 75%; left: 12%; } /* Internat 2 */
+
+        /* KLYNGE: Media (nede i midten - størst klynge) */
+        #postit-medie     { top: 65%; left: 43%; }
+        #grid-flerkamera1 { top: 50%; left: 40%; } /* Flerkamera-produksjon */
+        #grid-flerkamera2 { top: 65%; left: 53%; } /* Han flytter seg */
+        #grid-media3      { top: 68%; left: 35%; } /* Filip Nyhamn */
+        #grid-media4      { top: 48%; left: 49%; } /* Mediaproduksjon 4 */
+        #grid-media6      { top: 80%; left: 44%; } /* Mediaproduksjon 6 */
+
+        /* KLYNGE: Galleri (nede til høyre) */
+        #postit-galleri   { top: 45%; left: 65%; }
+        #grid-media5      { top: 55%; left: 70%; } /* Mediaproduksjon 5 */
+        #grid-media1      { top: 36%; left: 68%; } /* Jeg liker kyling */
+        #grid-media2      { top: 53%; left: 60%; } /* The Decever */
 
         /* --- Telefon (liten skjerm) --- */
-        @media (max-width: 600px) {
-            #grid-film        { max-width: 15vw; max-height: 15vh; top: 8vh;  left: 4vw;  right: auto; } /* Reklame 1 */
-            #grid-film2       { max-width: 15vw; max-height: 15vh; top: 8vh;  left: 52vw; right: auto; } /* Reklame 2 */
-            #grid-bedrift1    { max-width: 15vw; max-height: 15vh; top: 30vh; left: 4vw;  right: auto; } /* Northbyte */
-            #grid-bedrift2    { max-width: 15vw; max-height: 15vh; top: 30vh; left: 52vw; right: auto; } /* Logo oppgave */
-            #grid-flerkamera2 { max-width: 15vw; max-height: 15vh; top: 52vh; left: 4vw;  right: auto; } /* Han flyttet seg */
-            #grid-flerkamera1 { max-width: 15vw; max-height: 15vh; top: 52vh; left: 52vw; right: auto; } /* Flerkamera-produksjon */
-            #grid-gjennestad  { max-width: 15vw; max-height: 15vh; top: 74vh; left: 4vw;  right: auto; } /* Skolen!!! */
-            #grid-imlan1      { max-width: 15vw; max-height: 15vh; top: 74vh; left: 52vw; right: auto; } /* Lanet er i full sving */
-            #grid-imlan2      { max-width: 15vw; max-height: 15vh; top: 18vh; left: 28vw; right: auto; } /* Lan vinner */
-            #grid-itkode1     { max-width: 15vw; max-height: 15vh; top: 42vh; left: 28vw; right: auto; } /* Gooby code */
-            #grid-filmplakat  { max-width: 15vw; max-height: 15vh; top: 20vh; left: 78vw; right: auto; } /* Riffriders */
-            #grid-media1      { max-width: 15vw; max-height: 15vh; top: 42vh; left: 78vw; right: auto; } /* Jeg liker kyling */
-            #grid-media2      { max-width: 15vw; max-height: 15vh; top: 64vh; left: 78vw; right: auto; } /* The Decever */
-            #grid-media3      { max-width: 15vw; max-height: 15vh; top: 86vh; left: 28vw; right: auto; } /* Filip Nyhamn */
-            #grid-egetspill   { max-width: 15vw; max-height: 15vh; top: 86vh; left: 4vw;  right: auto; } /* Gravespill */
-            #grid-itkode2        { max-width: 15vw; max-height: 15vh; top: 42vh; left: 4vw;  right: auto; } /* IT kode 3 */
-            #grid-bedriftsbesok1 { max-width: 15vw; max-height: 15vh; top: 30vh; left: 28vw; right: auto; } /* Bedriftsbesøk 1 */
-            #grid-bedriftsbesok2 { max-width: 15vw; max-height: 15vh; top: 30vh; left: 78vw; right: auto; } /* Bedriftsbesøk 2 */
-            #grid-flerkamera3    { max-width: 15vw; max-height: 15vh; top: 52vh; left: 28vw; right: auto; } /* Flerkamera 3 */
-            #grid-flerkamera4    { max-width: 15vw; max-height: 15vh; top: 52vh; left: 78vw; right: auto; } /* Flerkamera 4 */
-            #grid-internat1      { max-width: 15vw; max-height: 15vh; top: 18vh; left: 4vw;  right: auto; } /* Internat 1 */
-            #grid-internat2      { max-width: 15vw; max-height: 15vh; top: 18vh; left: 52vw; right: auto; } /* Internat 2 */
-            #grid-media4         { max-width: 15vw; max-height: 15vh; top: 42vh; left: 52vw; right: auto; } /* Mediaproduksjon 4 */
-            #grid-media5         { max-width: 15vw; max-height: 15vh; top: 64vh; left: 28vw; right: auto; } /* Mediaproduksjon 5 */
-            #grid-media6         { max-width: 15vw; max-height: 15vh; top: 64vh; left: 52vw; right: auto; } /* Mediaproduksjon 6 */
+        /* Samme brytepunkt som bakgrunnsbildet og korktavla (oppdaterTavle i
+           JS-en nederst), så bilde, ramme og lapper bytter samtidig. */
+        @media (max-width: 768px) {
+            /* Litt mindre lapper på den smale telefon-tavla, så klyngene
+               (løse hauger med post-it oppå) får plass ved siden av hverandre
+               likt som på PC. */
+            #grid-film, #grid-film2, #grid-bedrift1, #grid-bedrift2,
+            #grid-flerkamera2, #grid-flerkamera1, #grid-gjennestad, #grid-imlan1,
+            #grid-imlan2, #grid-itkode1, #grid-filmplakat, #grid-media1,
+            #grid-media2, #grid-media3, #grid-egetspill, #grid-itkode2,
+            #grid-bedriftsbesok1, #grid-bedriftsbesok2, #grid-flerkamera3,
+            #grid-flerkamera4, #grid-internat1, #grid-internat2, #grid-media4,
+            #grid-media5, #grid-media6 { width: 15%; }
 
-            /* Postit-lapper på telefon */
-            #postit-it            { max-width: 18vw; max-height: 18vh; top: 8vh;  left: 78vw; right: auto; }
-            #postit-galleri       { max-width: 18vw; max-height: 18vh; top: 8vh;  left: 28vw; right: auto; }
-            #postit-grafisk       { max-width: 18vw; max-height: 18vh; top: 30vh; left: 78vw; right: auto; }
-            #postit-internat      { max-width: 18vw; max-height: 18vh; top: 30vh; left: 28vw; right: auto; }
-            #postit-medie         { max-width: 18vw; max-height: 18vh; top: 52vh; left: 78vw; right: auto; }
-            #postit-reklamer      { max-width: 18vw; max-height: 18vh; top: 52vh; left: 28vw; right: auto; }
-            #postit-lan           { max-width: 18vw; max-height: 18vh; top: 74vh; left: 78vw; right: auto; }
-            #postit-praksis       { max-width: 18vw; max-height: 18vh; top: 74vh; left: 28vw; right: auto; }
+            #postit-it, #postit-galleri, #postit-grafisk, #postit-internat,
+            #postit-medie, #postit-reklamer, #postit-praksis { width: 19%; }
+
+            /* Samme klynger og samme relative plassering som PC-visningen, men
+               tilpasset den høye, smale tavla: IT oppe til venstre, Reklamer
+               oppe til høyre, Media nederst i midten osv. Hver klynge er en løs
+               haug med post-iten oppå (z-index). Alt er skjøvet litt ned så
+               toppen ikke blir kuttet av nettleserlinja på telefon. */
+
+            /* IT (oppe til venstre) */
+            #postit-it        { top: 15%; left: 12%; right: auto; }
+            #grid-itkode1     { top: 14%; left: 3%;  right: auto; } /* Gooby code */
+            #grid-imlan1      { top: 14%; left: 27%; right: auto; } /* Lanet er i full sving */
+            #grid-imlan2      { top: 22%; left: 7%;  right: auto; } /* Lan vinner */
+            #grid-itkode2     { top: 23%; left: 23%; right: auto; } /* IT kode 3 */
+            #grid-egetspill   { top: 27%; left: 15%; right: auto; } /* Gravespill */
+
+            /* Reklamer (oppe til høyre) */
+            #postit-reklamer  { top: 40%; left: 16%; right: auto; }
+            #grid-film        { top: 35%; left: 30%; right: auto; } /* Reklame 1 */
+            #grid-film2       { top: 42%; left: 5%; right: auto; } /* Reklame 2 */
+
+            /* Praksis (øvre midt, venstre) */
+            #postit-praksis   { top: 19%; left: 69%; right: auto; }
+            #grid-flerkamera3 { top: 16%; left: 59%;  right: auto; } /* Flerkamera 3 */
+            #grid-flerkamera4 { top: 12%; left: 78%; right: auto; } /* Flerkamera 4 */
+            #grid-bedriftsbesok1 { top: 26%; left: 64%; right: auto; } /* Bedriftsbesøk 1 */
+            #grid-bedriftsbesok2 { top: 27%; left: 80%; right: auto; } /* Bedriftsbesøk 2 */
+
+            /* Grafisk design (øvre midt, høyre) */
+            #postit-grafisk   { top: 80%; left: 70%; right: auto; }
+            #grid-bedrift1    { top: 78%; left: 60%; right: auto; } /* Northbyte */
+            #grid-bedrift2    { top: 79%; left: 85%; right: auto; } /* Logo oppgave */
+            #grid-filmplakat  { top: 84%; left: 67%; right: auto; } /* Riffriders */
+
+            /* Internat og Gjennestad (midt til venstre) */
+            #postit-internat  { top: 55%; left: 14%; right: auto; }
+            #grid-gjennestad  { top: 53%; left: 4%;  right: auto; } /* Skolen!!! */
+            #grid-internat1   { top: 54%; left: 30%; right: auto; } /* Internat 1 */
+            #grid-internat2   { top: 63%; left: 10%; right: auto; } /* Internat 2 */
+
+            /* Galleri (midt til høyre) */
+            #postit-galleri   { top: 50%; left: 64%; right: auto; }
+            #grid-media5      { top: 60%; left: 65%; right: auto; } /* Mediaproduksjon 5 */
+            #grid-media1      { top: 49%; left: 79%; right: auto; } /* Jeg liker kyling */
+            #grid-media2      { top: 48%; left: 54%; right: auto; } /* The Decever */
+
+            /* Media (nederst i midten - størst klynge) */
+            #postit-medie     { top: 72%; left: 30%; right: auto; }
+            #grid-flerkamera1 { top: 67%; left: 30%; right: auto; } /* Flerkamera-produksjon */
+            #grid-flerkamera2 { top: 68%; left: 47%; right: auto; } /* Han flytter seg */
+            #grid-media4      { top: 76%; left: 20%; right: auto; } /* Mediaproduksjon 4 */
+            #grid-media3      { top: 77%; left: 41%; right: auto; } /* Filip Nyhamn */
+            #grid-media6      { top: 81%; left: 33%; right: auto; } /* Mediaproduksjon 6 */
         }
     </style>
 </head>
@@ -180,6 +269,109 @@
 
 <script>
     const img = document.querySelectorAll('.main-assets')
+    const tavle = document.querySelector('.prosjekt-grid')
+
+    // ============================================================
+    // KORKTAVLA: legg den usynlige .prosjekt-grid-boksen nøyaktig
+    // oppå korkflaten i bakgrunnsbildet. Bakgrunnen bruker
+    // "background-size: cover" + "center bottom", så vi regner ut
+    // samme beskjæring her og plasserer boksen deretter. Da følger
+    // alle lappene rammen på alle skjermstørrelser.
+    //
+    // venstre/hoyre/topp/bunn er hvor korkflaten (innsiden av
+    // trerammen) ligger, som andel 0-1 av bakgrunnsbildet. Juster
+    // disse litt hvis rammen ikke treffer helt.
+    // ============================================================
+    const TAVLE_PC  = { w: 1920, h: 1080, venstre: 0.12, hoyre: 0.89, topp: 0.11, bunn: 0.86 };
+    const TAVLE_TLF = { w: 1440, h: 3200, venstre: 0.11, hoyre: 0.90, topp: 0.13, bunn: 0.75 };
+
+    function oppdaterTavle() {
+        // Samme brytepunkt (768px) som bakgrunnsbildet bytter på i CSS-en.
+        const b = window.innerWidth <= 768 ? TAVLE_TLF : TAVLE_PC;
+        const vW = window.innerWidth, vH = window.innerHeight;
+        const skala = Math.max(vW / b.w, vH / b.h);   // "cover": dekk hele skjermen
+        const rW = b.w * skala, rH = b.h * skala;       // bildets faktiske størrelse
+        const forskyvX = (vW - rW) / 2;                 // sentrert vannrett
+        const forskyvY = vH - rH;                       // forankret i bunn
+        tavle.style.left   = (forskyvX + b.venstre * rW) + 'px';
+        tavle.style.top    = (forskyvY + b.topp    * rH) + 'px';
+        tavle.style.width  = ((b.hoyre - b.venstre) * rW) + 'px';
+        tavle.style.height = ((b.bunn  - b.topp)    * rH) + 'px';
+    }
+    window.addEventListener('resize', oppdaterTavle);
+    window.addEventListener('orientationchange', oppdaterTavle);
+    oppdaterTavle();
+
+    // ============================================================
+    // HOLD LAPPENE UNNA PC-EN / TERMINALEN
+    // PC-en (og terminalvinduet når det er åpent) ligger nede i høyre
+    // hjørne. Vi vil ikke at lappene skal kunne dras oppå eller bak den.
+    // Funksjonen tar en ønsket skjerm-posisjon (vpLeft/vpTop) for lappen
+    // og dytter den ut av hindringen - oppover eller mot venstre, det som
+    // krever minst flytting (PC-en sitter jo i hjørnet).
+    //
+    // pc-forside.png har gjennomsiktig kant rundt selve PC-en. Vi trekker
+    // sonen innover med disse andelene (0-1 av bildets bredde/høyde) så man
+    // bare blokkeres der det faktisk ER noe. Juster om kanten er feil.
+    // ============================================================
+    const PC_KANT = { venstre: 0.22, hoyre: 0.15, topp: 0.10, bunn: 0.10 };
+
+    function holdUnnaPC(vpLeft, vpTop, w, h) {
+        const hindringer = [];
+        const pc = document.getElementById('pc-forside');
+        if (pc) {
+            const b = pc.getBoundingClientRect();
+            // Stram inn til selve PC-en (fjern den gjennomsiktige kanten).
+            hindringer.push({
+                left:   b.left  + b.width  * PC_KANT.venstre,
+                right:  b.right - b.width  * PC_KANT.hoyre,
+                top:    b.top   + b.height * PC_KANT.topp,
+                bottom: b.bottom - b.height * PC_KANT.bunn,
+            });
+        }
+        const term = document.getElementById('terminal-vindu');
+        if (term && !term.classList.contains('skjult')) {
+            // Terminalvinduet er en heldekkende boks - ingen kant å trekke fra.
+            hindringer.push(term.getBoundingClientRect());
+        }
+        for (const r of hindringer) {
+            const overlapper = vpLeft < r.right && vpLeft + w > r.left &&
+                               vpTop < r.bottom && vpTop + h > r.top;
+            if (!overlapper) continue;
+            const penOpp     = (vpTop + h) - r.top;   // hvor langt ned i hindringen lappen stikker
+            const penVenstre = (vpLeft + w) - r.left; // hvor langt inn fra venstre den stikker
+            if (penOpp <= penVenstre) {
+                vpTop = r.top - h;     // skyv opp, over PC-en
+            } else {
+                vpLeft = r.left - w;   // skyv til venstre, forbi PC-en
+            }
+        }
+        return { vpLeft, vpTop };
+    }
+
+    // Kast ut lapper som ALLEREDE ligger oppå PC-en/terminalen (fra start-
+    // plasseringen eller etter at vinduet endret størrelse), så de aldri
+    // havner bak/oppå PC-en.
+    function kastUtFraPC() {
+        const tavleRekt = tavle.getBoundingClientRect();
+        img.forEach(el => {
+            const er = el.getBoundingClientRect();
+            const w = el.offsetWidth, h = el.offsetHeight;
+            const res = holdUnnaPC(er.left, er.top, w, h);
+            if (res.vpLeft === er.left && res.vpTop === er.top) return; // lå ikke oppå
+            const nyLeft = Math.max(0, Math.min(res.vpLeft - tavleRekt.left, tavleRekt.width - w));
+            const nyTop  = Math.max(0, Math.min(res.vpTop  - tavleRekt.top,  tavleRekt.height - h));
+            el.style.right = 'auto';
+            el.style.left = nyLeft + 'px';
+            el.style.top = nyTop + 'px';
+        });
+    }
+    // Kjør når alt er lastet (PC-en finnes, bildene har fått størrelse) og
+    // hver gang tavla regnes om.
+    window.addEventListener('load', kastUtFraPC);
+    window.addEventListener('resize', kastUtFraPC);
+    window.addEventListener('orientationchange', kastUtFraPC);
+
     let isDragging = false;
     let currentImage = null;
     let offsetX, offsetY;
@@ -214,17 +406,29 @@
                 mouseHasMoved = true;
             }
 
-            let nyLeft = clientX - offsetX;
-            let nyTop = clientY - offsetY;
+            // Regn ut posisjonen RELATIVT TIL KORKTAVLA (ikke skjermen), siden
+            // lappene nå ligger inni .prosjekt-grid-boksen.
+            const tavleRekt = tavle.getBoundingClientRect();
+            let nyLeft = clientX - offsetX - tavleRekt.left;
+            let nyTop = clientY - offsetY - tavleRekt.top;
 
-            // Hold bildet innenfor skjermen, så det aldri havner utenfor
-            // (og dermed ikke gjør siden bredere / zoomer ut på telefon).
-            const maxLeft = window.innerWidth - currentImage.offsetWidth;
-            const maxTop = window.innerHeight - currentImage.offsetHeight;
+            // Hold lappen innenfor korktavla, så den aldri havner utenfor rammen.
+            const w = currentImage.offsetWidth;
+            const h = currentImage.offsetHeight;
+            const maxLeft = tavleRekt.width - w;
+            const maxTop = tavleRekt.height - h;
             nyLeft = Math.max(0, Math.min(nyLeft, maxLeft));
             nyTop = Math.max(0, Math.min(nyTop, maxTop));
 
-            // Bytt fra eventuell right/vw-plassering til ren px-styring
+            // Hold lappen unna PC-en/terminalen (regnes i skjerm-koordinater).
+            let vpLeft = tavleRekt.left + nyLeft;
+            let vpTop = tavleRekt.top + nyTop;
+            ({ vpLeft, vpTop } = holdUnnaPC(vpLeft, vpTop, w, h));
+            // tilbake til tavle-koordinater, og hold innenfor rammen igjen
+            nyLeft = Math.max(0, Math.min(vpLeft - tavleRekt.left, maxLeft));
+            nyTop = Math.max(0, Math.min(vpTop - tavleRekt.top, maxTop));
+
+            // Bytt fra eventuell right/%-plassering til ren px-styring
             currentImage.style.right = 'auto';
             currentImage.style.left = nyLeft + 'px';
             currentImage.style.top = nyTop + 'px';
