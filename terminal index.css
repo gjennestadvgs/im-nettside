@@ -226,10 +226,12 @@
    Når terminalen er lukket fungerer den som åpne-knapp. */
 #pc-forside #terminal-knapp {
     position: absolute;
-    left: 27%;
-    top: 16.5%;
-    width: 42.5%;
-    height: 41%;
+    /* Plassert nøyaktig på den mørke skjermflaten (målt fra pc-forside.png),
+       slik at teksten sentreres midt på skjermen og ikke litt til høyre. */
+    left: 29%;
+    top: 19%;
+    width: 34%;
+    height: 36%;
     right: auto;
     bottom: auto;
     border-radius: 0;
